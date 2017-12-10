@@ -1,0 +1,7 @@
+hutch:
+  - hutch.py
+  - cows.py
+
+experiment:
+  - tst12345
+  - toastfile
