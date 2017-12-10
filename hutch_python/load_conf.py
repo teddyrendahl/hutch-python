@@ -6,6 +6,19 @@ logger = logging.getLogger(__name__)
 
 
 def load(filename):
+    """
+    Load the hutch-specific conf.yml file.
+
+    Parameters
+    ----------
+    filename: str
+        Path the conf.yml file
+
+    Returns
+    -------
+    objs: list
+        All objects defined by the file
+    """
     with open(filename, 'r') as f:
         conf = yaml.load(f)[0]
     all_objs = []
