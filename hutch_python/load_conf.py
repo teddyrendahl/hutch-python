@@ -16,24 +16,24 @@ def load(filename):
 
     Returns
     -------
-    objs: list
-        All objects defined by the file
+    objs: dict{str: Object}
+        All objects defined by the file, separated by original yml header.
     """
     with open(filename, 'r') as f:
         conf = yaml.load(f)[0]
-    all_objs = []
-    for module, info in conf.items():
+    all_objs = {}
+    for header, info in conf.items():
         objs = []
         try:
-            loader = importlib.import_module('hutch_python.yaml_' + module)
+            loader = importlib.import_header('hutch_python.yaml_' + header)
         except ImportError:
             err = 'ImportError when including %s. Skipping.'
-            logger.exception(err, module)
+            logger.exception(err, header)
             continue
         try:
             objs = loader.load_objs(info)
         except Exception:
             err = 'Exception thrown when building %s objects. Skipping'
-            logger.exception(err, module)
+            logger.exception(err, header)
             continue
-        all_objs.extend(objs)
+        all_objs[header] = objs
