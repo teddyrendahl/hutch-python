@@ -5,3 +5,14 @@ hutch:
 experiment:
   - tst12345
   - toastfile
+
+namespace:
+  experiment:
+    - x
+    - user
+  class:
+    float:
+      - floats
+      - fl
+    int:
+      - ints

@@ -68,3 +68,19 @@ def extract_objs(module_name):
         except AttributeError:
             pass
     return objs
+
+
+def assign_names(objs):
+    name_dict = {}
+    for obj in objs:
+        name = assign_name(obj)
+        name_dict[name] = obj
+    return name_dict
+
+
+def assign_name(obj):
+    try:
+        name = obj.name
+    except AttributeError:
+        name = type(obj).__name__.lower()
+    return name
