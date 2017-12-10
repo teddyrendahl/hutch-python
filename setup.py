@@ -7,5 +7,7 @@ setup(name='hutch-python',
       license='BSD',
       author='SLAC National Accelerator Laboratories',
       packages=find_packages(),
-      description='Laucher and Config Reader for LCLS Python 3 Interactive IPython Sessions',
+      description=('Launcher and Config Reader for '
+                   'LCLS Interactive IPython Sessions'),
+      scripts=['bin/hutch-python']
       )
