@@ -124,7 +124,7 @@ def find_class(class_path):
     -------
     cls: type
     """
-    if "." in class_path:
+    if '.' in class_path:
         parts = class_path.split('.')
         module_path = '.'.join(parts[:-1])
         class_name = parts[-1]
