@@ -71,6 +71,19 @@ def extract_objs(module_name):
 
 
 def assign_names(objs):
+    """
+    Given a list of objects, either find their name or assign a name based on
+    their class.
+
+    Parameters
+    ----------
+    objs: list of Object
+
+    Returns
+    -------
+    names: dict
+        Mapping of name to object
+    """
     name_dict = {}
     for obj in objs:
         name = assign_name(obj)
@@ -79,8 +92,43 @@ def assign_names(objs):
 
 
 def assign_name(obj):
+    """
+    Find an object's name or assign a name based on the class.
+
+    Parameters
+    ----------
+    obj: Object
+
+    Returns
+    -------
+    name: str
+    """
     try:
         name = obj.name
     except AttributeError:
         name = type(obj).__name__.lower()
     return name
+
+
+def find_class(class_path):
+    """
+    Given a string class name, either return the matching built-in type or
+    import the correct module and return the type.
+
+    Parameters
+    ----------
+    class_path: str
+        Built-in type name or import path e.g. ophyd.device.Device
+
+    Returns
+    -------
+    cls: type
+    """
+    if "." in class_path:
+        parts = class_path.split('.')
+        module_path = '.'.join(parts[:-1])
+        class_name = parts[-1]
+        module = importlib.import_module(module_path)
+        return getattr(module, class_name)
+    else:
+        return eval(class_path)
