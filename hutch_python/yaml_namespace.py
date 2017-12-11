@@ -59,6 +59,7 @@ class NameSpaceAssembler:
                     continue
                 spaces = assemble(objs, opts)
             all_spaces.update(spaces)
+        return all_spaces
 
     def source_space(self, objs, opts):
         """
