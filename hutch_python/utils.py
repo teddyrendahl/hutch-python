@@ -60,13 +60,10 @@ def extract_objs(module_name):
         return objs
     all_kwd = getattr(module, '__all__', None)
     if all_kwd is None:
-        all_kwd = (a for a in dir(module) if a[0] != '_')
-    for name in all_kwd:
-        try:
-            obj = module.name
-            objs.append(obj)
-        except AttributeError:
-            pass
+        all_kwd = [a for a in dir(module) if a[0] != '_']
+    for attr in all_kwd:
+        obj = getattr(module, attr)
+        objs.append(obj)
     return objs
 
 
