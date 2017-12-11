@@ -1,4 +1,4 @@
-import utils
+from . import utils
 
 
 def load_objs(info):

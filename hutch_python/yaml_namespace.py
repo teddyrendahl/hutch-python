@@ -1,7 +1,7 @@
 from types import SimpleNamespace
 import logging
 
-import utils
+from . import utils
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +60,7 @@ class NameSpaceAssembler:
                 spaces = assemble(objs, opts)
             all_spaces.update(spaces)
 
-    def source_space(objs, opts):
+    def source_space(self, objs, opts):
         """
         Group objects into namespaces by source. This is the trivial one since
         we group them by source as we create them. To reach this block, we need
@@ -86,7 +86,7 @@ class NameSpaceAssembler:
             namespaces[space_name] = SimpleNamespace(**named_obj)
         return namespaces
 
-    def class_space(objs, opts):
+    def class_space(self, objs, opts):
         """
         Group objects into namespaces by Python type. Subclasses are included.
 
@@ -107,15 +107,29 @@ class NameSpaceAssembler:
             Mapping from namespace name to namespace
         """
         namespaces = {}
-        for class_path, name in opts.items():
+        for class_path, names in opts.items():
             space_info = {}
+            target_class = utils.find_class(class_path)
             for object_group in objs.values():
                 if isinstance(object_group, list):
-                    space_info.update(utils.assign_names(object_group))
+                    good_obj_list = []
+                    for obj in object_group:
+                        if isinstance(obj, target_class):
+                            good_obj_list.append(obj)
+                    if good_obj_list:
+                        space_info.update(utils.assign_names(good_obj_list))
                 elif isinstance(object_group, dict):
-                    space_info.update(object_group)
+                    good_obj_dict = {}
+                    for name, obj in object_group.items():
+                        if isinstance(obj, target_class):
+                            good_obj_dict[name] = obj
+                    space_info.update(good_obj_dict)
+                elif isinstance(object_group, NameSpaceAssembler):
+                    continue
                 else:
-                    raise TypeError('Invalid type %s in arg to class_space',
-                                    type(objs))
-            namespaces[name] = SimpleNamespace(**space_info)
+                    err = 'Invalid type {} in arg to class_space'
+                    raise TypeError(err.format(type(object_group)))
+            names = utils.interpret_list(names)
+            for name in names:
+                namespaces[name] = SimpleNamespace(**space_info)
         return namespaces
