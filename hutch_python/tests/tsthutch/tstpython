@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+hutch-python --cfg conf.yml
