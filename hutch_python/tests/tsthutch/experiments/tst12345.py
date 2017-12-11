@@ -4,3 +4,5 @@ def cool_scan():
 
 def _wow_hide_me():
     pass
+
+some_number = 234.03
