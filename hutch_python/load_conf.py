@@ -37,3 +37,10 @@ def load(filename):
             logger.exception(err, header)
             continue
         all_objs[header] = objs
+    assembler = all_objs.get('namespace', None)
+    if assembler is None:
+        namespaces = {}
+    else:
+        namespaces = assembler(all_objs)
+    all_objs.update(namespaces)
+    return all_objs
