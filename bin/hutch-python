@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+import os
+import sys
 import argparse
 
 import IPython
@@ -12,13 +14,19 @@ parser.add_argument('--cfg', required=True,
                     help='Configuration yaml file')
 args = parser.parse_args()
 
+# Make sure the hutch's directory is in the path
+sys.path.insert(0, os.getcwd())
+
 # Load objects from the configuration file
 objs = load(args.cfg)
 
 # Remove modules and other objects from the global namespace
 # After this, should ONLY have IPython and objs
+del os
+del sys
 del argparse
 del load
+del parser
 del args
 
 # Install objects into the global namespace
