@@ -20,12 +20,12 @@ def load(filename):
         All objects defined by the file, separated by original yml header.
     """
     with open(filename, 'r') as f:
-        conf = yaml.load(f)[0]
+        conf = yaml.load(f)
     all_objs = {}
     for header, info in conf.items():
         objs = []
         try:
-            loader = importlib.import_header('hutch_python.yaml_' + header)
+            loader = importlib.import_module('hutch_python.yaml_' + header)
         except ImportError:
             err = 'ImportError when including %s. Skipping.'
             logger.exception(err, header)
