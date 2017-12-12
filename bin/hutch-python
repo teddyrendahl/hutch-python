@@ -18,10 +18,10 @@ args = parser.parse_args()
 sys.path.insert(0, os.getcwd())
 
 # Load objects from the configuration file
-objs = load(args.cfg)
+_ = load(args.cfg)
 
 # Remove modules and other objects from the global namespace
-# After this, should ONLY have IPython and objs
+# After this, should ONLY have IPython and _
 del os
 del sys
 del argparse
@@ -30,5 +30,6 @@ del parser
 del args
 
 # Install objects into the global namespace
-globals().update(objs)
+globals().update(_)
+del _
 IPython.embed()
