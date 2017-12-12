@@ -3,7 +3,7 @@ from . import utils
 
 def load_objs(info):
     """
-    Load the hutch.py file for generic hutch-specific includes.
+    Load arbitrary files for generic hutch-specific includes.
     """
     objs = {}
     files = utils.interpret_list(info)

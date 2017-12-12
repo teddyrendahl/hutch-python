@@ -25,6 +25,14 @@ def load(filename):
     """
     with open(filename, 'r') as f:
         conf = yaml.load(f)
+    return read_conf(conf)
+
+
+def read_conf(conf):
+    """
+    Separate this from load to make it easier to test without tons of temp
+    files.
+    """
     all_objs = {}
     for header, info in conf.items():
         objs = {}
