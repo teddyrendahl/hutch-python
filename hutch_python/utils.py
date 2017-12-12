@@ -48,9 +48,10 @@ def extract_objs(module_name):
 
     Returns
     -------
-    objs: list of Objects
+    objs: dict
+        Mapping from name in file to object
     """
-    objs = []
+    objs = {}
     # Allow filenames
     module_name = module_name.strip('.py')
     try:
@@ -63,7 +64,7 @@ def extract_objs(module_name):
         all_kwd = [a for a in dir(module) if a[0] != '_']
     for attr in all_kwd:
         obj = getattr(module, attr)
-        objs.append(obj)
+        objs[attr] = obj
     return objs
 
 

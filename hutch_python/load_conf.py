@@ -47,7 +47,7 @@ def load(filename):
             mapping = utils.assign_names(object_grouping)
             return_dict.update(mapping)
         elif isinstance(object_grouping, dict):
-            return_dict.update(mapping)
+            return_dict.update(object_grouping)
     assembler = all_objs.get('namespace', None)
     if assembler is not None:
         namespaces = assembler(all_objs)
