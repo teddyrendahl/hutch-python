@@ -27,7 +27,7 @@ def load(filename):
         conf = yaml.load(f)
     all_objs = {}
     for header, info in conf.items():
-        objs = []
+        objs = {}
         try:
             loader = importlib.import_module('hutch_python.yaml_' + header)
         except ImportError:

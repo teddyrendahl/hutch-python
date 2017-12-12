@@ -69,8 +69,8 @@ class NameSpaceAssembler:
 
         Parameters
         ----------
-        objs: list
-            List of objects under the chosen header
+        objs: dict
+            Mapping of name to object under the chosen header
 
         opts: list
             List of names to alias this namespace
@@ -82,9 +82,8 @@ class NameSpaceAssembler:
         """
         namespaces = {}
         namespace_names = utils.interpret_list(opts)
-        named_obj = utils.assign_names(objs)
         for space_name in namespace_names:
-            namespaces[space_name] = SimpleNamespace(**named_obj)
+            namespaces[space_name] = SimpleNamespace(**objs)
         return namespaces
 
     def class_space(self, objs, opts):
