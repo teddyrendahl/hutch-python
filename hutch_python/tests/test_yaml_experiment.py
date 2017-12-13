@@ -10,3 +10,11 @@ def test_load_experiment():
     info = ['sample_expname']
     objs = load_objs(info)
     assert 'sample_plan' in objs
+    assert 'another' in objs
+    info = ['sample_expname.sample_plan']
+    objs = load_objs(info)
+    assert 'sample_plan' in objs
+    assert 'another' not in objs
+    info = ['sample_expname.sample_plan()']
+    objs = load_objs(info)
+    assert objs['sample_plan'] == 5

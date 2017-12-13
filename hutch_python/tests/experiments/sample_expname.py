@@ -1,3 +1,6 @@
 def sample_plan():
-    return
-    yield None
+    return 5
+
+
+def another():
+    return 4
