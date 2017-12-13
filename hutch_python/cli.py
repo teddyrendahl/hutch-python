@@ -17,7 +17,8 @@ def setup_cli_env():
     sys.path.insert(0, os.getcwd())
 
     # Set up logging
-    setup_logging()
+    log_dir = os.path.join(os.path.dirname(args.cfg), 'logs')
+    setup_logging(dir_logs=log_dir)
 
     # Load objects from the configuration file
     return load(args.cfg)
