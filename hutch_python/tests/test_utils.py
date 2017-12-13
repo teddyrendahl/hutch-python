@@ -21,12 +21,12 @@ def test_interpret_list():
 def test_extract_objs():
     logger.debug('test_extract_objs')
     # Has no __all__ keyword
-    objs = utils.extract_objs('test_module_1')
+    objs = utils.extract_objs('sample_module_1')
     assert objs == dict(hey='4horses',
                         milk='cows',
                         some_int=5)
     # Has an __all__ keyword
-    objs = utils.extract_objs('test_module_2.py')
+    objs = utils.extract_objs('sample_module_2.py')
     assert objs == dict(just_this=5.0)
     # Doesn't exist
     objs = utils.extract_objs('fake_module_243esd')
