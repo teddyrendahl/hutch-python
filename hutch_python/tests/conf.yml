@@ -1,0 +1,14 @@
+file:
+  - sample_module_1.py
+  - sample_module_2.py
+experiment:
+  - sample_expname
+namespace:
+  file:
+    - cat
+    - dog
+  class:
+    float:
+      - flt
+    str:
+      - sting
