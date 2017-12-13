@@ -1,6 +1,7 @@
 import os
 import logging
 import logging.handlers
+import logging.config
 from pathlib import Path
 
 import yaml
@@ -48,7 +49,7 @@ def absolute_submodule_path(submodule, cur_dir=os.path.realpath(__file__)):
 
 
 DIR_MODULE = Path(absolute_submodule_path("hutch-python/"))
-DIR_LOGS = DIR_MODULE / "logs"
+DIR_LOGS = DIR_MODULE / "hutch_python/logs"
 
 
 def setup_logging(path_yaml=None, dir_logs=None, default_level=logging.INFO):

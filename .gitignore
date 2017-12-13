@@ -104,4 +104,4 @@ ENV/
 *.swp
 
 # None of the logs 
-/logs/*
+logs
