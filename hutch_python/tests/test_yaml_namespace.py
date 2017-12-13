@@ -13,7 +13,7 @@ info = {'catagory': ['cat', 'dog'],
                   'str': ['sting']}}
 
 
-@pytest.fixture(scope='func')
+@pytest.fixture(scope='function')
 def assembler():
     return NameSpaceAssembler(info)
 
