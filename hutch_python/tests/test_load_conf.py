@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 def test_load_normal():
     logger.debug('test_load_normal')
-    objs = load(os.path.join(__file__, 'conf.yml'))
+    objs = load(os.path.join(os.path.dirname(__file__), 'conf.yml'))
     assert objs['hey'] == '4horses'
     assert objs['milk'] == 'cows'
     assert objs['some_int'] == 5
