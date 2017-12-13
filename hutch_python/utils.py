@@ -61,7 +61,7 @@ def extract_objs(module_name):
     # Allow filenames
     module_name = module_name.strip('.py')
     if '()' in module_name:
-        module_name.strip('()')
+        module_name = module_name.strip('()')
         call_me = True
     else:
         call_me = False
