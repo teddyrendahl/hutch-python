@@ -47,4 +47,11 @@ def test_assign_names():
 
 
 def test_find_class():
-    pass
+    logger.debug('test_find_class')
+    # Find some standard type that needs an import
+    found_Request = utils.find_class('urllib.request.Request')
+    from urllib.request import Request
+    assert found_Request is Request
+    # Find some built-in type
+    found_float = utils.find_class('float')
+    assert found_float is float
