@@ -32,6 +32,11 @@ def read_conf(conf):
     """
     Separate this from load to make it easier to test without tons of temp
     files.
+
+    Parameters
+    ----------
+    conf: dict
+        dict interpretation of the original yaml file
     """
     all_objs = {}
     for header, info in conf.items():

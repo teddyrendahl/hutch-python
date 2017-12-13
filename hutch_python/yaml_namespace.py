@@ -11,6 +11,11 @@ def load_objs(info):
     Create a NameSpaceAssembler object based on the info from the
     yaml file. This will be used in the post-initialization step to organize
     objects into namespaces.
+
+    Parameters
+    ----------
+    info: dict
+        Mapping from str namespace type to the specific options
     """
     return NameSpaceAssembler(info)
 
