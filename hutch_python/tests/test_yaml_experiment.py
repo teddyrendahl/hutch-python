@@ -9,4 +9,4 @@ def test_load_experiment():
     logger.debug('test_load_experiment')
     info = ['sample_expname']
     objs = load_objs(info)
-    assert 'some_plan' in objs
+    assert 'sample_plan' in objs
