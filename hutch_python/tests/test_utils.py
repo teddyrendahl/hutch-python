@@ -33,14 +33,14 @@ def test_extract_objs():
     assert objs == {}
 
 
-class Test:
+class Named:
     def __init__(self, *, name):
         self.name = name
 
 
 def test_assign_names():
     logger.debug('test_assign_names')
-    obj = Test(name='Karl')
+    obj = Named(name='Karl')
     num = 2.3
     name_dict = utils.assign_names([obj, num])
     assert name_dict == dict(Karl=obj, float=num)
