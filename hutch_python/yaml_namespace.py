@@ -55,8 +55,14 @@ class NameSpaceAssembler:
         all_spaces = {}
         for space, opts in self.info.items():
             spaces = {}
-            if space in objs:
-                spaces = self.source_space(objs[space], opts)
+            assemble = getattr(self, space + "_space", None)
+            if assemble is None:
+                if space in objs:
+                    spaces = self.source_space(objs[space], opts)
+                else:
+                    err = 'Nothing for namespace "%s". Either invalid or empty.'
+                    logger.error(err, space)
+                    all_spaces.update({space: SimpleNamespace()})
             else:
                 assemble = getattr(self, space + "_space", None)
                 if assemble is None:
