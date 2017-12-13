@@ -2,11 +2,14 @@
 import os
 import sys
 import argparse
+import logging
 
 import IPython
 
 from hutch_python.load_conf import load
+from hutch_python.log_setup import setup_logging
 
+logger = logging.get_logger(__name__)
 
 # Parse the user's arguments
 parser = argparse.ArgumentParser(description='Launch LCLS Hutch Python')
@@ -17,17 +20,23 @@ args = parser.parse_args()
 # Make sure the hutch's directory is in the path
 sys.path.insert(0, os.getcwd())
 
+# Set up logging
+setup_logging()
+logger.debug('launching hutch-python')
+
 # Load objects from the configuration file
 _ = load(args.cfg)
 
 # Remove modules and other objects from the global namespace
-# After this, should ONLY have IPython and _
+# After this, should ONLY have IPython, logger, and _
 del os
 del sys
 del argparse
+del logging
 del load
 del parser
 del args
+del setup_logging
 
 # Install objects into the global namespace
 globals().update(_)
