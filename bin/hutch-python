@@ -9,6 +9,7 @@ _ = setup_cli_env()
 del setup_cli_env
 
 globals().update(_)
+del _
 
 logger = logging.getLogger(__name__)
 logger.debug('launching hutch-python')
