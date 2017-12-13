@@ -9,7 +9,7 @@ import IPython
 from hutch_python.load_conf import load
 from hutch_python.log_setup import setup_logging
 
-logger = logging.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 # Parse the user's arguments
 parser = argparse.ArgumentParser(description='Launch LCLS Hutch Python')

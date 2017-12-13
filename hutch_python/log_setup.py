@@ -1,5 +1,4 @@
 import os
-import inspect
 import logging
 import logging.handlers
 from pathlib import Path
@@ -21,7 +20,7 @@ class RotatingFileHandlerRelativePath(logging.handlers.RotatingFileHandler):
         super().__init__(filename_full, *args, **kwargs)
 
 
-def absolute_submodule_path(submodule, cur_dir=inspect.stack()[0][1]):
+def absolute_submodule_path(submodule, cur_dir=os.path.realpath(__file__)):
     """
     Returns the absolute path of the inputted hutch-python submodule
     based on an inputted absolute path, or the absolute path of this file.
