@@ -42,7 +42,7 @@ def read_conf(conf):
     for header, info in conf.items():
         objs = {}
         try:
-            loader = importlib.import_module('hutch_python.yaml_' + header)
+            loader = importlib.import_module('hutch_python.plugins.' + header)
         except ImportError:
             err = 'ImportError when including %s. Skipping.'
             logger.exception(err, header)
