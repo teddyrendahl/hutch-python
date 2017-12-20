@@ -1,14 +1,15 @@
 import logging
 
-from hutch_python.yaml_file import load_objs
+from hutch_python.plugins.load import Plugin
 
 logger = logging.getLogger(__name__)
 
 
-def test_load_load():
-    logger.debug('test_file_load')
-    info = ['sample_module_1.py', 'sample_module_2.py']
-    objs = load_objs(info)
+def test_load_plugin():
+    logger.debug('test_load_plugin')
+    info = ['sample_module_1', 'sample_module_2.py']
+    plugin = Plugin(info)
+    objs = plugin.get_objects()
     assert objs['hey'] == '4horses'
     assert objs['milk'] == 'cows'
     assert objs['some_int'] == 5

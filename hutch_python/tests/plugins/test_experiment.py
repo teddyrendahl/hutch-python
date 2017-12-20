@@ -1,20 +1,42 @@
 import logging
 
-from hutch_python.yaml_experiment import load_objs
+from hutch_python.plugins.experiment import Plugin
 
 logger = logging.getLogger(__name__)
 
 
-def test_load_experiment():
-    logger.debug('test_load_experiment')
-    info = ['sample_expname']
-    objs = load_objs(info)
+def test_experiment_plugin():
+    logger.debug('test_experiment_plugin')
+
+    info = {'name': 'sample_expname',
+            'import': 'experiment'}
+    plugin = Plugin(info)
+    objs = plugin.get_objects()
     assert 'sample_plan' in objs
     assert 'another' in objs
-    info = ['sample_expname.sample_plan']
-    objs = load_objs(info)
+
+    info = {'name': 'sample_expname',
+            'import': 'experiment.sample_plan'}
+    plugin = Plugin(info)
+    objs = plugin.get_objects()
     assert 'sample_plan' in objs
     assert 'another' not in objs
-    info = ['sample_expname.sample_plan()']
-    objs = load_objs(info)
+
+    info = {'name': 'sample_expname',
+            'import': 'experiment.sample_plan()'}
+    plugin = Plugin(info)
+    objs = plugin.get_objects()
     assert objs['sample_plan'] == 5
+
+    info = {'name': 'sample_expname',
+            'import': 'experiment as x'}
+    plugin = Plugin(info)
+    objs = plugin.get_objects()
+    assert 'x' in objs
+
+    info = {'name': 'sample_expname',
+            'import': 'experiment.sample_plan as x, y'}
+    plugin = Plugin(info)
+    objs = plugin.get_objects()
+    assert 'x' in objs
+    assert 'y' in objs
