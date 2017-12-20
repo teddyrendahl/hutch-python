@@ -24,12 +24,11 @@ def test_read_empty():
 
 def test_read_duplicate():
     logger.debug('test_read_duplicate')
-    objs = read_conf({'file': ['sample_module_1.py', 'sample_module_1.py']})
+    objs = read_conf({'load': ['sample_module_1.py', 'sample_module_1.py']})
     assert len(objs) == 3
 
 
 def test_read_only_namespaces():
     logger.debug('test_read_only_namespaces')
-    objs = read_conf({'namespace': {'happi': {'lcls': ['beamline']},
-                                    'class': {'float': ['flt']}}})
+    objs = read_conf({'namespace': {'class': {'float': ['text', 'words']}}})
     assert len(objs) == 2
