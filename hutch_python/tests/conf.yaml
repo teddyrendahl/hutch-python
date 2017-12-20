@@ -16,10 +16,11 @@ load:
   - hutch.py
 
 experiment:
-  number: automatic
+  #number: automatic
+  number: mfxx000
   import: experiment.User() as x
-  features:
-    - pswww
+  #features:
+  #  - pswww
 
 namespace:
   class:
@@ -35,6 +36,12 @@ namespace:
     pcdsdevices.Slits:
       - s
       - slits
+    ophyd.sim.SynSignal:
+      - f
+      - fake
+    ophyd.sim.SynAxis:
+      - f
+      - fake
   happi:
     lcls:
       - beamline

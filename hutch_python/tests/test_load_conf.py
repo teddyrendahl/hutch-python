@@ -9,15 +9,11 @@ logger = logging.getLogger(__name__)
 def test_load_normal():
     logger.debug('test_load_normal')
     objs = load(os.path.join(os.path.dirname(__file__), 'conf.yml'))
-    assert objs['hey'] == '4horses'
-    assert objs['milk'] == 'cows'
-    assert objs['some_int'] == 5
-    assert objs['just_this'] == 5.0
-    assert 'sample_plan' in objs
-    assert 'cat' in objs
-    assert 'dog' in objs
-    assert 'flt' in objs
-    assert 'sting' in objs
+    should_have = ('x', 's', 'scripts', 'm', 'motors', 'p', 'pims', 's',
+                   'slits', 'f', 'fake', 'lcls', 'fake_motor', 'fake_det',
+                   'unique_device', 'calc_thing')
+    for elem in should_have:
+        assert elem in objs
 
 
 def test_read_empty():
@@ -34,6 +30,6 @@ def test_read_duplicate():
 
 def test_read_only_namespaces():
     logger.debug('test_read_only_namespaces')
-    objs = read_conf({'namespace': {'file': ['beamline'],
+    objs = read_conf({'namespace': {'happi': {'lcls': ['beamline']},
                                     'class': {'float': ['flt']}}})
     assert len(objs) == 2
