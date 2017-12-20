@@ -1,14 +1,39 @@
-file:
-  - sample_module_1.py
-  - sample_module_2.py
+daq:
+  lcls: 1
+  platform: 4
+
+happi:
+  beamline:
+    - FEE
+    - HXD
+    - MFX
+
+lightpath: MFX
+
+load:
+  - hutch.py
+
 experiment:
-  - sample_expname
+  number: automatic
+  import: experiment.User() as x
+  features:
+    - pswww
+
 namespace:
-  file:
-    - cat
-    - dog
   class:
-    float:
-      - flt
-    str:
-      - sting
+    function:
+      - s
+      - scripts
+    ophyd.PositionerBase:
+      - m
+      - motors
+    pcdsdevices.PIM:
+      - p
+      - pims
+    pcdsdevices.Slits:
+      - s
+      - slits
+  happi:
+    lcls:
+      - beamline
+      - stand
