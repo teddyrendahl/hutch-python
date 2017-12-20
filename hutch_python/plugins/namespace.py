@@ -1,146 +1,75 @@
 from types import SimpleNamespace
 import logging
 
+from ..base_plugin import BasePlugin
 from .. import utils
 
 logger = logging.getLogger(__name__)
 
 
-def load_objs(info):
+class Plugin(BasePlugin):
     """
-    Create a NameSpaceAssembler object based on the info from the
-    yaml file. This will be used in the post-initialization step to organize
-    objects into namespaces.
-
-    Parameters
-    ----------
-    info: dict
-        Mapping from str namespace type to the specific options
+    Plugin to organize the user namespaces
     """
-    return NameSpaceAssembler(info)
+    priority = 10
+    name = 'namespace'
 
-
-class NameSpaceAssembler:
-    """
-    Used in post-initialization to organize objects into namespaces.
-    """
-    def __init__(self, info):
-        """
-        Parameters
-        ----------
-        info: dict
-            Mapping from namespace catagory to options. This should come from
-            loading a yaml file, and should be the sub-dictionary under the
-            top-level namespace key.
-        """
-        self.info = info
-
-    def __call__(self, objs):
-        return self.assemble(objs)
-
-    def assemble(self, objs):
-        """
-        Parameters
-        ----------
-        objs: dict
-            Mapping from top-level yaml header to either lists of objects or
-            dictionaries that map name to object. This should exhaustively
-            include all the objects that we've loaded.
-
-        Returns
-        -------
-        namespaces: dict
-            Mapping from namespace name to namespace
-        """
-        all_spaces = {}
+    def get_objects(self):
+        return_objs = {}
+        self.namespace_managers = []
         for space, opts in self.info.items():
-            spaces = {}
-            assemble = getattr(self, space + "_space", None)
-            if assemble is None:
-                if space in objs:
-                    spaces = self.source_space(objs[space], opts)
-                else:
-                    err = 'Nothing for namespace "%s". Either invalid or empty.'
-                    logger.error(err, space)
-                    all_spaces.update({space: SimpleNamespace()})
+            if space == 'class':
+                objs, managers = self.get_class_objects(opts)
             else:
-                assemble = getattr(self, space + "_space", None)
-                if assemble is None:
-                    logger.error('No handler for namespace %s', space)
-                    continue
-                spaces = assemble(objs, opts)
-            all_spaces.update(spaces)
-        return all_spaces
+                err = 'Namespace {} not defined'
+                logger.warning(err.format(space))
+                continue
+            return_objs.update(objs)
+            self.namespace_managers.extend(managers)
+        return return_objs
 
-    def source_space(self, objs, opts):
-        """
-        Group objects into namespaces by source. This is the trivial one since
-        we group them by source as we create them. To reach this block, we need
-        a subheader under namespace that matches a previous top-level header.
+    def future_object_hook(self, name, obj):
+        for manager in self.namespace_managers:
+            manager.add(name, obj)
 
-        Parameters
-        ----------
-        objs: dict
-            Mapping of name to object under the chosen header
+    def get_class_objects(self, opts):
+        objs = {}
+        managers = []
+        for cls_name, space_names in opts.items():
+            try:
+                cls = utils.find_class(cls_name)
+            except Exception:
+                cls = None
+                err = 'Type {} could not be loaded'
+                logger.exception(err.format(cls_name))
+                continue
+            namespace = SimpleNamespace()
+            for name in space_names:
+                objs[name] = namespace
+            manager = ClassNamespaceManager(namespace, cls)
+            managers.append(manager)
+        return objs, managers
 
-        opts: list
-            List of names to alias this namespace
 
-        Returns
-        -------
-        namespaces: dict
-            Mapping from namespace name to namespace
-        """
-        namespaces = {}
-        namespace_names = utils.interpret_list(opts)
-        for space_name in namespace_names:
-            namespaces[space_name] = SimpleNamespace(**objs)
-        return namespaces
+class NamespaceManager:
+    def __init__(self, namespace):
+        self.namespace = namespace
 
-    def class_space(self, objs, opts):
-        """
-        Group objects into namespaces by Python type. Subclasses are included.
+    def should_include(self, name, obj):
+        return False
 
-        Parameters
-        ----------
-        objs: dict
-            Mapping from source header to list of objects or dict of name to
-            object.
+    def add(self, name, obj):
+        if self.should_include(name, obj):
+            setattr(self.namespace, name, obj)
 
-        opts: dict
-            Mapping from type to namespace aliases. Types must be represented
-            as strings, so they either must be built-ins or importable from the
-            string path.
 
-        Returns
-        -------
-        namespaces: dict
-            Mapping from namespace name to namespace
-        """
-        namespaces = {}
-        for class_path, names in opts.items():
-            space_info = {}
-            target_class = utils.find_class(class_path)
-            for object_group in objs.values():
-                if isinstance(object_group, list):
-                    good_obj_list = []
-                    for obj in object_group:
-                        if isinstance(obj, target_class):
-                            good_obj_list.append(obj)
-                    if good_obj_list:
-                        space_info.update(utils.assign_names(good_obj_list))
-                elif isinstance(object_group, dict):
-                    good_obj_dict = {}
-                    for name, obj in object_group.items():
-                        if isinstance(obj, target_class):
-                            good_obj_dict[name] = obj
-                    space_info.update(good_obj_dict)
-                elif isinstance(object_group, NameSpaceAssembler):
-                    continue
-                else:
-                    err = 'Invalid type {} in arg to class_space'
-                    raise TypeError(err.format(type(object_group)))
-            names = utils.interpret_list(names)
-            for name in names:
-                namespaces[name] = SimpleNamespace(**space_info)
-        return namespaces
+class ClassNamespaceManager(NamespaceManager):
+    def __init__(self, namespace, cls):
+        super().__init__(namespace)
+        self.cls = cls
+
+    def should_include(self, name, obj):
+        if isinstance(obj, self.cls):
+            return True
+        else:
+            return False

@@ -16,8 +16,8 @@ load:
   - hutch.py
 
 experiment:
-  #number: automatic
-  number: mfxx000
+  #name: automatic
+  name: mfxx000
   import: experiment.User() as x
   #features:
   #  - pswww

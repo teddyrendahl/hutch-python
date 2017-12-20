@@ -1,10 +1,11 @@
-class Plugin:
+class BasePlugin:
     """
     Interface for each top-level entry in the conf.yaml file.
     """
     # Plugins with high priority numbers will be created first.
     # Plugins with equal priority numbers will be created in sequence.
     priority = 0
+    name = None
 
     def __init__(self, info):
         """

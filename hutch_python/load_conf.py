@@ -1,8 +1,9 @@
-import yaml
-import importlib
 import logging
+import yaml
+from importlib import import_module
+from collections import defaultdict
 
-from . import utils
+import hutch_python
 
 logger = logging.getLogger(__name__)
 
@@ -38,31 +39,41 @@ def read_conf(conf):
     conf: dict
         dict interpretation of the original yaml file
     """
-    all_objs = {}
-    for header, info in conf.items():
-        objs = {}
+    hutch_python.clear_load()
+    all_objects = hutch_python.objects
+    plugins = defaultdict(list)
+
+    for plugin_name, info in conf.items():
         try:
-            loader = importlib.import_module('hutch_python.plugins.' + header)
+            module = import_module('hutch_python.plugins.' + plugin_name)
         except ImportError:
-            err = 'ImportError when including %s. Skipping.'
-            logger.exception(err, header)
+            module = None
+            err = 'Plugin {} is not available, skipping'
+            logger.warning(err.format(plugin_name))
             continue
-        try:
-            objs = loader.load_objs(info)
-        except Exception:
-            err = 'Exception thrown when building %s objects. Skipping'
-            logger.exception(err, header)
-            continue
-        all_objs[header] = objs
-    return_dict = {}
-    for object_grouping in all_objs.values():
-        if isinstance(object_grouping, list):
-            mapping = utils.assign_names(object_grouping)
-            return_dict.update(mapping)
-        elif isinstance(object_grouping, dict):
-            return_dict.update(object_grouping)
-    assembler = all_objs.get('namespace', None)
-    if assembler is not None:
-        namespaces = assembler(all_objs)
-        return_dict.update(namespaces)
-    return return_dict
+        this_plugin = module.Plugin(info)
+        plugins[this_plugin.priority].append(this_plugin)
+
+    plugin_priorities = reversed(sorted(list(plugins.keys())))
+    executed_plugins = []
+
+    for prio in plugin_priorities:
+        for this_plugin in plugins[prio]:
+            try:
+                objs = this_plugin.get_objects()
+            except Exception:
+                objs = None
+                err = 'Plugin {} failed to load, skipping'
+                logger.error(err.format(this_plugin.name))
+                continue
+            for past_plugin in executed_plugins:
+                try:
+                    past_plugin.future_plugin_hook(this_plugin.name, objs)
+                except Exception:
+                    err = 'Plugin {} post-hook failed for plugin {}'
+                    logger.error(err.format(past_plugin.name,
+                                            this_plugin.name))
+            executed_plugins.append(this_plugin)
+            all_objects.__dict__.update(objs)
+
+    return all_objects.__dict__
