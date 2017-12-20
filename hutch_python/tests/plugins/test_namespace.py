@@ -6,7 +6,7 @@ from hutch_python.plugins.namespace import Plugin
 logger = logging.getLogger(__name__)
 
 
-def test_namespace_plugin_class(assembler):
+def test_namespace_plugin_class():
     logger.debug('test_namespace_plugin_class')
     objs = {'catagory': {'one': 1, 'two': 2.0, 'three': '3'},
             'my_list': ['apples', 4]}
