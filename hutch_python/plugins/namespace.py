@@ -1,4 +1,5 @@
 from types import SimpleNamespace
+import inspect
 import logging
 
 from ..base_plugin import BasePlugin
@@ -37,7 +38,10 @@ class Plugin(BasePlugin):
         managers = []
         for cls_name, space_names in opts.items():
             try:
-                cls = utils.find_class(cls_name)
+                if cls_name == 'function':
+                    cls = 'function'
+                else:
+                    cls = utils.find_class(cls_name)
             except Exception:
                 cls = None
                 err = 'Type {} could not be loaded'
@@ -69,7 +73,12 @@ class ClassNamespaceManager(NamespaceManager):
         self.cls = cls
 
     def should_include(self, name, obj):
-        if isinstance(obj, self.cls):
+        if self.cls == 'function':
+            if inspect.isfunction(obj):
+                return True
+            else:
+                return False
+        elif isinstance(obj, self.cls):
             return True
         else:
             return False
