@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 def test_load_normal():
     logger.debug('test_load_normal')
-    objs = load(os.path.join(os.path.dirname(__file__), 'conf.yml'))
+    objs = load(os.path.join(os.path.dirname(__file__), 'conf.yaml'))
     should_have = ('x', 's', 'scripts', 'm', 'motors', 'p', 'pims', 's',
                    'slits', 'f', 'fake', 'lcls', 'fake_motor', 'fake_det',
                    'unique_device', 'calc_thing')
