@@ -5,7 +5,7 @@ from hutch_python.yaml_file import load_objs
 logger = logging.getLogger(__name__)
 
 
-def test_file_load():
+def test_load_load():
     logger.debug('test_file_load')
     info = ['sample_module_1.py', 'sample_module_2.py']
     objs = load_objs(info)
