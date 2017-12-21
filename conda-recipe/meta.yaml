@@ -1,0 +1,33 @@
+{% set data = load_setup_py_data() %}
+
+package:
+  name: hutch-python
+  version : {{ data.get('version') }}
+
+source:
+  path: ..
+
+build:
+  number: 1
+
+requirements:
+  build:
+    - python {{PY_VER}}*,>=3
+    - setuptools
+
+  run:
+    - python {{PY_VER}}*,>=3
+    - ipython
+    - pyyaml
+    - coloredlogs
+
+test:
+  imports:
+    - hutch_python
+  commands:
+    - hutch-python --help
+
+about:
+  home: https://github.com/pcdshub/hutch-python
+  license: SLAC Open License
+  summary: Launcher and config reader for LCLS interactive IPython sessions
