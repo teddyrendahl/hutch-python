@@ -9,13 +9,13 @@ logger = logging.getLogger(__name__)
 def test_load_normal():
     logger.debug('test_load_normal')
     objs = load(os.path.join(os.path.dirname(__file__), 'conf.yaml'))
-    should_have = ('x', 's', 'scripts', 'm', 'motors', 'p', 'pims', 's',
+    should_have = ('x', 'fn', 'funcs', 'm', 'motors', 'p', 'pims', 's',
                    'slits', 'f', 'fake', 'fake_motor', 'fake_det',
                    'unique_device', 'calc_thing')
     for elem in should_have:
         assert elem in objs
-    assert objs['s'] == objs['scripts']
     assert len(objs['fake'].__dict__) == 2
+    assert objs['fn'] == objs['funcs']
 
 
 def test_read_empty():
