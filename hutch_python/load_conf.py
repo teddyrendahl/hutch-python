@@ -46,11 +46,10 @@ def read_conf(conf):
     for plugin_name, info in conf.items():
         try:
             module = import_module('hutch_python.plugins.' + plugin_name)
-        except ImportError as exc:
+        except ImportError:
             module = None
             err = 'Plugin {} is not available, skipping'
             logger.warning(err.format(plugin_name))
-            logger.debug(exc, exc_info=True)
             continue
         this_plugin = module.Plugin(info)
         plugins[this_plugin.priority].append(this_plugin)
