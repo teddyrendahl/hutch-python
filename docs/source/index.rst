@@ -8,10 +8,32 @@
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Getting Started
+   :hidden:
 
-   getting-started
+   installation
+   invokation
+   hutch_setup
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Configuration
+   :hidden:
+
+   yaml_files
+   load
+   experiment
+   namespace
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Developer API
+   :hidden:
+
+   base_plugin
+   log_setup
+   utils
    
 
 Indices and tables
