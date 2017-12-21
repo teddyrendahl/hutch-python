@@ -9,3 +9,4 @@ omit =
     #tests
     *test*
     hutch_python/tests/*
+    log_setup.py

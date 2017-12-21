@@ -1,6 +1,6 @@
 import os
-import inspect
 import logging
+import logging.config
 from pathlib import Path
 
 import yaml
@@ -9,18 +9,7 @@ import coloredlogs
 logger = logging.getLogger(__name__)
 
 
-class RotatingFileHandlerRelativePath(logging.handlers.RotatingFileHandler):
-    """
-    Extension of the filehandler class that appends the current directory to
-    the inputted filename. This is so the log files can be found relative to
-    this file rather than from wherever the script is run.
-    """
-    def __init__(self, filename, *args, **kwargs):
-        filename_full = os.path.join(os.path.dirname(__file__), filename)
-        super().__init__(filename_full, *args, **kwargs)
-
-
-def absolute_submodule_path(submodule, cur_dir=inspect.stack()[0][1]):
+def absolute_submodule_path(submodule, cur_dir=os.path.realpath(__file__)):
     """
     Returns the absolute path of the inputted hutch-python submodule
     based on an inputted absolute path, or the absolute path of this file.
@@ -48,7 +37,7 @@ def absolute_submodule_path(submodule, cur_dir=inspect.stack()[0][1]):
 
 
 DIR_MODULE = Path(absolute_submodule_path("hutch-python/"))
-DIR_LOGS = DIR_MODULE / "logs"
+DIR_LOGS = DIR_MODULE / "hutch_python/logs"
 
 
 def setup_logging(path_yaml=None, dir_logs=None, default_level=logging.INFO):
@@ -88,32 +77,18 @@ def setup_logging(path_yaml=None, dir_logs=None, default_level=logging.INFO):
     if not dir_logs.exists():
         dir_logs.mkdir()
 
-    log_files = ['info.log', 'errors.log', 'debug.log',  'critical.log',
-                 'warn.log']
+    with open(path_yaml, 'rt') as f:
+        config = yaml.safe_load(f.read())
+
+    log_files = ['info', 'error', 'debug', 'critical', 'warn']
     for log_file in log_files:
-        path_log_file = dir_logs / log_file
+        path_log_file = dir_logs / (log_file + '.log')
         # Make the log files if they don't exist
         if not path_log_file.exists():
             path_log_file.touch()
         # Set permissions to be accessible to everyone
         if path_log_file.stat().st_mode != 33279:
             path_log_file.chmod(0o777)
+        config['handlers'][log_file]['filename'] = str(path_log_file)
 
-    # Set up everything if the yaml file is present
-    if path_yaml.exists():
-        with open(path_yaml, 'rt') as f:
-            try:
-                config = yaml.safe_load(f.read())
-                logging.config.dictConfig(config)
-                coloredlogs.install()
-            except Exception as e:
-                print('Error in Logging Configuration. Using default configs')
-                logging.basicConfig(level=default_level)
-                logging.error(e)
-                coloredlogs.install(level=default_level)
-
-    # Just use the normal configuration
-    else:
-        logging.basicConfig(level=default_level)
-        coloredlogs.install(level=default_level)
-        print('Failed to load configuration file. Using default configs')
+    logging.config.dictConfig(config)

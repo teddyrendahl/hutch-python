@@ -1,0 +1,48 @@
+hutch: mfx
+
+daq:
+  lcls: 1
+  platform: 4
+
+happi:
+  beamline:
+    - FEE
+    - HXD
+    - MFX
+
+lightpath: MFX
+
+load:
+  - hutch.py
+
+experiment:
+  #name: automatic
+  name: mfxx000
+  import: experiment.User() as x
+  #features:
+  #  - pswww
+
+namespace:
+  class:
+    function:
+      - fn
+      - funcs
+    ophyd.PositionerBase:
+      - m
+      - motors
+    pcdsdevices.PIM:
+      - p
+      - pims
+    pcdsdevices.Slits:
+      - s
+      - slits
+    ophyd.sim.SynSignal:
+      - f
+      - fake
+    ophyd.sim.SynAxis:
+      - f
+      - fake
+  happi:
+    lcls:
+      - beamline
+      - stand
