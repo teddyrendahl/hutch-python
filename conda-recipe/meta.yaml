@@ -12,11 +12,11 @@ build:
 
 requirements:
   build:
-    - python {{PY_VER}}*,>=3
+    - python {{PY_VER}}*,>=3.6
     - setuptools
 
   run:
-    - python {{PY_VER}}*,>=3
+    - python {{PY_VER}}*,>=3.6
     - ipython
     - pyyaml
     - coloredlogs
