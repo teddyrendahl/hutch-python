@@ -14,6 +14,8 @@ def test_load_normal():
                    'unique_device', 'calc_thing')
     for elem in should_have:
         assert elem in objs
+    assert objs['s'] == objs['scripts']
+    assert len(objs['fake'].__dict__) == 2
 
 
 def test_read_empty():
