@@ -92,4 +92,3 @@ def setup_logging(path_yaml=None, dir_logs=None, default_level=logging.INFO):
         config['handlers'][log_file]['filename'] = str(path_log_file)
 
     logging.config.dictConfig(config)
-    coloredlogs.install()
