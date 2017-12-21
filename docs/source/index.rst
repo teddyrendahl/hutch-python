@@ -5,8 +5,6 @@
 
 .. include:: ../../README.rst
 
-Contents:
-
 .. toctree::
    :maxdepth: 1
    :caption: Getting Started
@@ -34,11 +32,3 @@ Contents:
    base_plugin
    log_setup
    utils
-   
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
