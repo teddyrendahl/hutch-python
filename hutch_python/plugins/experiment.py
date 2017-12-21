@@ -1,8 +1,11 @@
+import logging
 from importlib import import_module
 from types import SimpleNamespace
 
 from ..base_plugin import BasePlugin
 from .. import utils
+
+logger = logging.getLogger(__name__)
 
 
 class Plugin(BasePlugin):
@@ -13,6 +16,7 @@ class Plugin(BasePlugin):
         expname = self.info['name']
         if expname[:4] == 'auto':
             expname = self.get_experiment_name()
+        logger.info('Loading experiment %s', expname)
 
         module_name = 'experiments.' + expname
         all_instructions = self.info['import'].split(' as ')
@@ -33,6 +37,7 @@ class Plugin(BasePlugin):
             'experiment.user'   -> get the object named user
             'experiment.User()' -> get the class named User and make an object
         """
+        logger.debug('Using import instructions "%s"', import_instructions)
         if '.' in import_instructions:
             module = import_module(module_name)
             name = import_instructions.split('.')[1]
@@ -58,6 +63,7 @@ class Plugin(BasePlugin):
             'experiment as x'              -> all objs as namespace x
             'experiment.User() as x, exp'  -> one obj as x and as exp
         """
+        logger.debug('Using naming instructions "%s"', naming_instructions)
         if naming_instructions is None:
             return objs
         else:

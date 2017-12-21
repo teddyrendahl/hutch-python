@@ -19,6 +19,7 @@ class Plugin(BasePlugin):
         return_objs = {}
         self.namespace_managers = []
         for space, opts in self.info.items():
+            logger.debug('Loading %s namespaces', space)
             if space == 'class':
                 objs, managers = self.get_class_objects(opts)
             else:
@@ -42,14 +43,17 @@ class Plugin(BasePlugin):
                     cls = 'function'
                 else:
                     cls = utils.find_class(cls_name)
-            except Exception:
+            except Exception as exc:
                 cls = None
                 err = 'Type {} could not be loaded'
-                logger.exception(err.format(cls_name))
+                logger.error(err.format(cls_name))
+                logger.debug(exc, exc_info=True)
                 continue
             namespace = SimpleNamespace()
             for name in space_names:
                 objs[name] = namespace
+            logger.debug('Added class namespace for type %s as names %s',
+                         cls, space_names)
             manager = ClassNamespaceManager(namespace, cls)
             managers.append(manager)
         return objs, managers

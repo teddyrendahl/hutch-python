@@ -46,10 +46,11 @@ def read_conf(conf):
     for plugin_name, info in conf.items():
         try:
             module = import_module('hutch_python.plugins.' + plugin_name)
-        except ImportError:
+        except ImportError as exc:
             module = None
             err = 'Plugin {} is not available, skipping'
             logger.warning(err.format(plugin_name))
+            logger.debug(exc, exc_info=True)
             continue
         this_plugin = module.Plugin(info)
         plugins[this_plugin.priority].append(this_plugin)
@@ -61,18 +62,20 @@ def read_conf(conf):
         for this_plugin in plugins[prio]:
             try:
                 objs = this_plugin.get_objects()
-            except Exception:
+            except Exception as exc:
                 objs = None
                 err = 'Plugin {} failed to load, skipping'
                 logger.error(err.format(this_plugin.name))
+                logger.debug(exc, exc_info=True)
                 continue
             for past_plugin in executed_plugins:
                 try:
                     past_plugin.future_plugin_hook(this_plugin.name, objs)
-                except Exception:
+                except Exception as exc:
                     err = 'Plugin {} post-hook failed for plugin {}'
                     logger.error(err.format(past_plugin.name,
                                             this_plugin.name))
+                    logger.debug(exc, exc_info=True)
             executed_plugins.append(this_plugin)
             all_objects.__dict__.update(objs)
 
