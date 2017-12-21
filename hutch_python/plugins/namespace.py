@@ -69,7 +69,7 @@ class NamespaceManager:
 
     def add(self, name, obj):
         if self.should_include(name, obj):
-            logger.info('Add %s to namespace %s', name, self.name)
+            logger.debug('Add %s to namespace %s', name, self.name)
             setattr(self.namespace, name, obj)
 
 
