@@ -21,7 +21,7 @@ install:
   # Test suite dependencies
   - conda install coverage pip wheel pytest codecov versioneer -c defaults -c conda-forge
   # Module test dependencies
-  - conda install ipython yaml coloredlogs ophyd pcds-devices -c defaults -c conda-forge -c lightsource2-tag -c skywalker-tag
+  - conda install ipython pyyaml coloredlogs ophyd pcds-devices -c defaults -c conda-forge -c lightsource2-tag -c skywalker-tag
   # Build it!
   - python setup.py install
 
