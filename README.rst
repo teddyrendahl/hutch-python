@@ -20,9 +20,9 @@ running this module. These are small utilities:
 
 At LCLS, there is little point to running this module without:
 
-- `pcdsdevices <https://github.com/pcdshub/pcdsdevices>_` for our Device abstraction layers
+- `pcdsdevices <https://github.com/pcdshub/pcdsdevices>`_ for our Device abstraction layers
 - ``pydaq`` for running the DAQ
-- `bluesky <https://github.com/nsls-ii/bluesky>_` for scanning
+- `bluesky <https://github.com/nsls-ii/bluesky>`_ for scanning
 
 If present, some modules will enable extra features, which will be listed
 below:
