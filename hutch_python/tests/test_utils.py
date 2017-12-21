@@ -7,17 +7,6 @@ from hutch_python import utils
 logger = logging.getLogger(__name__)
 
 
-def test_interpret_list():
-    logger.debug('test_interpret_list')
-    test_input = 'apples to apples'
-    answer = ['apples', 'to', 'apples']
-    junk = 234453
-    assert utils.interpret_list(test_input) == answer
-    assert utils.interpret_list(answer) == answer
-    with pytest.raises(RuntimeError):
-        utils.interpret_list(junk)
-
-
 def test_extract_objs():
     logger.debug('test_extract_objs')
     # Has no __all__ keyword

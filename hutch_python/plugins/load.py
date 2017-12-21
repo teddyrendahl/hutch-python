@@ -14,8 +14,7 @@ class Plugin(BasePlugin):
 
     def get_objects(self):
         objs = {}
-        files = utils.interpret_list(self.info)
-        for filename in files:
+        for filename in self.info:
             logger.info('Loading %s', filename)
             module_objs = utils.extract_objs(filename)
             objs.update(module_objs)

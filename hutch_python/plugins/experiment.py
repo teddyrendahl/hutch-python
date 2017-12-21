@@ -12,6 +12,8 @@ class Plugin(BasePlugin):
     """
     Plugin to load experiment-spefic includes.
     """
+    name = 'experiment'
+
     def get_objects(self):
         expname = self.info['name']
         if expname[:4] == 'auto':
