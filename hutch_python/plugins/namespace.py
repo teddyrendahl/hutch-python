@@ -52,28 +52,30 @@ class Plugin(BasePlugin):
                 continue
             for name in space_names:
                 namespace = objs[name]
+                manager = ClassNamespaceManager(namespace, name, cls)
+                managers.append(manager)
                 logger.debug('Added class namespace for type %s as name %s',
                              cls, name)
-            manager = ClassNamespaceManager(namespace, cls)
-            managers.append(manager)
         return objs, managers
 
 
 class NamespaceManager:
-    def __init__(self, namespace):
+    def __init__(self, namespace, name):
         self.namespace = namespace
+        self.name = name
 
     def should_include(self, name, obj):
         return False
 
     def add(self, name, obj):
         if self.should_include(name, obj):
+            logger.info('Add %s to namespace %s', name, self.name)
             setattr(self.namespace, name, obj)
 
 
 class ClassNamespaceManager(NamespaceManager):
-    def __init__(self, namespace, cls):
-        super().__init__(namespace)
+    def __init__(self, namespace, name, cls):
+        super().__init__(namespace, name)
         self.cls = cls
 
     def should_include(self, name, obj):
