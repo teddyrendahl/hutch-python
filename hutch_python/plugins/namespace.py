@@ -1,4 +1,5 @@
 from types import SimpleNamespace
+from collections import defaultdict
 import inspect
 import logging
 
@@ -35,7 +36,7 @@ class Plugin(BasePlugin):
             manager.add(name, obj)
 
     def get_class_objects(self, opts):
-        objs = {}
+        objs = defaultdict(SimpleNamespace)
         managers = []
         for cls_name, space_names in opts.items():
             try:
@@ -49,11 +50,10 @@ class Plugin(BasePlugin):
                 logger.error(err.format(cls_name))
                 logger.debug(exc, exc_info=True)
                 continue
-            namespace = SimpleNamespace()
             for name in space_names:
-                objs[name] = namespace
-            logger.debug('Added class namespace for type %s as names %s',
-                         cls, space_names)
+                namespace = objs[name]
+                logger.debug('Added class namespace for type %s as name %s',
+                             cls, name)
             manager = ClassNamespaceManager(namespace, cls)
             managers.append(manager)
         return objs, managers
