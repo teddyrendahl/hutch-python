@@ -1,6 +1,15 @@
-===============================
+============
 Hutch Python
-===============================
+============
+.. image:: https://travis-ci.org/pcdshub/hutch-python.svg?branch=master
+   :target: https://travis-ci.org/pcdshub/hutch-python
+   :alt: Build Status
+.. image:: https://codecov.io/gh/pcdshub/hutch-python/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/pcdshub/hutch-python
+   :alt: Code Coverage
+.. image:: https://landscape.io/github/pcdshub/hutch-python/master/landscape.svg?style=flat
+   :target: https://landscape.io/github/pcdshub/hutch-python/master
+   :alt: Code Health
 
 Hutch Python is the launcher and config reader for LCLS interactive IPython
 sessions. This will replace the existing Python 2 ``pyhutch`` modules
