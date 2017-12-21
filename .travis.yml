@@ -16,7 +16,7 @@ install:
   - conda info -a
   # Grab all dependencies
   # Build dependencies
-  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION setuptools versioneer -c defaults -c conda-forge
+  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION setuptools -c defaults -c conda-forge
   - source activate test-environment
   # Test suite dependencies
   - conda install coverage pip wheel pytest codecov versioneer -c defaults -c conda-forge
