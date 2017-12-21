@@ -26,7 +26,7 @@ install:
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION setuptools -c defaults -c conda-forge
   - source activate test-environment
   # Test suite dependencies
-  - conda install coverage pip wheel pytest codecov -c defaults -c conda-forge
+  - conda install coverage pip wheel pytest flake8 codecov -c defaults -c conda-forge
   # Module test dependencies
   - conda install ipython pyyaml coloredlogs ophyd pcds-devices -c defaults -c conda-forge -c lightsource2-tag -c skywalker-tag
   # Build it!
