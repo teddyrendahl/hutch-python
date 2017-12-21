@@ -1,7 +1,5 @@
 import logging
 
-import pytest
-
 from hutch_python import utils
 
 logger = logging.getLogger(__name__)
