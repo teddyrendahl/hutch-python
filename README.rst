@@ -14,6 +14,8 @@ Requirements
 This module is intended to be run using the latest pcds release in the `pcds-envs <https://github.com/pcdshub/pcds-envs>`_ package, but this is not strictly required.
 Other than Python 3.5+, there are few requirements for running this module. These are small utilities:
 
+- ipython, for improved interactive sessions
+- pyyaml, for reading config files
 - coloredlogs, for colored logging
 
 If present, some modules will enable extra features, which will be listed below:
