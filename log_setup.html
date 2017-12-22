@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Logging Configuration &mdash; hutch-python 0+untagged.72.g4c0c213 documentation</title>
+  <title>Logging Configuration &mdash; hutch-python 0+untagged.89.gcca5e7e documentation</title>
   
 
   
@@ -35,7 +35,8 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="hutch-python 0+untagged.72.g4c0c213 documentation" href="index.html"/>
+    <link rel="top" title="hutch-python 0+untagged.89.gcca5e7e documentation" href="index.html"/>
+        <link rel="next" title="Utility Functions" href="utils.html"/>
         <link rel="prev" title="Plugin Spec" href="base_plugin.html"/> 
 
   
@@ -65,7 +66,7 @@
             
             
               <div class="version">
-                0+untagged.72.g4c0c213
+                0+untagged.89.gcca5e7e
               </div>
             
           
@@ -106,9 +107,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="base_plugin.html">Plugin Spec</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Logging Configuration</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#log-setup-py">log_setup.py</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="#log-setup-py">log_setup.py</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">Utility Functions</a></li>
@@ -190,27 +189,36 @@ spec. There is also a testing logger that is set up directly in the
 </ul>
 <p>The tests logger is set up to:</p>
 <ul class="simple">
-<li>Log with level DEBUG to the diractory’s <code class="docutils literal"><span class="pre">logs</span></code> folder</li>
+<li>Log with level DEBUG to the directory’s <code class="docutils literal"><span class="pre">logs</span></code> folder</li>
 <li>Rotate the file such that each testing run has its own log file</li>
 </ul>
 <p>There is a helper module <code class="docutils literal"><span class="pre">log_setup</span></code> that is used internally to set up the
 logger for interactive sessions.</p>
 <div class="section" id="log-setup-py">
 <h2>log_setup.py<a class="headerlink" href="#log-setup-py" title="Permalink to this headline">¶</a></h2>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
+<dl class="function">
+<dt id="hutch_python.log_setup.setup_logging">
+<code class="descclassname">hutch_python.log_setup.</code><code class="descname">setup_logging</code><span class="sig-paren">(</span><em>path_yaml=None</em>, <em>dir_logs=None</em>, <em>default_level=20</em><span class="sig-paren">)</span><a class="headerlink" href="#hutch_python.log_setup.setup_logging" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets up the logging module to make a properly configured logger.</p>
+<p>This will go into the <code class="docutils literal"><span class="pre">logging.yml</span></code> file in the top level directory, and
+try to load the logging configuration. If it fails for any reason, it will
+just use the default configuration. For more details on how the logger will
+be configured, see the <code class="docutils literal"><span class="pre">logging.yml</span></code> file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
 <tbody valign="top">
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">hutch_python.log_setup.absolute_submodule_path</span></code>(…)</td>
-<td>Returns the absolute path of the inputted hutch-python submodule based on an inputted absolute path, or the absolute path of this file.</td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">hutch_python.log_setup.setup_logging</span></code>([…])</td>
-<td>Sets up the logging module to make a properly configured logger.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>path_yaml</strong> (<em>str</em><em> or </em><em>Path</em><em>, </em><em>optional</em>) – Path to the yaml file.</li>
+<li><strong>dir_logs</strong> (<em>str</em><em> or </em><em>Path</em><em>, </em><em>optional</em>) – Path to the log directory.</li>
+<li><strong>default_level</strong> (<em>logging.LEVEL</em><em>, </em><em>optional</em>) – Logging level for the default logging setup if the yaml fails.</li>
+</ul>
+</td>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
 </div>
 </div>
 
@@ -223,6 +231,8 @@ logger for interactive sessions.</p>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="utils.html" class="btn btn-neutral float-right" title="Utility Functions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="base_plugin.html" class="btn btn-neutral" title="Plugin Spec" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
@@ -256,7 +266,7 @@ logger for interactive sessions.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0+untagged.72.g4c0c213',
+            VERSION:'0+untagged.89.gcca5e7e',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true,
