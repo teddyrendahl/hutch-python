@@ -19,7 +19,7 @@ def load(filename):
 
     Returns
     -------
-    objs: dict{str: Object}
+    objs: dict{str: object}
         All objects defined by the file that need to make it into the
         environment. The strings are the names that will be accessible in the
         global namespace.
@@ -31,16 +31,35 @@ def load(filename):
 
 def read_conf(conf):
     """
-    Separate this from load to make it easier to test without tons of temp
-    files.
-
     Parameters
     ----------
     conf: dict
         dict interpretation of the original yaml file
+
+    Returns
+    ------
+    objs: dict{str: object}
+        Return value of load
     """
     hutch_python.clear_load()
-    all_objects = hutch_python.objects
+    plugins = get_plugins(conf)
+    objects = run_plugins(plugins)
+    return objects
+
+
+def get_plugins(conf):
+    """
+    Parameters
+    ----------
+    conf: dict
+        dict interpretation of the original yaml file
+
+    Returns
+    -------
+    plugins: dict{int: list}
+        Mapping from priority level to list of instantiated plugins at that
+        prority.
+    """
     plugins = defaultdict(list)
 
     for plugin_name, info in conf.items():
@@ -53,6 +72,25 @@ def read_conf(conf):
             continue
         this_plugin = module.Plugin(info)
         plugins[this_plugin.priority].append(this_plugin)
+
+    return plugins
+
+
+def run_plugins(plugins):
+    """
+    Create all of the objects, given plugin instructions.
+
+    Parameters
+    ----------
+    plugins: dict{int: list}
+        Return value from get_plugins
+
+    Returns
+    ------
+    objs: dict{str: object}
+        Return value of load
+    """
+    all_objects = hutch_python.objects
 
     plugin_priorities = reversed(sorted(list(plugins.keys())))
     executed_plugins = []
