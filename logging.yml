@@ -64,14 +64,7 @@ handlers:
         mode: a
         delay: 0
 
-# Root logger sees all the handlers, the hutch_python logger only has the console
 root:
     level: DEBUG
     handlers: [console, info, error, critical, debug, warn]
     propogate: no
-    
-loggers:
-    <hutch_python>:
-        level: INFO
-        handlers: [console]
-        propogate: no
