@@ -20,6 +20,7 @@ requirements:
     - ipython
     - pyyaml
     - coloredlogs
+    - pcds-devices >=0.2.0
 
 test:
   imports:

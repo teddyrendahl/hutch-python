@@ -1,8 +1,8 @@
 language: python
+sudo: false
 
 env:
   global:
-    # Doctr deploy key for pcdshub/hutch-python
     - OFFICIAL_REPO="pcdshub/hutch-python"
     - secure: "kjUAbNvwnSPFQFNf0TRX+Ea0BgVwMwRaPaL5wLRD7zvLpF5D9dzc+giUneap3LzKBxtEXIJ8hY9KgL0n63z0LwyWHKmKQT0F3ILEaqIcOOscU1G0MjCSal0DUji8EBe7xzXWr1T0AApyu39Y2iW0Qp+gTMSJEcNN9XdnBh7V0PIEA9xYP4xfpZ7vbNGvMhpDefJSIjdrAz7bVxp8JH8pxnu2WYCDS1Ik8pA7WGgNSknI0VBI2Fs43gfLocMkJSKimn2M+EGgxORdgBwoxMjRKRxIaTiLsCd+ZY5FP1DM1F1dvVusm3KNyyytaWTv9cDELQazMspv6VB1s7ouq0IgOJMySkl2BAvT6c+e8Adn+x87ZO1PyBAlJZNGO/YQdjrhRNbObu5Ld5IyvwcLw10teCMEkWJ3cNfYBL8O52vlzIlvhDcb1J+pONecc+a6Fr9Ag6nUz6krPr5zF5bK/3qxlC5PmzhnjSeTXqizaub+RVXHNyj7xKNJDczOmqM4HvkXe+kyBiauCnWXu86bOlKY3j8upSrGQCOKcHbFWMExZIsIBq3+g2nLI0bpEC2xT9iTgeLtzB24kkF3bHQ6BaTjU135lrRlVhC7CFiFPuqDUpVzLNWikG9rjPcJAsmQzYauUedm40MNtbqVOA5+2VGePuVMxLIXfHVn43taL916Vh8="
 
@@ -18,19 +18,19 @@ install:
   - export PATH="$HOME/miniconda/bin:$PATH"
   - hash -r
   - conda config --set always_yes yes --set changeps1 no
-  - conda update -q conda
+  - conda install conda-build
+  - conda update -q conda conda-build
+  - conda config --append channels conda-forge
+  - conda config --append channels skywalker-tag
+  - conda config --append channels lightsource2-tag
   # Useful for debugging any issues with conda
   - conda info -a
-  # Grab all dependencies
-  # Build dependencies
-  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION setuptools -c defaults -c conda-forge
+  # Test conda build
+  - conda build -q conda-recipe --output-folder bld-dir
+  - conda config --add channels "file://`pwd`/bld-dir"
+  # Create test environment
+  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION hutch-python --file dev-requirements.txt
   - source activate test-environment
-  # Test suite dependencies
-  - conda install coverage pip wheel pytest flake8 codecov -c defaults -c conda-forge
-  # Module test dependencies
-  - conda install ipython pyyaml coloredlogs ophyd pcds-devices -c defaults -c conda-forge -c lightsource2-tag -c skywalker-tag
-  # Build it!
-  - python setup.py install
 
 script:
   - coverage run run_tests.py
@@ -41,11 +41,10 @@ script:
   - set -e
   - |
     if [[ -n "$DOCTR_DEPLOY_ENCRYPTION_KEY_PCDSHUB_HUTCH_PYTHON" && $BUILD_DOCS ]]; then
-      pip install -r docs-requirements.txt
       pushd docs
       make html
       popd
-      doctr deploy . --built-docs docs/_build/html --deploy-branch-name gh-pages
+      doctr deploy . --built-docs docs/build/html --deploy-branch-name gh-pages
     fi
 
 after_success:

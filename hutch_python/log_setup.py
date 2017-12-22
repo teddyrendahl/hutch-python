@@ -1,4 +1,3 @@
-import os
 import logging
 import logging.config
 from pathlib import Path
@@ -7,36 +6,8 @@ import yaml
 
 logger = logging.getLogger(__name__)
 
-
-def absolute_submodule_path(submodule, cur_dir=os.path.realpath(__file__)):
-    """
-    Returns the absolute path of the inputted hutch-python submodule
-    based on an inputted absolute path, or the absolute path of this file.
-
-    Parameters
-    ----------
-    submodule : str or Path
-        Desired submodule path.
-
-    cur_dir : str or Path, optional
-        Absolute path to use as a template for the full submodule path.
-
-    Returns
-    -------
-    full_path : str
-        Full string path to the inputted submodule.
-    """
-    dir_parts = Path(cur_dir).parts
-    sub_parts = Path(submodule).parts
-    base_path = Path(*dir_parts[:dir_parts.index(sub_parts[0])])
-    if str(base_path) == ".":
-        logger.warning("Could not match base path with desired submodule.")
-    full_path = base_path / Path(submodule)
-    return str(full_path)
-
-
-DIR_MODULE = Path(absolute_submodule_path("hutch-python/"))
-DIR_LOGS = DIR_MODULE / "hutch_python/logs"
+DIR_MODULE = Path(__file__).resolve().parent.parent
+DIR_LOGS = DIR_MODULE / 'hutch_python/logs'
 
 
 def setup_logging(path_yaml=None, dir_logs=None, default_level=logging.INFO):
@@ -61,7 +32,7 @@ def setup_logging(path_yaml=None, dir_logs=None, default_level=logging.INFO):
     """
     # Get the yaml path
     if path_yaml is None:
-        path_yaml = DIR_MODULE / "logging.yml"
+        path_yaml = DIR_MODULE / 'logging.yml'
     # Make sure we are using Path objects
     else:
         path_yaml = Path(path_yaml)

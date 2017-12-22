@@ -15,7 +15,7 @@ As a summary, the logger is set up to:
 
 The tests logger is set up to:
 
-- Log with level DEBUG to the diractory's ``logs`` folder
+- Log with level DEBUG to the directory's ``logs`` folder
 - Rotate the file such that each testing run has its own log file
 
 There is a helper module ``log_setup`` that is used internally to set up the
@@ -23,9 +23,5 @@ logger for interactive sessions.
 
 log_setup.py
 ------------
-
-.. autosummary::
-   :toctree: generated
-
-   hutch_python.log_setup.absolute_submodule_path
+.. autofunction::
    hutch_python.log_setup.setup_logging
