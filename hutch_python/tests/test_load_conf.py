@@ -27,7 +27,7 @@ def test_read_empty():
 def test_read_duplicate():
     logger.debug('test_read_duplicate')
     objs = read_conf({'load': ['sample_module_1.py', 'sample_module_1.py']})
-    assert len(objs) == 3
+    assert len(objs) == 4
 
 
 def test_read_only_namespaces():

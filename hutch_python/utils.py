@@ -27,9 +27,10 @@ def extract_objs(module_name):
     """
     objs = {}
     # Allow filenames
-    module_name = module_name.strip('.py')
-    if '()' in module_name:
-        module_name = module_name.strip('()')
+    if module_name.endswith('.py'):
+        module_name = module_name[:-3]
+    elif module_name.endswith('()'):
+        module_name = module_name[:-2]
         call_me = True
     else:
         call_me = False
@@ -45,8 +46,9 @@ def extract_objs(module_name):
             else:
                 objs[name] = my_obj
             return objs
-    except Exception:
-        logger.exception('Error loading %s', module_name)
+    except Exception as exc:
+        logger.error('Error loading %s', module_name)
+        logger.debug(exc, exc_info=True)
         return objs
     all_kwd = getattr(module, '__all__', None)
     if all_kwd is None:
