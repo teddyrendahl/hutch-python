@@ -18,20 +18,23 @@ install:
   - export PATH="$HOME/miniconda/bin:$PATH"
   - hash -r
   - conda config --set always_yes yes --set changeps1 no
+  - conda config --add channels conda-forge
+  - conda config --add channels skywalker-tag
+  - conda config --add channels lightsource2-tag
   - conda update -q conda
   - conda install conda-build
   # Useful for debugging any issues with conda
   - conda info -a
   # Grab all dependencies
   # Build dependencies
-  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION setuptools -c defaults -c conda-forge
+  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION setuptools
   - source activate test-environment
   # Test suite dependencies
-  - conda install coverage pip wheel pytest flake8 codecov -c defaults -c conda-forge
+  - conda install coverage pip wheel pytest flake8 codecov
   # Test conda build
   - ./test-conda.sh
   # Install it
-  - conda install hutch-python -c "file://`readlink -f conda-bld-tst`" -c defaults -c conda-forge -c skywalker-tag -c lightsource2-tag
+  - conda install hutch-python -c "file://`readlink -f conda-bld-tst`"
 
 script:
   - coverage run run_tests.py
