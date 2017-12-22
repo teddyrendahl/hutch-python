@@ -30,11 +30,11 @@ install:
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION setuptools
   - source activate test-environment
   # Test suite dependencies
-  - conda install coverage pip wheel pytest flake8 codecov
+  - conda install -q coverage pip wheel pytest flake8 codecov
   # Test conda build
-  - conda build -q -b conda-recipe
+  - conda build -q conda-recipe
   # Install it
-  - conda install hutch-python --use-local
+  - conda install -q hutch-python --use-local
 
 script:
   - coverage run run_tests.py
