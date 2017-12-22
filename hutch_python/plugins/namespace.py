@@ -65,7 +65,7 @@ class NamespaceManager:
         self.name = name
 
     def should_include(self, name, obj):
-        return False
+        raise NotImplementedError('Need to subclass should_include')
 
     def add(self, name, obj):
         if self.should_include(name, obj):
