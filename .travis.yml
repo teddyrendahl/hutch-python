@@ -40,7 +40,7 @@ script:
   # Build docs
   - set -e
   - |
-    if [[ -n "$DOCTR_DEPLOY_ENCRYPTION_KEY" && $BUILD_DOCS ]]; then
+    if [[ -n "$DOCTR_DEPLOY_ENCRYPTION_KEY_PCDSHUB_HUTCH_PYTHON" && $BUILD_DOCS ]]; then
       pip install -r docs-requirements.txt
       pushd docs
       make html
