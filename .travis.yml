@@ -18,19 +18,17 @@ install:
   - export PATH="$HOME/miniconda/bin:$PATH"
   - hash -r
   - conda config --set always_yes yes --set changeps1 no
-  - conda config --add channels conda-forge
-  - conda config --add channels skywalker-tag
-  - conda config --add channels lightsource2-tag
+  - conda config --append channels conda-forge
+  - conda config --append channels skywalker-tag
+  - conda config --append channels lightsource2-tag
   - conda install conda-build
   - conda update -q conda conda-build
   # Useful for debugging any issues with conda
   - conda info -a
   # Grab all dependencies
   # Build dependencies
-  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION setuptools
+  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION --file dev-requirements.txt
   - source activate test-environment
-  # Test suite dependencies
-  - conda install -q coverage pip wheel pytest flake8 codecov
   # Test conda build
   - conda build -q conda-recipe
   # Install it
@@ -45,7 +43,6 @@ script:
   - set -e
   - |
     if [[ -n "$DOCTR_DEPLOY_ENCRYPTION_KEY_PCDSHUB_HUTCH_PYTHON" && $BUILD_DOCS ]]; then
-      pip install -r docs-requirements.txt
       pushd docs
       make html
       popd

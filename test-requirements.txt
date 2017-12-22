@@ -1,5 +1,0 @@
-pytest
-coverage
-coloredlogs
-ophyd
-pcdsdevices
