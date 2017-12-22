@@ -1,8 +1,8 @@
 language: python
+sudo: false
 
 env:
   global:
-    # Doctr deploy key for pcdshub/hutch-python
     - OFFICIAL_REPO="pcdshub/hutch-python"
     - secure: "kjUAbNvwnSPFQFNf0TRX+Ea0BgVwMwRaPaL5wLRD7zvLpF5D9dzc+giUneap3LzKBxtEXIJ8hY9KgL0n63z0LwyWHKmKQT0F3ILEaqIcOOscU1G0MjCSal0DUji8EBe7xzXWr1T0AApyu39Y2iW0Qp+gTMSJEcNN9XdnBh7V0PIEA9xYP4xfpZ7vbNGvMhpDefJSIjdrAz7bVxp8JH8pxnu2WYCDS1Ik8pA7WGgNSknI0VBI2Fs43gfLocMkJSKimn2M+EGgxORdgBwoxMjRKRxIaTiLsCd+ZY5FP1DM1F1dvVusm3KNyyytaWTv9cDELQazMspv6VB1s7ouq0IgOJMySkl2BAvT6c+e8Adn+x87ZO1PyBAlJZNGO/YQdjrhRNbObu5Ld5IyvwcLw10teCMEkWJ3cNfYBL8O52vlzIlvhDcb1J+pONecc+a6Fr9Ag6nUz6krPr5zF5bK/3qxlC5PmzhnjSeTXqizaub+RVXHNyj7xKNJDczOmqM4HvkXe+kyBiauCnWXu86bOlKY3j8upSrGQCOKcHbFWMExZIsIBq3+g2nLI0bpEC2xT9iTgeLtzB24kkF3bHQ6BaTjU135lrRlVhC7CFiFPuqDUpVzLNWikG9rjPcJAsmQzYauUedm40MNtbqVOA5+2VGePuVMxLIXfHVn43taL916Vh8="
 
@@ -19,6 +19,7 @@ install:
   - hash -r
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
+  - conda install conda-build
   # Useful for debugging any issues with conda
   - conda info -a
   # Grab all dependencies
@@ -27,12 +28,12 @@ install:
   - source activate test-environment
   # Test suite dependencies
   - conda install coverage pip wheel pytest flake8 codecov -c defaults -c conda-forge
-
-script:
   # Test conda build
-  - bash test-conda.sh
+  - ./test-conda.sh
   # Install it
   - conda install hutch-python -c "file://`readlink -f conda-bld-tst`" -c defaults -c conda-forge -c skywalker-tag -c lightsource2-tag
+
+script:
   - coverage run run_tests.py
   - coverage report -m
   - flake8 hutch_python
