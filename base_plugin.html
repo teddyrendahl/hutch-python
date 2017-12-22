@@ -1,0 +1,330 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Plugin Spec &mdash; hutch-python 0+untagged.72.g4c0c213 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="hutch-python 0+untagged.72.g4c0c213 documentation" href="index.html"/>
+        <link rel="next" title="Logging Configuration" href="log_setup.html"/>
+        <link rel="prev" title="Namespace" href="namespace.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> hutch-python
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.72.g4c0c213
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="invokation.html">Invokation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hutch_setup.html">Hutch Setup</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Configuration</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="yaml_files.html">Yaml Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load.html">Load</a></li>
+<li class="toctree-l1"><a class="reference internal" href="experiment.html">Experiment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="namespace.html">Namespace</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer API</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Plugin Spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="log_setup.html">Logging Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utility Functions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">hutch-python</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Plugin Spec</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/base_plugin.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="plugin-spec">
+<h1>Plugin Spec<a class="headerlink" href="#plugin-spec" title="Permalink to this headline">¶</a></h1>
+<p>A <code class="docutils literal"><span class="pre">Plugin</span></code> class tells the loader how to interpret a segment of the yaml file.
+All plugins will be stored in the <code class="docutils literal"><span class="pre">hutch_python.plugins</span></code> directory in a file
+with the name <code class="docutils literal"><span class="pre">pluginname.py</span></code> containing a <code class="docutils literal"><span class="pre">Plugin</span></code> class that inherits from
+<code class="docutils literal"><span class="pre">hutch_python.base_plugin.BasePlugin</span></code>. The specificatin for <code class="docutils literal"><span class="pre">BasePlugin</span></code> is
+included below.</p>
+<dl class="class">
+<dt id="hutch_python.base_plugin.BasePlugin">
+<em class="property">class </em><code class="descclassname">hutch_python.base_plugin.</code><code class="descname">BasePlugin</code><span class="sig-paren">(</span><em>info</em><span class="sig-paren">)</span><a class="headerlink" href="#hutch_python.base_plugin.BasePlugin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interface for each top-level entry in the conf.yaml file.</p>
+<dl class="attribute">
+<dt id="hutch_python.base_plugin.BasePlugin.priority">
+<code class="descname">priority</code><a class="headerlink" href="#hutch_python.base_plugin.BasePlugin.priority" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> – Plugins with a larger priority number will be executed first. Plugins
+with the same priority number will be executed in the order they appear
+in the configuration file.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="hutch_python.base_plugin.BasePlugin.name">
+<code class="descname">name</code><a class="headerlink" href="#hutch_python.base_plugin.BasePlugin.name" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – Convenience attribute that is the name of the Plugin. Should match the
+filename, without the extension.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="hutch_python.base_plugin.BasePlugin.future_object_hook">
+<code class="descname">future_object_hook</code><span class="sig-paren">(</span><em>name</em>, <em>obj</em><span class="sig-paren">)</span><a class="headerlink" href="#hutch_python.base_plugin.BasePlugin.future_object_hook" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method will be called on every object that is created afterwards
+by other plugins. Please do not mutate the incoming objects.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<em>str</em>) – Global reference name</li>
+<li><strong>obj</strong> (<em>object</em>) – Any object</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="hutch_python.base_plugin.BasePlugin.future_plugin_hook">
+<code class="descname">future_plugin_hook</code><span class="sig-paren">(</span><em>source</em>, <em>objs</em><span class="sig-paren">)</span><a class="headerlink" href="#hutch_python.base_plugin.BasePlugin.future_plugin_hook" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provided to be overridden if the plugin needs to treat the incoming
+objects as a group.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>source</strong> (<em>str</em>) – Top-level yaml config string that built the objs</li>
+<li><strong>objs</strong> (<em>dict{str: object}</em>) – The return value from a previous plugin’s get_objects call</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="hutch_python.base_plugin.BasePlugin.get_objects">
+<code class="descname">get_objects</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hutch_python.base_plugin.BasePlugin.get_objects" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build the Python objects specified by the plugin and config.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>objects</strong> – Mapping from final global reference name to object</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">dict{str: object}</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="log_setup.html" class="btn btn-neutral float-right" title="Logging Configuration" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="namespace.html" class="btn btn-neutral" title="Namespace" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright .
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0+untagged.72.g4c0c213',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

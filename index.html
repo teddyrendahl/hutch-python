@@ -1,0 +1,296 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Hutch Python &mdash; hutch-python 0+untagged.72.g4c0c213 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="hutch-python 0+untagged.72.g4c0c213 documentation" href="#"/>
+        <link rel="next" title="Installation" href="installation.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="#" class="icon icon-home"> hutch-python
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0+untagged.72.g4c0c213
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="invokation.html">Invokation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hutch_setup.html">Hutch Setup</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Configuration</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="yaml_files.html">Yaml Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="load.html">Load</a></li>
+<li class="toctree-l1"><a class="reference internal" href="experiment.html">Experiment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="namespace.html">Namespace</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developer API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="base_plugin.html">Plugin Spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="log_setup.html">Logging Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utility Functions</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">hutch-python</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#">Docs</a> &raquo;</li>
+        
+      <li>Hutch Python</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="hutch-python">
+<h1>Hutch Python<a class="headerlink" href="#hutch-python" title="Permalink to this headline">¶</a></h1>
+<a class="reference external image-reference" href="https://travis-ci.org/pcdshub/hutch-python"><img alt="Build Status" src="https://travis-ci.org/pcdshub/hutch-python.svg?branch=master" /></a>
+<a class="reference external image-reference" href="https://codecov.io/gh/pcdshub/hutch-python"><img alt="Code Coverage" src="https://codecov.io/gh/pcdshub/hutch-python/branch/master/graph/badge.svg" /></a>
+<a class="reference external image-reference" href="https://landscape.io/github/pcdshub/hutch-python/master"><img alt="Code Health" src="https://landscape.io/github/pcdshub/hutch-python/master/landscape.svg?style=flat" /></a>
+<p>Hutch Python is the launcher and config reader for LCLS interactive IPython
+sessions. This will replace the existing Python 2 <code class="docutils literal"><span class="pre">pyhutch</span></code> modules
+(blbase/blutil/blinst) for scripting during experiments.</p>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<p>This module is intended to be run using the latest pcds release in the
+<a class="reference external" href="https://github.com/pcdshub/pcds-envs">pcds-envs</a> package, but this is not
+strictly required. Other than Python 3.6+, there are few requirements for
+running this module. These are small utilities:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">ipython</span></code>, for improved interactive sessions</li>
+<li><code class="docutils literal"><span class="pre">pyyaml</span></code>, for reading config files</li>
+<li><code class="docutils literal"><span class="pre">coloredlogs</span></code>, for colored logging</li>
+</ul>
+<p>At LCLS, there is little point to running this module without:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://github.com/pcdshub/pcdsdevices">pcdsdevices</a> for our Device abstraction layers</li>
+<li><code class="docutils literal"><span class="pre">pydaq</span></code> for running the DAQ</li>
+<li><a class="reference external" href="https://github.com/nsls-ii/bluesky">bluesky</a> for scanning</li>
+</ul>
+<p>If present, some modules will enable extra features, which will be listed
+below:</p>
+<ul class="simple">
+<li>None, at the moment</li>
+</ul>
+<p>In the future, I plan to support the following extra features:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://github.com/slaclab/happi">happi</a> will enable device loading from a happi database, and from the experiment questionaire.</li>
+<li><a class="reference external" href="https://github.com/slaclab/lightpath">lightpath</a> will enable specification of a path object to include (requires happi).</li>
+<li><code class="docutils literal"><span class="pre">pyfiglet</span></code> will enable hutch banners (think big <code class="docutils literal"><span class="pre">xpppython</span></code> on startup)</li>
+</ul>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>This module is not yet ready for users. When completed, the included conda
+recipe will install all optional requirements by default. It is assumed that
+every user will want all of the features. It is up to you to install this
+module differently if you do not want the added dependencies. In the future,
+this will be installable via conda channel.</p>
+<div class="toctree-wrapper compound">
+</div>
+<div class="toctree-wrapper compound">
+</div>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright .
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0+untagged.72.g4c0c213',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
