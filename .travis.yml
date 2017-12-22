@@ -32,9 +32,9 @@ install:
   # Test suite dependencies
   - conda install coverage pip wheel pytest flake8 codecov
   # Test conda build
-  - ./test-conda.sh
+  - conda build -q -b conda-recipe
   # Install it
-  - conda install hutch-python -c "file://`readlink -f conda-bld-tst`"
+  - conda install hutch-python --use-local
 
 script:
   - coverage run run_tests.py
