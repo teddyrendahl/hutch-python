@@ -18,19 +18,18 @@ install:
   - export PATH="$HOME/miniconda/bin:$PATH"
   - hash -r
   - conda config --set always_yes yes --set changeps1 no
-  - conda config --append channels "file://`pwd`/bld-dir"
+  - conda install conda-build
+  - conda update -q conda conda-build
   - conda config --append channels conda-forge
   - conda config --append channels skywalker-tag
   - conda config --append channels lightsource2-tag
-  - conda install conda-build
-  - conda update -q conda conda-build
   # Useful for debugging any issues with conda
   - conda info -a
   # Test conda build
   - conda build -q conda-recipe --output-folder bld-dir
+  - conda config --add channels "file://`pwd`/bld-dir"
   # Create test environment
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION hutch-python --file dev-requirements.txt
-
   - source activate test-environment
 
 script:
