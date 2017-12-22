@@ -37,7 +37,7 @@ class BasePlugin:
         objects: dict{str: object}
             Mapping from final global reference name to object
         """
-        pass
+        ...
 
     def future_object_hook(self, name, obj):
         """
@@ -51,7 +51,7 @@ class BasePlugin:
         obj: object
             Any object
         """
-        pass
+        ...
 
     def future_plugin_hook(self, source, objs):
         """
