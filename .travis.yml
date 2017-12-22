@@ -27,12 +27,12 @@ install:
   - source activate test-environment
   # Test suite dependencies
   - conda install coverage pip wheel pytest flake8 codecov -c defaults -c conda-forge
+
+script:
   # Test conda build
   - ./test-conda.sh
   # Install it
   - conda install hutch-python -c "file://`readlink -f conda-bld-tst`" -c defaults -c conda-forge -c skywalker-tag -c lightsource2-tag
-
-script:
   - coverage run run_tests.py
   - coverage report -m
   - flake8 hutch_python
