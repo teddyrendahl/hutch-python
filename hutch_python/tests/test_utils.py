@@ -1,21 +1,8 @@
 import logging
 
-import pytest
-
 from hutch_python import utils
 
 logger = logging.getLogger(__name__)
-
-
-def test_interpret_list():
-    logger.debug('test_interpret_list')
-    test_input = 'apples to apples'
-    answer = ['apples', 'to', 'apples']
-    junk = 234453
-    assert utils.interpret_list(test_input) == answer
-    assert utils.interpret_list(answer) == answer
-    with pytest.raises(RuntimeError):
-        utils.interpret_list(junk)
 
 
 def test_extract_objs():
@@ -31,19 +18,6 @@ def test_extract_objs():
     # Doesn't exist
     objs = utils.extract_objs('fake_module_243esd')
     assert objs == {}
-
-
-class Named:
-    def __init__(self, *, name):
-        self.name = name
-
-
-def test_assign_names():
-    logger.debug('test_assign_names')
-    obj = Named(name='Karl')
-    num = 2.3
-    name_dict = utils.assign_names([obj, num])
-    assert name_dict == dict(Karl=obj, float=num)
 
 
 def test_find_class():

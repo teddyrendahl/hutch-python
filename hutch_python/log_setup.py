@@ -4,7 +4,6 @@ import logging.config
 from pathlib import Path
 
 import yaml
-import coloredlogs
 
 logger = logging.getLogger(__name__)
 

@@ -4,6 +4,7 @@
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
+SPHINXAUTO    = sphinx-autogen
 SPHINXPROJ    = hutch-python
 SOURCEDIR     = source
 PAPER         =
@@ -42,8 +43,10 @@ help:
 
 clean:
 	-rm -rf $(BUILDDIR)/*
+	-rm -rf $(SOURCEDIR)/generated
 
 html:
+	$(SPHINXAUTO) -o $(SOURCEDIR)/generated $(SOURCEDIR)/*.rst
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."

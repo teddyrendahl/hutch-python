@@ -5,18 +5,30 @@
 
 .. include:: ../../README.rst
 
-Contents:
+.. toctree::
+   :maxdepth: 1
+   :caption: Getting Started
+   :hidden:
+
+   installation
+   invokation
+   hutch_setup
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Getting Started
+   :maxdepth: 1
+   :caption: Configuration
+   :hidden:
 
-   getting-started
-   
+   yaml_files
+   load
+   experiment
+   namespace
 
-Indices and tables
-==================
+.. toctree::
+   :maxdepth: 1
+   :caption: Developer API
+   :hidden:
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   base_plugin
+   log_setup
+   utils

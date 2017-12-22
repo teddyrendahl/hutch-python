@@ -1,6 +1,17 @@
 class BasePlugin:
     """
     Interface for each top-level entry in the conf.yaml file.
+
+    Attributes
+    ----------
+    priority: int
+        Plugins with a larger priority number will be executed first. Plugins
+        with the same priority number will be executed in the order they appear
+        in the configuration file.
+
+    name: str
+        Convenience attribute that is the name of the Plugin. Should match the
+        filename, without the extension.
     """
     # Plugins with high priority numbers will be created first.
     # Plugins with equal priority numbers will be created in sequence.
