@@ -25,14 +25,15 @@ install:
   - conda update -q conda conda-build
   # Useful for debugging any issues with conda
   - conda info -a
-  # Grab all dependencies
-  # Build dependencies
-  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION --file dev-requirements.txt
-  - source activate test-environment
   # Test conda build
   - conda build -q conda-recipe
+  # Is it there?
+  - ls /home/travis/miniconda/conda-bld/linux-64
   # Install it
   - conda install -q hutch-python --use-local
+  # Create test environment
+  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION --file dev-requirements.txt --use-local
+  - source activate test-environment
 
 script:
   - coverage run run_tests.py
