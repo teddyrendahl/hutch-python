@@ -11,6 +11,10 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 @contextmanager
 def cli_args(args):
+    """
+    Context manager for running a block of code with a specific set of
+    command-line arguments.
+    """
     prev_args = sys.argv
     sys.argv = args
     yield
@@ -19,6 +23,10 @@ def cli_args(args):
 
 @contextmanager
 def restore_logging():
+    """
+    Context manager for reverting our logging config after testing a function
+    that configures the logging.
+    """
     prev_handlers = copy(logging.root.handlers)
     yield
     logging.root.handlers = prev_handlers
