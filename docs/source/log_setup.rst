@@ -23,9 +23,5 @@ logger for interactive sessions.
 
 log_setup.py
 ------------
-
-.. autosummary::
-   :toctree: generated
-
-   hutch_python.log_setup.absolute_submodule_path
+.. autofunction::
    hutch_python.log_setup.setup_logging
