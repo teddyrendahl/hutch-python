@@ -30,7 +30,7 @@ install:
 
 script:
   # Test conda build
-  - ./test-conda.sh
+  - bash test-conda.sh
   # Install it
   - conda install hutch-python -c "file://`readlink -f conda-bld-tst`" -c defaults -c conda-forge -c skywalker-tag -c lightsource2-tag
   - coverage run run_tests.py
