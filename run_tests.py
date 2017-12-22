@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 import os
 import sys
-import pytest
-from pathlib import Path
 import logging
+from pathlib import Path
 from logging.handlers import RotatingFileHandler
+
+import pytest
 
 if __name__ == '__main__':
     # Show output results from every test function
