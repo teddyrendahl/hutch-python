@@ -1,7 +1,8 @@
 import logging
 import os.path
 
-from hutch_python.load_conf import load, read_conf
+from hutch_python.base_plugin import BasePlugin
+from hutch_python.load_conf import load, read_conf, run_plugins
 
 logger = logging.getLogger(__name__)
 
@@ -27,10 +28,38 @@ def test_read_empty():
 def test_read_duplicate():
     logger.debug('test_read_duplicate')
     objs = read_conf({'load': ['sample_module_1.py', 'sample_module_1.py']})
-    assert len(objs) == 3
+    assert len(objs) == 4
 
 
 def test_read_only_namespaces():
     logger.debug('test_read_only_namespaces')
     objs = read_conf({'namespace': {'class': {'float': ['text', 'words']}}})
     assert len(objs) == 2
+
+
+class BadGetObjects(BasePlugin):
+    name = 'broken'
+
+    def get_objects(self):
+        raise RuntimeError('I am broken for the test')
+
+
+class SimplePlugin(BasePlugin):
+    name = 'simple'
+
+    def get_objects(self):
+        return {'name': 'text'}
+
+
+class BadFutureHook(SimplePlugin):
+    name = 'broken'
+
+    def future_plugin_hook(self, *args, **kwargs):
+        raise RuntimeError('I am broken for the test')
+
+
+def test_skip_failures():
+    logger.debug('test_skip_failures')
+    bad_plugins = {0: [BadGetObjects({}), BadFutureHook({}), SimplePlugin({})]}
+    objs = run_plugins(bad_plugins)
+    assert objs['name'] == 'text'

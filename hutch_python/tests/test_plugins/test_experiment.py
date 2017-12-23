@@ -1,5 +1,7 @@
 import logging
 
+import pytest
+
 from hutch_python.plugins.experiment import Plugin
 
 logger = logging.getLogger(__name__)
@@ -40,3 +42,13 @@ def test_experiment_plugin():
     objs = plugin.get_objects()
     assert 'x' in objs
     assert 'y' in objs
+
+
+def test_experiment_auto():
+    logger.debug('test_experiment_auto')
+
+    info = {'name': 'automatic',
+            'import': 'experiment'}
+    plugin = Plugin(info)
+    with pytest.raises(NotImplementedError):
+        plugin.get_objects()

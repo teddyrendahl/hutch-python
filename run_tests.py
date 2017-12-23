@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 import os
 import sys
-import pytest
-from pathlib import Path
 import logging
+from pathlib import Path
 from logging.handlers import RotatingFileHandler
+
+import pytest
 
 if __name__ == '__main__':
     # Show output results from every test function
@@ -36,7 +37,7 @@ if __name__ == '__main__':
     if do_rollover:
         handler.doRollover()
     formatter = logging.Formatter(fmt=('%(asctime)s.%(msecs)03d '
-                                       '%(module)-10s '
+                                       '%(module)-15s '
                                        '%(levelname)-8s '
                                        '%(threadName)-10s '
                                        '%(message)s'),

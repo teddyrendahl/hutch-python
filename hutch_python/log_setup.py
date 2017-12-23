@@ -7,6 +7,7 @@ import yaml
 logger = logging.getLogger(__name__)
 
 DIR_MODULE = Path(__file__).resolve().parent.parent
+DEFAULT_YAML = DIR_MODULE / 'logging.yml'
 DIR_LOGS = DIR_MODULE / 'hutch_python/logs'
 
 
@@ -32,7 +33,7 @@ def setup_logging(path_yaml=None, dir_logs=None, default_level=logging.INFO):
     """
     # Get the yaml path
     if path_yaml is None:
-        path_yaml = DIR_MODULE / 'logging.yml'
+        path_yaml = DEFAULT_YAML
     # Make sure we are using Path objects
     else:
         path_yaml = Path(path_yaml)
