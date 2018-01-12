@@ -1,3 +1,4 @@
 ipython
 pyyaml
 coloredlogs
+git+https://github.com/slaclab/happi#egg=happi
