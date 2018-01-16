@@ -1,3 +1,23 @@
+"""
+This plugin depends on a JSON happi database stored somewhere in the file
+system. The path of this file is supplied in the YAML as ``filename``.
+Finally, if a smaller subsection of the databse is desired, a requirements
+specification can be used to limit the number of devices that are loaded.
+
+The plugin then handles; initalizing the ``happi.Client``, finding the
+containers that match the specified requirements, then using the device
+loading utilities from happi to create instantiated devices
+
+Example
+-------
+.. code:: YAML
+
+    happi:
+        filename: path/to/my_db.json
+        requirements:
+            active: True
+            beamline: MFX
+"""
 import logging
 
 import happi
