@@ -5,10 +5,10 @@ daq:
   platform: 4
 
 happi:
-  beamline:
-    - FEE
-    - HXD
-    - MFX
+  filename: hutch_python/tests/happi_db.json
+  requirements:
+      active: True
+      beamline: TST
 
 lightpath: MFX
 
