@@ -4,4 +4,3 @@ doctr
 pytest
 flake8
 codecov
-git+https://github.com/slaclab/happi#egg=happi
