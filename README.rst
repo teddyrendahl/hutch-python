@@ -24,7 +24,6 @@ strictly required. Other than Python 3.6+, there are few requirements for
 running this module. These are small utilities:
 
 - ``ipython``, for improved interactive sessions
-- ``happi``, for device loading
 - ``pyyaml``, for reading config files
 - ``coloredlogs``, for colored logging
 
