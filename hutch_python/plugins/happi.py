@@ -32,7 +32,6 @@ class Plugin(BasePlugin):
     """
     Plugin to load search information from happi
     """
-    priority = 5
     name = 'happi'
 
     def get_objects(self):
