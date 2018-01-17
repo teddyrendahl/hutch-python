@@ -21,7 +21,7 @@ install:
   - conda install conda-build
   - conda update -q conda conda-build
   - conda config --append channels conda-forge
-  - conda config --append channels skywalker-tag
+  - conda config --append channels skywalker-dev
   - conda config --append channels lightsource2-tag
   # Useful for debugging any issues with conda
   - conda info -a
