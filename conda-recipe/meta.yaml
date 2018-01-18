@@ -21,7 +21,7 @@ requirements:
     - pyyaml
     - coloredlogs
     - happi >=0.5.0
-    - pcds-devices >=0.2.0
+    - pcdsdevices >=0.2.0
 
 test:
   imports:
