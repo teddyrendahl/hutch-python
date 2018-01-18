@@ -36,7 +36,8 @@ At LCLS, there is little point to running this module without:
 If present, some modules will enable extra features, which will be listed
 below:
 
-- None, at the moment
+- `happi <https://github.com/slaclab/happi>`_ will enable device loading from a
+  happi database, and from the experiment questionaire.
 
 In the future, I plan to support the following extra features:
 
