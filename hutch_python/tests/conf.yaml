@@ -5,10 +5,10 @@ daq:
   platform: 4
 
 happi:
-  beamline:
-    - FEE
-    - HXD
-    - MFX
+  filename: hutch_python/tests/happi_db.json
+  requirements:
+      active: True
+      beamline: TST
 
 lightpath: MFX
 
@@ -30,10 +30,10 @@ namespace:
     ophyd.PositionerBase:
       - m
       - motors
-    pcdsdevices.PIM:
+    pcdsdevices.epics.pim.PIM:
       - p
       - pims
-    pcdsdevices.Slits:
+    pcdsdevices.slits.Slits:
       - s
       - slits
     ophyd.sim.SynSignal:

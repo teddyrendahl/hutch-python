@@ -9,7 +9,12 @@ env:
 matrix:
   include:
     - python: 3.6
-      env: BUILD_DOCS=1
+      env: 
+         - PCDS_CHANNEL=skywalker-tag
+    - python: 3.6
+      env:
+         - PCDS_CHANNEL=skywalker-dev
+         - BUILD_DOCS=1
 
 install:
   - sudo apt-get update
@@ -21,7 +26,7 @@ install:
   - conda install conda-build
   - conda update -q conda conda-build
   - conda config --append channels conda-forge
-  - conda config --append channels skywalker-tag
+  - conda config --append channels $PCDS_CHANNEL
   - conda config --append channels lightsource2-tag
   # Useful for debugging any issues with conda
   - conda info -a

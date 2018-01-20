@@ -1,0 +1,68 @@
+{
+    "Tst:Dev:1": {
+        "_id": "Tst:Dev:1",
+        "active": true,
+        "args": [],
+        "beamline": "TST",
+        "creation": "Sat Jan 13 13:48:43 2018",
+        "device_class": "happi.Device",
+        "kwargs": {
+            "active": "{{active}}",
+            "name": "{{name}}"
+        },
+        "last_edit": "Tue Jan 16 13:36:13 2018",
+        "macros": null,
+        "name": "Test Device 1",
+        "parent": null,
+        "prefix": "Tst:Dev:1",
+        "screen": null,
+        "stand": null,
+        "system": null,
+        "type": "Device",
+        "z": -1.0
+    },
+    "Tst:Dev:2": {
+        "_id": "Tst:Dev:2",
+        "active": true,
+        "args": [],
+        "beamline": "TST",
+        "creation": "Sat Jan 13 13:49:51 2018",
+        "device_class": "happi.Device",
+        "kwargs": {
+            "active": "{{active}}",
+            "name": "{{name}}"
+        },
+        "last_edit": "Tue Jan 16 13:36:13 2018",
+        "macros": null,
+        "name": "Test Device 2",
+        "parent": null,
+        "prefix": "Tst:Dev:2",
+        "screen": null,
+        "stand": null,
+        "system": null,
+        "type": "Device",
+        "z": -1.0
+    },
+    "Tst:Dev:3": {
+        "_id": "Tst:Dev:3",
+        "active": false,
+        "args": [],
+        "beamline": "TST",
+        "creation": "Sat Jan 13 13:50:36 2018",
+        "device_class": "happi.Device",
+        "kwargs": {
+            "active": "{{active}}",
+            "name": "{{name}}"
+        },
+        "last_edit": "Tue Jan 16 13:36:13 2018",
+        "macros": null,
+        "name": "Test Device 3",
+        "parent": null,
+        "prefix": "Tst:Dev:3",
+        "screen": null,
+        "stand": null,
+        "system": null,
+        "type": "Device",
+        "z": -1.0
+    }
+}
