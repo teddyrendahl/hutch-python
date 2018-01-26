@@ -18,15 +18,15 @@ class BasePlugin:
     priority = 0
     name = None
 
-    def __init__(self, info):
+    def __init__(self, conf):
         """
         Parameters
         ----------
-        info: str, list, or dict
-            The full entry from the yaml file, not including the top-level
-            dictionary key.
+        conf: dict
+            The full dict from the yaml file.
         """
-        self.info = info
+        self.conf = conf
+        self.info = conf[self.name]
 
     def get_objects(self):
         """
