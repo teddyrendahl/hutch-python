@@ -2,5 +2,5 @@ from hutch_python import objects
 
 
 class User:
-    m = objects.motors
+    funcs = objects.funcs
     some_device = objects.unique_device

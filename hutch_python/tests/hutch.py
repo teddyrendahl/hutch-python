@@ -1,6 +1,3 @@
-from ophyd.sim import motor as fake_motor, det as fake_det  # NOQA
-
-
 class UniqueDevice:
     pass
 
