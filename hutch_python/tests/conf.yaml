@@ -27,21 +27,6 @@ namespace:
     function:
       - fn
       - funcs
-    ophyd.PositionerBase:
-      - m
-      - motors
-    pcdsdevices.pim.PIM:
-      - p
-      - pims
-    pcdsdevices.slits.Slits:
-      - s
-      - slits
-    ophyd.sim.SynSignal:
-      - f
-      - fake
-    ophyd.sim.SynAxis:
-      - f
-      - fake
   happi:
     lcls:
       - beamline
