@@ -60,6 +60,9 @@ class BadFutureHook(SimplePlugin):
 
 def test_skip_failures():
     logger.debug('test_skip_failures')
-    bad_plugins = {0: [BadGetObjects({}), BadFutureHook({}), SimplePlugin({})]}
+    conf = dict(broken={}, simple={})
+    bad_plugins = {0: [BadGetObjects(conf),
+                       BadFutureHook(conf),
+                       SimplePlugin(conf)]}
     objs = run_plugins(bad_plugins)
     assert objs['name'] == 'text'

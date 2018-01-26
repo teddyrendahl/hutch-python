@@ -30,7 +30,7 @@ namespace:
     ophyd.PositionerBase:
       - m
       - motors
-    pcdsdevices.epics.pim.PIM:
+    pcdsdevices.pim.PIM:
       - p
       - pims
     pcdsdevices.slits.Slits:

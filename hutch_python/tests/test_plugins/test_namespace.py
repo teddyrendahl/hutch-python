@@ -24,7 +24,8 @@ def test_namespace_plugin_class():
     info = {'class': {'float': ['flt'],
                       'skip_bad': ['skip_me'],
                       'str': ['text', 'words']}}
-    plugin = Plugin(info)
+    conf = dict(namespace=info)
+    plugin = Plugin(conf)
     namespaces = plugin.get_objects()
     plugin.future_plugin_hook(None, objs)
     float_space = namespaces['flt']
