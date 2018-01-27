@@ -10,12 +10,10 @@ logger = logging.getLogger(__name__)
 def test_load_normal():
     logger.debug('test_load_normal')
     objs = load(os.path.join(os.path.dirname(__file__), 'conf.yaml'))
-    should_have = ('x', 'fn', 'funcs', 'm', 'motors', 'p', 'pims', 's',
-                   'slits', 'f', 'fake', 'fake_motor', 'fake_det',
-                   'unique_device', 'calc_thing')
+    should_have = ('x', 'fn', 'funcs', 'unique_device', 'calc_thing')
     for elem in should_have:
         assert elem in objs
-    assert len(objs['fake'].__dict__) == 2
+    assert len(objs['funcs'].__dict__) == 1
     assert objs['fn'] == objs['funcs']
 
 
@@ -60,6 +58,9 @@ class BadFutureHook(SimplePlugin):
 
 def test_skip_failures():
     logger.debug('test_skip_failures')
-    bad_plugins = {0: [BadGetObjects({}), BadFutureHook({}), SimplePlugin({})]}
+    conf = dict(broken={}, simple={})
+    bad_plugins = {0: [BadGetObjects(conf),
+                       BadFutureHook(conf),
+                       SimplePlugin(conf)]}
     objs = run_plugins(bad_plugins)
     assert objs['name'] == 'text'

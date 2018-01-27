@@ -12,13 +12,15 @@ def test_happi_plugin():
     logger.debug("test_happi_plugin")
     # Select all the available objects
     info = {'filename': _db}
-    plugin = Plugin(info)
+    conf = dict(happi=info)
+    plugin = Plugin(conf)
     objs = plugin.get_objects()
     assert len(objs) == 3
     # Only select active objects
     info = {'filename': _db,
             'requirements': {'active': True}}
-    plugin = Plugin(info)
+    conf = dict(happi=info)
+    plugin = Plugin(conf)
     objs = plugin.get_objects()
     assert len(objs) == 2
     assert all([obj.active for obj in objs.values()])
