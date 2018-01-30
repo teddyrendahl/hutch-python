@@ -33,3 +33,24 @@ def test_namespace_plugin_class():
     string_space = namespaces['text']
     assert string_space.three == '3'
     assert string_space == namespaces['words']
+
+
+def test_namespace_plugin_metadata():
+    logger.debug('test_namespace_plugin_metadata')
+    obj1 = SimpleNamespace(beamline='MFX', stand='DIA')
+    obj2 = SimpleNamespace(beamline='MFX', stand='DIA')
+    obj3 = SimpleNamespace(beamline='MFX', stand='DG2')
+    obj4 = SimpleNamespace(beamline='MFX')
+    obj5 = SimpleNamespace(beamline='XPP', stand='SB2')
+    objs = dict(mfx_dia_obj1=obj1, mfx_dia_obj2=obj2, mfx_dg2_obj3=obj3,
+                mfx_obj4=obj4, xpp_sb2_obj5=obj5)
+    info = {'metadata': ['beamline', 'stand']}
+    plugin = Plugin(info=info)
+    namespaces = plugin.get_objects()
+    plugin.future_plugin_hook(None, objs)
+    space = namespaces[0]
+    assert space.mfx.dia.obj1 == obj1
+    assert space.mfx.dia.obj2 == obj2
+    assert space.mfx.dg2.obj3 == obj3
+    assert space.mfx.obj4 == obj4
+    assert space.xpp.sb2.obj5 == obj5
