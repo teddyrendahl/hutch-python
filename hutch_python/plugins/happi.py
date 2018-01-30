@@ -46,5 +46,5 @@ class Plugin(BasePlugin):
             containers = client.all_devices
         else:
             containers = client.search(**reqs)
-        dev_namespace = load_devices(*containers, pprint=True)
+        dev_namespace = load_devices(*containers, pprint=False)
         return dev_namespace.__dict__
