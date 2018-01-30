@@ -11,39 +11,44 @@ def test_experiment_plugin():
     logger.debug('test_experiment_plugin')
 
     info = {'name': 'sample_expname',
-            'import': 'experiment'}
+            'import': 'experiment',
+            'questionnaire': False}
     conf = dict(experiment=info)
-    plugin = Plugin(conf)
+    plugin = Plugin(conf).pre_plugins()[-1]
     objs = plugin.get_objects()
     assert 'sample_plan' in objs
     assert 'another' in objs
 
     info = {'name': 'sample_expname',
-            'import': 'experiment.sample_plan'}
+            'import': 'experiment.sample_plan',
+            'questionnaire': False}
     conf = dict(experiment=info)
-    plugin = Plugin(conf)
+    plugin = Plugin(conf).pre_plugins()[-1]
     objs = plugin.get_objects()
     assert 'sample_plan' in objs
     assert 'another' not in objs
 
     info = {'name': 'sample_expname',
-            'import': 'experiment.sample_plan()'}
+            'import': 'experiment.sample_plan()',
+            'questionnaire': False}
     conf = dict(experiment=info)
-    plugin = Plugin(conf)
+    plugin = Plugin(conf).pre_plugins()[-1]
     objs = plugin.get_objects()
     assert objs['sample_plan'] == 5
 
     info = {'name': 'sample_expname',
-            'import': 'experiment as x'}
+            'import': 'experiment as x',
+            'questionnaire': False}
     conf = dict(experiment=info)
-    plugin = Plugin(conf)
+    plugin = Plugin(conf).pre_plugins()[-1]
     objs = plugin.get_objects()
     assert 'x' in objs
 
     info = {'name': 'sample_expname',
-            'import': 'experiment.sample_plan as x, y'}
+            'import': 'experiment.sample_plan as x, y',
+            'questionnaire': False}
     conf = dict(experiment=info)
-    plugin = Plugin(conf)
+    plugin = Plugin(conf).pre_plugins()[-1]
     objs = plugin.get_objects()
     assert 'x' in objs
     assert 'y' in objs
@@ -55,6 +60,5 @@ def test_experiment_auto():
     info = {'name': 'automatic',
             'import': 'experiment'}
     conf = dict(experiment=info)
-    plugin = Plugin(conf)
     with pytest.raises(NotImplementedError):
-        plugin.get_objects()
+        plugin = Plugin(conf).pre_plugins()[-1]
