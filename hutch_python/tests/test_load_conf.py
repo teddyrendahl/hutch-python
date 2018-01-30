@@ -35,6 +35,11 @@ def test_read_only_namespaces():
     assert len(objs) == 2
 
 
+def test_ignores_bad_plugin():
+    logger.debug('test_ignores_bad_plugin')
+    objs = read_conf({'awoeifdhasd': True})
+
+
 class BadGetObjects(BasePlugin):
     name = 'broken'
 
