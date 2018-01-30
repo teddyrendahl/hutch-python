@@ -1,26 +1,17 @@
 beamline: mfx
 
-daq:
-  lcls: 1
-  platform: 4
-
 happi:
   filename: hutch_python/tests/happi_db.json
   requirements:
       active: True
       beamline: TST
 
-lightpath: MFX
-
 load:
   - hutch.py
 
 experiment:
-  #name: automatic
   name: mfxx000
   import: experiment.User() as x
-  #features:
-  #  - pswww
 
 namespace:
   class:
