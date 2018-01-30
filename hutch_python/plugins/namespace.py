@@ -34,15 +34,11 @@ class Plugin(BasePlugin):
                 err = 'Namespace {} not defined'
                 logger.warning(err.format(space))
                 continue
-            for key, space in new_objs.items():
-                if key in return_objs:
-                    return_objs[key].update(space.__dict__)
-                else:
-                    return_objs[key] = space
+            return_objs.update(new_objs)
         return return_objs
 
     def get_class_objs(self, opts, prev_objs):
-        class_objs = {}
+        class_objs = defaultdict(SimpleNamespace)
         for cls_name, space_names in opts.items():
             try:
                 if cls_name == 'function':
@@ -56,7 +52,7 @@ class Plugin(BasePlugin):
                 logger.debug(exc, exc_info=True)
                 continue
             for ns_name in space_names:
-                namespace = SimpleNamespace()
+                namespace = class_objs[ns_name]
                 logger.debug('Added class namespace for type %s as name %s',
                              cls, ns_name)
                 for name, obj in prev_objs.items():
@@ -69,7 +65,6 @@ class Plugin(BasePlugin):
                     if ok:
                         setattr(namespace, name, obj)
                         logger.debug('Add %s to namespace %s', name, ns_name)
-                class_objs[ns_name] = namespace
         return class_objs
 
     def get_metadata_objs(self, opts, prev_objs):
