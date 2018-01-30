@@ -4,3 +4,4 @@ doctr
 pytest
 flake8
 codecov
+psdm_qs_cli
