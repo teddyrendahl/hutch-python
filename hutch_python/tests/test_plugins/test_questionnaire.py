@@ -51,4 +51,4 @@ def test_questionnaire_bad_conf():
     plugin = Plugin(conf)
     hutch_python.plugins.questionnaire.QSBackend = QSBackend
     with pytest.raises(ValueError):
-        objs = plugin.get_objects()
+        plugin.get_objects()
