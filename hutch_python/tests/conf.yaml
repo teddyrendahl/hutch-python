@@ -1,4 +1,4 @@
-hutch: mfx
+beamline: mfx
 
 happi:
   filename: hutch_python/tests/happi_db.json
