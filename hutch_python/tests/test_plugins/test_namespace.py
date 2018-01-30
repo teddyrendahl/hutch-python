@@ -37,11 +37,16 @@ def test_namespace_plugin_class():
 
 def test_namespace_plugin_metadata():
     logger.debug('test_namespace_plugin_metadata')
-    obj1 = SimpleNamespace(beamline='MFX', stand='DIA')
-    obj2 = SimpleNamespace(beamline='MFX', stand='DIA')
-    obj3 = SimpleNamespace(beamline='MFX', stand='DG2')
-    obj4 = SimpleNamespace(beamline='MFX')
-    obj5 = SimpleNamespace(beamline='XPP', stand='SB2')
+    obj1 = SimpleNamespace()
+    obj2 = SimpleNamespace()
+    obj3 = SimpleNamespace()
+    obj4 = SimpleNamespace()
+    obj5 = SimpleNamespace()
+    obj1.md = SimpleNamespace(beamline='MFX', stand='DIA')
+    obj2.md = SimpleNamespace(beamline='MFX', stand='DIA')
+    obj3.md = SimpleNamespace(beamline='MFX', stand='DG2')
+    obj4.md = SimpleNamespace(beamline='MFX')
+    obj5.md = SimpleNamespace(beamline='XPP', stand='SB2')
     objs = dict(mfx_dia_obj1=obj1, mfx_dia_obj2=obj2, mfx_dg2_obj3=obj3,
                 mfx_obj4=obj4, xpp_sb2_obj5=obj5)
     info = {'metadata': ['beamline', 'stand']}
