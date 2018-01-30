@@ -23,6 +23,8 @@ class Plugin(BasePlugin):
             logger.debug('Loading %s namespaces', space)
             if space == 'class':
                 objs, managers = self.get_class_objects(opts)
+            elif space == 'metadata':
+                objs, managers = self.get_metadata_objects(opt)
             else:
                 err = 'Namespace {} not defined'
                 logger.warning(err.format(space))
@@ -58,6 +60,11 @@ class Plugin(BasePlugin):
                              cls, name)
         return objs, managers
 
+    def get_metadata_objects(self, opts):
+        objs = {'md': SimpleNamespace()}
+        managers = [MetadataNamespaceManager(objs['md'], 'md', opts)]
+        return objs, managers
+
 
 class NamespaceManager:
     def __init__(self, namespace, name):
@@ -88,3 +95,29 @@ class ClassNamespaceManager(NamespaceManager):
             return True
         else:
             return False
+
+
+class MetadataNamespaceManager(NamespaceManager):
+    def __init__(self, namespace, name, filters):
+        super().__init__(namespace, name)
+        self.filters = filters
+
+    def should_include(self, name, obj):
+        return hasattr(obj, 'md')
+
+    def add(self, name, obj):
+        if self.should_include(name, obj):
+            logger.debug('Add %s to namespace %s', name, self.name)
+            upper_space = self.namespace
+            for filt in self.filters:
+                key = getattr(obj.md, filt, None)
+                if key is None:
+                    setattr(upper_space, name, obj)
+                    return
+                key = key.lower()
+                if name.startswith(key):
+                    name = name[len(key)+1:]
+                if not hasattr(upper_space, key):
+                    setattr(upper_space, key, SimpleNamespace())
+                upper_space = getattr(upper_space, key)
+            setattr(upper_space, name, obj)
