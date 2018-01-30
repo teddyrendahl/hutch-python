@@ -18,15 +18,22 @@ class BasePlugin:
     priority = 0
     name = None
 
-    def __init__(self, conf):
+    def __init__(self, conf=None, info=None):
         """
+        Arguments will be passed every time by the loader, but are optional for
+        ease of testing and to help create metaplugins. At least one or the
+        other must be provided.
+
         Parameters
         ----------
-        conf: dict
+        conf: dict, optional
             The full dict from the yaml file.
+
+        info: object, optional
+            The portion of the dict specific to this plugin
         """
         self.conf = conf
-        self.info = conf[self.name]
+        self.info = info or conf[self.name]
 
     def get_objects(self):
         """
@@ -38,6 +45,17 @@ class BasePlugin:
             Mapping from final global reference name to object
         """
         pass
+
+    def other_plugins(self):
+        """
+        Return a list of instantiated plugins that must be run before running
+        this plugin.
+
+        Returns
+        -------
+        plugins: list
+        """
+        return []
 
     def future_object_hook(self, name, obj):
         """

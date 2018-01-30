@@ -62,7 +62,7 @@ def get_plugins(conf):
     """
     plugins = defaultdict(list)
 
-    for plugin_name in conf.keys():
+    for plugin_name, info in conf.items():
         try:
             module = import_module('hutch_python.plugins.' + plugin_name)
         except ImportError:
@@ -70,7 +70,7 @@ def get_plugins(conf):
             err = 'Plugin {} is not available, skipping'
             logger.warning(err.format(plugin_name))
             continue
-        this_plugin = module.Plugin(conf)
+        this_plugin = module.Plugin(conf, info)
         plugins[this_plugin.priority].append(this_plugin)
 
     return plugins
