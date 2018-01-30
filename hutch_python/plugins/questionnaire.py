@@ -2,6 +2,9 @@
 This plugin depends on the QSBackend in `happi`. Not intended to be run
 individually, it is expected that the requisite information is passed in the
 `experiment` section. This includes the proposal id and run.
+
+A connection to the Questionnaire webservice is made and the devices that have
+enough information to be turned into Python objects are instantiated.
 """
 import logging
 
