@@ -61,8 +61,9 @@ class Plugin(BasePlugin):
                              cls, ns_name)
                 for name, obj in prev_objs.items():
                     ok = False
-                    if cls == 'function' and inspect.isfunction(obj):
-                        ok = True
+                    if cls == 'function':
+                        if inspect.isfunction(obj):
+                            ok = True
                     elif isinstance(obj, cls):
                         ok = True
                     if ok:
