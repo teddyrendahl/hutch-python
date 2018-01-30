@@ -53,7 +53,7 @@ def test_namespace_plugin_metadata():
     plugin = Plugin(info=info)
     namespaces = plugin.get_objects()
     plugin.future_plugin_hook(None, objs)
-    space = namespaces[0]
+    space = namespaces['md']
     assert space.mfx.dia.obj1 == obj1
     assert space.mfx.dia.obj2 == obj2
     assert space.mfx.dg2.obj3 == obj3
