@@ -33,5 +33,5 @@ class Plugin(BasePlugin):
         else:
             raise ValueError("Inadequate information to load Questionnaire. "
                              "Must specify proposal and run.")
-        dev_namespace = load_devices(*qs_client.all_devices, pprint=True)
+        dev_namespace = load_devices(*qs_client.all_devices, pprint=False)
         return dev_namespace.__dict__
