@@ -92,7 +92,7 @@ def run_plugins(plugins):
     objs: dict{str: object}
         Return value of load
     """
-    all_objects = hutch_python.objects
+    all_objs = {}
 
     plugin_priorities = reversed(sorted(list(plugins.keys())))
     executed_plugins = []
@@ -116,6 +116,7 @@ def run_plugins(plugins):
                                             this_plugin.name))
                     logger.debug(exc, exc_info=True)
             executed_plugins.append(this_plugin)
-            all_objects.__dict__.update(objs)
+            all_objs.update(objs)
+            hutch_python.register_load(this_plugin.name, objs)
 
-    return all_objects.__dict__
+    return all_objs

@@ -1,6 +1,7 @@
-from hutch_python import objects
+from hutch_python import namespace as ns
+from hutch import unique_device
 
 
 class User:
-    funcs = objects.funcs
-    some_device = objects.unique_device
+    funcs = ns.funcs
+    some_device = unique_device
