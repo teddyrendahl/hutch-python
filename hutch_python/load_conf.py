@@ -71,7 +71,9 @@ def get_plugins(conf):
             logger.warning(err.format(plugin_name))
             continue
         this_plugin = module.Plugin(conf, info)
-        plugins[this_plugin.priority].append(this_plugin)
+        pre_plugins = this_plugin.pre_plugins()
+        for plugin in pre_plugins + [this_plugin]:
+            plugins[this_plugin.priority].append(plugin)
 
     return plugins
 

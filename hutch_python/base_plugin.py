@@ -46,7 +46,7 @@ class BasePlugin:
         """
         pass
 
-    def other_plugins(self):
+    def pre_plugins(self):
         """
         Return a list of instantiated plugins that must be run before running
         this plugin.
