@@ -2,7 +2,10 @@ import logging
 
 import pytest
 
+import hutch_python.plugins.questionnaire
 from hutch_python.plugins.experiment import Plugin
+
+from ..conftest import QSBackend
 
 logger = logging.getLogger(__name__)
 
@@ -58,3 +61,14 @@ def test_experiment_auto():
     plugin = Plugin(conf)
     with pytest.raises(NotImplementedError):
         plugin.get_objects()
+
+
+def test_questionnaire_preplugin():
+    info = {'run': 15, 'proposal': 'LR12'}
+    conf = dict(experiment=info)
+    plugin = Plugin(conf)
+    hutch_python.plugins.questionnaire.QSBackend = QSBackend
+    pre_plugins = plugin.pre_plugins()
+    objs = pre_plugins[0].get_objects()
+    assert objs['inj_x'].run == '15'
+    assert objs['inj_x'].proposal == 'LR12'
