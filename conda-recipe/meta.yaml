@@ -20,7 +20,8 @@ requirements:
     - ipython
     - pyyaml
     - coloredlogs
-    - happi >=0.5.0  # Required if using happi plugin
+    - happi >=0.5.0
+    - pcdsdevices >=0.3.0
 
 test:
   imports:

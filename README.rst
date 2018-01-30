@@ -19,27 +19,20 @@ Requirements
 ------------
 
 This module is intended to be run using the latest pcds release in the
-`pcds-envs <https://github.com/pcdshub/pcds-envs>`_ package, but this is not
-strictly required. Other than Python 3.6+, there are few requirements for
-running this module. These are small utilities:
+`pcds-envs <https://github.com/pcdshub/pcds-envs>`_ package.
+
+This module requires Python 3.6+ and the following utilities:
 
 - ``ipython``, for improved interactive sessions
 - ``pyyaml``, for reading config files
 - ``coloredlogs``, for colored logging
-
-At LCLS, there is little point to running this module without:
-
 - `pcdsdevices <https://github.com/pcdshub/pcdsdevices>`_ for our Device abstraction layers
 - ``pydaq`` for running the DAQ
+- `happi <https://github.com/slaclab/happi>`_ will enable device loading from a
+   happi database, and from the experiment questionaire.
 - `bluesky <https://github.com/nsls-ii/bluesky>`_ for scanning
 
-If present, some modules will enable extra features, which will be listed
-below:
-
-- `happi <https://github.com/slaclab/happi>`_ will enable device loading from a
-  happi database, and from the experiment questionaire.
-
-In the future, I plan to support the following extra features:
+In the future, we plan to support the following extra features:
 
 - `lightpath <https://github.com/slaclab/lightpath>`_ will enable specification of a path object to include (requires happi).
 - ``pyfiglet`` will enable hutch banners (think big ``xpppython`` on startup)
