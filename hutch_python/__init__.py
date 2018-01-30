@@ -14,7 +14,8 @@ def register_load(plugin_name, objs):
     like `hutch_python.questionnaire` that can be imported and contain the
     loaded objects like `hutch_python.questionnaire.sam_x`.
     """
-    plugin_loads.append(plugin_name)
+    if plugin_name not in plugin_loads:
+        plugin_loads.append(plugin_name)
     namespace = globals().get(plugin_name)
     if namespace is None:
         globals()[plugin_name] = SimpleNamespace(**objs)
