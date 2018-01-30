@@ -1,10 +1,4 @@
-beamline: mfx
-
-happi:
-  filename: hutch_python/tests/happi_db.json
-  requirements:
-      active: True
-      beamline: TST
+beamline: tst
 
 load:
   - hutch.py
