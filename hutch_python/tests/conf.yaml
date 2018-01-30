@@ -12,7 +12,6 @@ namespace:
     function:
       - fn
       - funcs
-  happi:
-    lcls:
-      - beamline
-      - stand
+  metadata:
+    - beamline
+    - stand
