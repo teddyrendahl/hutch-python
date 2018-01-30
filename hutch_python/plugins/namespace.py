@@ -76,8 +76,13 @@ class Plugin(BasePlugin):
         metadata_objs = defaultdict(SimpleNamespace)
         for name, obj in prev_objs.items():
             if hasattr(obj, 'md'):
-                keys = [getattr(obj.md, filt, None) for filt in opts]
-                keys = [k.lower() for k in keys if isinstance(k, str)]
+                raw_keys = [getattr(obj.md, filt, None) for filt in opts]
+                keys = []
+                for key in raw_keys:
+                    if isinstance(key, str):
+                        keys.append(key.lower())
+                    else:
+                        keys.append(key)
                 if keys[0] is None:
                     continue
                 else:
