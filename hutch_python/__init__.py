@@ -15,7 +15,11 @@ def register_load(plugin_name, objs):
     loaded objects like `hutch_python.questionnaire.sam_x`.
     """
     plugin_loads.append(plugin_name)
-    globals()[plugin_name] = SimpleNamespace(**objs)
+    namespace = globals().get(plugin_name)
+    if namespace is None:
+        globals()[plugin_name] = SimpleNamespace(**objs)
+    else:
+        namespace.__dict__.update(objs)
 
 
 def clear_load():

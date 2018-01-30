@@ -5,6 +5,7 @@ import logging
 
 from ..base_plugin import BasePlugin
 from .. import utils
+import hutch_python
 
 logger = logging.getLogger(__name__)
 
@@ -13,33 +14,35 @@ class Plugin(BasePlugin):
     """
     Plugin to organize the user namespaces
     """
-    priority = 10
+    priority = -10
     name = 'namespace'
 
     def get_objects(self):
+        prev_objs = {}
+        for plugin_name in hutch_python.plugin_loads:
+            namespace = getattr(hutch_python, plugin_name)
+            prev_objs.update(namespace.__dict__)
+
         return_objs = {}
-        self.namespace_managers = []
         for space, opts in self.info.items():
             logger.debug('Loading %s namespaces', space)
             if space == 'class':
-                objs, managers = self.get_class_objects(opts)
+                new_objs = self.get_class_objs(opts, prev_objs)
             elif space == 'metadata':
-                objs, managers = self.get_metadata_objects(opts)
+                new_objs = self.get_metadata_objs(opts, prev_objs)
             else:
                 err = 'Namespace {} not defined'
                 logger.warning(err.format(space))
                 continue
-            return_objs.update(objs)
-            self.namespace_managers.extend(managers)
+            for key, space in new_objs.items():
+                if key in return_objs:
+                    return_objs[key].update(space.__dict__)
+                else:
+                    return_objs[key] = space
         return return_objs
 
-    def future_object_hook(self, name, obj):
-        for manager in self.namespace_managers:
-            manager.add(name, obj)
-
-    def get_class_objects(self, opts):
-        objs = defaultdict(SimpleNamespace)
-        managers = []
+    def get_class_objs(self, opts, prev_objs):
+        class_objs = {}
         for cls_name, space_names in opts.items():
             try:
                 if cls_name == 'function':
@@ -52,72 +55,46 @@ class Plugin(BasePlugin):
                 logger.error(err.format(cls_name))
                 logger.debug(exc, exc_info=True)
                 continue
-            for name in space_names:
-                namespace = objs[name]
-                manager = ClassNamespaceManager(namespace, name, cls)
-                managers.append(manager)
+            for ns_name in space_names:
+                namespace = SimpleNamespace()
                 logger.debug('Added class namespace for type %s as name %s',
-                             cls, name)
-        return objs, managers
+                             cls, ns_name)
+                for name, obj in prev_objs.items():
+                    ok = False
+                    if cls == 'function' and inspect.isfunction(obj):
+                        ok = True
+                    elif isinstance(obj, cls):
+                        ok = True
+                    if ok:
+                        setattr(namespace, name, obj)
+                        logger.debug('Add %s to namespace %s', name, ns_name)
+                class_objs[ns_name] = namespace
+        return class_objs
 
-    def get_metadata_objects(self, opts):
-        objs = {'md': SimpleNamespace()}
-        managers = [MetadataNamespaceManager(objs['md'], 'md', opts)]
-        return objs, managers
+    def get_metadata_objs(self, opts, prev_objs):
+        metadata_objs = defaultdict(SimpleNamespace)
+        for name, obj in prev_objs.items():
+            if hasattr(obj, 'md'):
+                keys = [getattr(obj.md, filt, None) for filt in opts]
+                keys = [k.lower() for k in keys if isinstance(k, str)]
+                if keys[0] is None:
+                    continue
+                else:
+                    upper_space = metadata_objs[keys[0]]
+                logger.debug('Add %s to namespace metadata', name)
+                name = self.strip_prefix(name, keys[0])
+                for key in keys[1:]:
+                    if key is None:
+                        break
+                    name = self.strip_prefix(name, key)
+                    if not hasattr(upper_space, key):
+                        setattr(upper_space, key, SimpleNamespace())
+                    upper_space = getattr(upper_space, key)
+                setattr(upper_space, name, obj)
+        return metadata_objs
 
-
-class NamespaceManager:
-    def __init__(self, namespace, name):
-        self.namespace = namespace
-        self.name = name
-
-    def should_include(self, name, obj):
-        raise NotImplementedError('Need to subclass should_include')
-
-    def add(self, name, obj):
-        if self.should_include(name, obj):
-            logger.debug('Add %s to namespace %s', name, self.name)
-            setattr(self.namespace, name, obj)
-
-
-class ClassNamespaceManager(NamespaceManager):
-    def __init__(self, namespace, name, cls):
-        super().__init__(namespace, name)
-        self.cls = cls
-
-    def should_include(self, name, obj):
-        if self.cls == 'function':
-            if inspect.isfunction(obj):
-                return True
-            else:
-                return False
-        elif isinstance(obj, self.cls):
-            return True
+    def strip_prefix(self, name, strip_text):
+        if name.startswith(strip_text):
+            return name[len(strip_text)+1:]
         else:
-            return False
-
-
-class MetadataNamespaceManager(NamespaceManager):
-    def __init__(self, namespace, name, filters):
-        super().__init__(namespace, name)
-        self.filters = filters
-
-    def should_include(self, name, obj):
-        return hasattr(obj, 'md')
-
-    def add(self, name, obj):
-        if self.should_include(name, obj):
-            logger.debug('Add %s to namespace %s', name, self.name)
-            upper_space = self.namespace
-            for filt in self.filters:
-                key = getattr(obj.md, filt, None)
-                if key is None:
-                    setattr(upper_space, name, obj)
-                    return
-                key = key.lower()
-                if name.startswith(key):
-                    name = name[len(key)+1:]
-                if not hasattr(upper_space, key):
-                    setattr(upper_space, key, SimpleNamespace())
-                upper_space = getattr(upper_space, key)
-            setattr(upper_space, name, obj)
+            return name
