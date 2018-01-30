@@ -24,7 +24,7 @@ class Plugin(BasePlugin):
             if space == 'class':
                 objs, managers = self.get_class_objects(opts)
             elif space == 'metadata':
-                objs, managers = self.get_metadata_objects(opt)
+                objs, managers = self.get_metadata_objects(opts)
             else:
                 err = 'Namespace {} not defined'
                 logger.warning(err.format(space))
