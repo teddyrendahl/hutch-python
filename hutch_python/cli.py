@@ -4,6 +4,7 @@ import argparse
 
 from .load_conf import load
 from .log_setup import setup_logging
+from .plugins import beamline
 
 
 def setup_cli_env():
@@ -11,6 +12,8 @@ def setup_cli_env():
     parser = argparse.ArgumentParser(description='Launch LCLS Hutch Python')
     parser.add_argument('--cfg', required=True,
                         help='Configuration yaml file')
+    parser.add_argument('--db', required=True,
+                        help='Device database access information')
     args = parser.parse_args()
 
     # Make sure the hutch's directory is in the path
@@ -19,6 +22,9 @@ def setup_cli_env():
     # Set up logging
     log_dir = os.path.join(os.path.dirname(args.cfg), 'logs')
     setup_logging(dir_logs=log_dir)
+
+    # Set the happi db path
+    beamline.HAPPI_DB = args.db
 
     # Load objects from the configuration file
     return load(args.cfg)
