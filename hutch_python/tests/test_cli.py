@@ -12,7 +12,8 @@ def test_setup_cli():
     logger.debug('test_setup_cli')
 
     cfg = os.path.dirname(__file__) + '/conf.yaml'
+    db = os.path.dirname(__file__) + '/happi_db.json'
 
-    with cli_args(['hutch_python', '--cfg', cfg]):
+    with cli_args(['hutch_python', '--cfg', cfg, '--db', db]):
         with restore_logging():
             setup_cli_env()
