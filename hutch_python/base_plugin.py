@@ -33,7 +33,7 @@ class BasePlugin:
             The portion of the dict specific to this plugin
         """
         self.conf = conf
-        self.info = info or conf[self.name]
+        self.info = info or conf.get(self.name)
 
     def get_objects(self):
         """
