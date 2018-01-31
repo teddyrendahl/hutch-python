@@ -4,7 +4,8 @@ load:
   - hutch.py
 
 experiment:
-  name: mfxx000
+  proposal: mfxx0
+  run: 10
   import: experiment.User() as x
 
 namespace:
