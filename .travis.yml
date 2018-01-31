@@ -38,13 +38,14 @@ install:
   - source activate test-environment
 
 script:
+  # Check for style first, before the rm step
+  - flake8 hutch_python
+  - flake8 bin
   # Make sure we run off the installed version by removing all top-level files
   - rm hutch_python/*.*
   # Run all the tests
   - coverage run run_tests.py
   - coverage report -m
-  - flake8 hutch_python
-  - flake8 bin
   # Build docs
   - set -e
   - |
