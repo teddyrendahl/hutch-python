@@ -4,7 +4,7 @@ import argparse
 
 from .load_conf import load
 from .log_setup import setup_logging
-from .plugins import beamline
+from .plugins import hutch
 
 
 def setup_cli_env():
@@ -24,7 +24,7 @@ def setup_cli_env():
     setup_logging(dir_logs=log_dir)
 
     # Set the happi db path
-    beamline.HAPPI_DB = args.db
+    hutch.HAPPI_DB = args.db
 
     # Load objects from the configuration file
     return load(args.cfg)

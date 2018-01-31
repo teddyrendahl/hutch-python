@@ -38,10 +38,14 @@ install:
   - source activate test-environment
 
 script:
+  # Test with the checkout
   - coverage run run_tests.py
   - coverage report -m
   - flake8 hutch_python
   - flake8 bin
+  # Test again, with the installed version
+  - rm hutch_python/*.*
+  - python run_tests.py
   # Build docs
   - set -e
   - |

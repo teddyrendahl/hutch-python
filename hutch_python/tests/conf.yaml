@@ -1,7 +1,7 @@
-beamline: tst
+hutch: tst
 
 load:
-  - hutch.py
+  - beamline.py
 
 experiment:
   proposal: mfxx0
