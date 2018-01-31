@@ -11,7 +11,7 @@ SIM_DAQ = False
 
 
 class Plugin(BasePlugin):
-    name = 'beamline'
+    name = 'hutch'
 
     def pre_plugins(self):
         requirements = dict(active=True,

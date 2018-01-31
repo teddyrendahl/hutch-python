@@ -1,4 +1,4 @@
-from hutch import unique_device
+from beamline import unique_device
 
 
 class User:
