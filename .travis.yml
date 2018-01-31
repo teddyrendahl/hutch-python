@@ -38,8 +38,8 @@ install:
   - source activate test-environment
 
 script:
-  # Make sure we run off the installed version
-  - rm hutch_python/*.py
+  # Make sure we run off the installed version by removing all top-level files
+  - rm hutch_python/*.*
   # Run all the tests
   - coverage run run_tests.py
   - coverage report -m
