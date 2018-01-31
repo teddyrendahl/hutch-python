@@ -24,7 +24,10 @@ class Plugin(BasePlugin):
             return [QSPlugin(conf=self.conf)]
 
     def get_objects(self):
-        expname = self.info['name']
+        proposal = self.info['proposal']
+        run = self.info['run']
+        expname = proposal + str(run)
+        expname = expname.lower()
         if expname[:4] == 'auto':
             expname = self.get_experiment_name()
         logger.info('Loading experiment %s', expname)
