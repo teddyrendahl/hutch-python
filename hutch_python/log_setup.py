@@ -6,16 +6,16 @@ import yaml
 
 logger = logging.getLogger(__name__)
 
-DIR_MODULE = Path(__file__).resolve().parent.parent
+DIR_MODULE = Path(__file__).resolve().parent
 DEFAULT_YAML = DIR_MODULE / 'logging.yml'
-DIR_LOGS = DIR_MODULE / 'hutch_python/logs'
+DIR_LOGS = DIR_MODULE / 'logs'
 
 
 def setup_logging(path_yaml=None, dir_logs=None, default_level=logging.INFO):
     """
     Sets up the logging module to make a properly configured logger.
 
-    This will go into the ``logging.yml`` file in the top level directory, and
+    This will go into the ``logging.yml`` file in the this directory, and
     try to load the logging configuration. If it fails for any reason, it will
     just use the default configuration. For more details on how the logger will
     be configured, see the ``logging.yml`` file.
