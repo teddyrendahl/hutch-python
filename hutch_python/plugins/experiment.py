@@ -11,11 +11,23 @@ logger = logging.getLogger(__name__)
 class Plugin(BasePlugin):
     """
     Plugin to load experiment-spefic includes.
+
+    By default, the Experiment plugin attempts to load information from the
+    PCDS Questionnaire. You can disable this by setting, ``questionnaire:
+    False`` underneath the ``experiment`` section in your YAML configuration
     """
     name = 'experiment'
 
+    def pre_plugins(self):
+        if self.info.get('questionnaire', True):
+            from .questionnaire import Plugin as QSPlugin
+            return [QSPlugin(conf=self.conf)]
+
     def get_objects(self):
-        expname = self.info['name']
+        proposal = self.info['proposal']
+        run = self.info['run']
+        expname = proposal + str(run)
+        expname = expname.lower()
         if expname[:4] == 'auto':
             expname = self.get_experiment_name()
         logger.info('Loading experiment %s', expname)

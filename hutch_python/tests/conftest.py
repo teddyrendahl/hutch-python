@@ -34,3 +34,28 @@ def restore_logging():
 
 
 Experiment = namedtuple('Experiment', ('run', 'proposal'))
+
+
+class QSBackend:
+    def __init__(self, run, proposal):
+        self.run = run
+        self.proposal = proposal
+
+    def find(self, multiples=False, **kwargs):
+        devices = [{
+            '_id': 'TST:USR:MMN:01',
+            'beamline': 'TST',
+            'device_class': 'hutch_python.tests.conftest.Experiment',
+            'location': 'Hutch-main experimental',
+            'args': ['{{run}}', '{{proposal}}'],
+            'kwargs': {},
+            'name': 'inj_x',
+            'prefix': 'TST:USR:MMN:01',
+            'purpose': 'Injector X',
+            'type': 'Device',
+            'run': self.run,
+            'proposal': self.proposal}]
+        if multiples:
+            return devices
+        else:
+            return devices[0]
