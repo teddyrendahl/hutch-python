@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 
 hutch.HAPPI_DB = os.path.join(os.path.abspath(os.path.dirname(__file__)),
-                           '../happi_db.json')
+                              '../happi_db.json')
 hutch.SIM_DAQ = True
 
 
