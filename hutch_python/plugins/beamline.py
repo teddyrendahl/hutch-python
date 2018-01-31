@@ -4,7 +4,8 @@ from pcdsdevices.sim.daq import SimDaq
 from ..base_plugin import BasePlugin
 from .happi import Plugin as HappiPlugin
 
-DAQ_MAP = dict(mfx=4)
+DAQ_MAP = dict(mfx=4,
+               tst=0)
 HAPPI_DB = 'filename add here later'
 SIM_DAQ = False
 

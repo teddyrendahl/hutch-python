@@ -6,7 +6,6 @@ import hutch_python.plugins.beamline as bl
 logger = logging.getLogger(__name__)
 
 
-bl.DAQ_MAP['tst'] = 0
 bl.HAPPI_DB = os.path.join(os.path.abspath(os.path.dirname(__file__)),
                            '../happi_db.json')
 bl.SIM_DAQ = True
