@@ -80,7 +80,10 @@ def find_object(obj_path):
     return getattr(module, class_name)
 
 
-def find_class(class_path):
+CLASS_SEARCH_PATH = ['pcdsdevices.device_types']
+
+
+def find_class(class_path, check_defaults=True):
     """
     Given a string class name, either return the matching built-in type or
     import the correct module and return the type.
@@ -90,11 +93,24 @@ def find_class(class_path):
     class_path: str
         Built-in type name or import path e.g. ophyd.device.Device
 
+    check_defaults: bool
+        If True, try checking for context for each module in CLASS_SEARCH_PATH
+
     Returns
     -------
     cls: type
     """
-    if '.' in class_path:
-        return find_object(class_path)
-    else:
-        return eval(class_path)
+    try:
+        if '.' in class_path:
+            return find_object(class_path)
+        else:
+            return eval(class_path)
+    except NameError:
+        if check_defaults:
+            for default in CLASS_SEARCH_PATH:
+                try:
+                    return find_class(default + '.' + class_path,
+                                      check_defaults=False)
+                except NameError:
+                    pass
+        raise

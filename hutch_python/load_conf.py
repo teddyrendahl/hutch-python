@@ -82,7 +82,12 @@ def get_plugins(conf):
             logger.warning(err.format(plugin_name))
             continue
         this_plugin = module.Plugin(conf, info)
-        pre_plugins = this_plugin.pre_plugins()
+        try:
+            pre_plugins = this_plugin.pre_plugins()
+        except Exception:
+            pre_plugins = []
+            err = 'Error in {} pre-plugins, skipping'
+            logger.warning(err.format(plugin_name))
         for plugin in pre_plugins + [this_plugin]:
             plugins[this_plugin.priority].append(plugin)
 
