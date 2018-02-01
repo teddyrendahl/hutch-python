@@ -3,8 +3,18 @@ import yaml
 from importlib import import_module
 from collections import defaultdict
 
+import pyfiglet
+
 import hutch_python
 
+HUTCH_COLORS = dict(
+    amo='38;5;27',
+    sxr='38;5;250',
+    xpp='38;5;40',
+    xcs='38;5;93',
+    mfx='38;5;202',
+    cxi='38;5;96',
+    mec='38;5;214')
 logger = logging.getLogger(__name__)
 
 
@@ -26,6 +36,7 @@ def load(filename):
     """
     with open(filename, 'r') as f:
         conf = yaml.load(f)
+    hutch_banner(conf.get('hutch', 'hutch').lower())
     return read_conf(conf)
 
 
@@ -71,7 +82,12 @@ def get_plugins(conf):
             logger.warning(err.format(plugin_name))
             continue
         this_plugin = module.Plugin(conf, info)
-        pre_plugins = this_plugin.pre_plugins()
+        try:
+            pre_plugins = this_plugin.pre_plugins()
+        except Exception:
+            pre_plugins = []
+            err = 'Error in {} pre-plugins, skipping'
+            logger.warning(err.format(plugin_name))
         for plugin in pre_plugins + [this_plugin]:
             plugins[this_plugin.priority].append(plugin)
 
@@ -120,3 +136,12 @@ def run_plugins(plugins):
             hutch_python.register_load(this_plugin.name, objs)
 
     return all_objs
+
+
+def hutch_banner(hutch_name):
+    text = hutch_name + 'Python'
+    f = pyfiglet.Figlet(font='big')
+    banner = f.renderText(text)
+    if hutch_name in HUTCH_COLORS:
+        banner = '\x1b[{}m'.format(HUTCH_COLORS[hutch_name]) + banner
+    print(banner)
