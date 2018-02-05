@@ -44,8 +44,11 @@ script:
   - flake8 hutch_python
   - flake8 bin
   # Test again, with the installed version
-  - rm hutch_python/*.*
+  - mkdir notest
+  - mv hutch_python/*.* notest
   - python run_tests.py
+  - mv notest/* hutch_python
+  - rmdir notest
   # Build docs
   - set -e
   - |
