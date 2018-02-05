@@ -2,7 +2,7 @@ import logging
 import os.path
 
 from hutch_python.base_plugin import BasePlugin
-from hutch_python.load_conf import load, read_conf, run_plugins
+from hutch_python.load_conf import load, read_conf, run_plugins, hutch_banner
 
 logger = logging.getLogger(__name__)
 
@@ -69,3 +69,8 @@ def test_skip_failures():
                        SimplePlugin(conf)]}
     objs = run_plugins(bad_plugins)
     assert objs['name'] == 'text'
+
+
+def test_banner():
+    logger.debug('test_banner')
+    hutch_banner('mfx')
