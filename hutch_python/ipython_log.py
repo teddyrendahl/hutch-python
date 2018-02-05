@@ -35,7 +35,7 @@ class IPythonLogger:
                 logger.debug('Exception in IPython session, traceback:\n' + tb)
                 self.prev_err = sys.last_value
         except Exception:
-            logger.debug('Logging error', show_exc=True)
+            logger.debug('Logging error', exc_info=True)
 
 
 def init_ipython_logger(ip):
