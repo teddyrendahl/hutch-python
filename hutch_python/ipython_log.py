@@ -42,5 +42,5 @@ class IPythonLogger:
 
 
 def init_ipython_logger(ip):
-    logging.addLevelName('INPUT', 15)
+    logging.addLevelName('INPUT', INPUT_LEVEL)
     ip.events.register('post_execute', IPythonLogger(ip).log)
