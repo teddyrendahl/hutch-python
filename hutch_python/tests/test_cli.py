@@ -1,7 +1,9 @@
 import os
 import logging
 
-from hutch_python.cli import setup_cli_env
+import pytest
+
+from hutch_python.cli import setup_cli_env, hutch_ipython_embed
 
 from conftest import cli_args, restore_logging
 
@@ -17,3 +19,12 @@ def test_setup_cli():
     with cli_args(['hutch_python', '--cfg', cfg, '--db', db]):
         with restore_logging():
             setup_cli_env()
+
+
+def test_hutch_ipython_embed():
+    logger.debug('test_hutch_ipython_embed')
+
+    # OSError because we can't actually enter IPython here.
+    # Any other error means something bad happened.
+    with pytest.raises(OSError):
+        hutch_ipython_embed()
