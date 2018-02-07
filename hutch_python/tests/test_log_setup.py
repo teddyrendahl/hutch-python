@@ -1,4 +1,5 @@
 import logging
+from logging.handlers import QueueHandler
 
 from hutch_python.log_setup import (DEFAULT_YAML, DIR_LOGS,
                                     setup_logging, set_console_level)
@@ -21,7 +22,12 @@ def test_set_console_level(log_queue):
     logger.debug('test_set_console_level')
 
     root_logger = logging.getLogger('')
-    queue_handler = root_logger.handlers[-1]
+
+    # Find the QueueHandler
+    for handler in root_logger.handlers:
+        if isinstance(handler, QueueHandler):
+            queue_handler = handler
+            break
     queue_handler.name = 'console'
     queue_handler.level = 20
 
