@@ -2,6 +2,7 @@ import os
 import time
 import logging
 import logging.config
+from contextlib import contextmanager
 from pathlib import Path
 
 import yaml
@@ -62,8 +63,39 @@ def setup_logging(path_yaml=None, dir_logs=None):
     logging.config.dictConfig(config)
 
 
-def set_console_level(level=20):
+def get_console_handler():
     root = logging.getLogger('')
     for handler in root.handlers:
         if handler.name == 'console':
-            handler.level = level
+            return handler
+    raise RuntimeError('No console handler')
+
+
+def get_console_level():
+    handler = get_console_handler()
+    return handler.level
+
+
+def set_console_level(level=20):
+    handler = get_console_handler()
+    handler.level = level
+
+
+def debug_mode(debug=True):
+    if debug:
+        set_console_level(level=logging.DEBUG)
+    else:
+        set_console_level(level=logging.INFO)
+
+
+@contextmanager
+def debug_context():
+    old_level = get_console_level()
+    debug_mode()
+    yield
+    set_console_level(level=old_level)
+
+
+def debug_wrapper(f, *args, **kwargs):
+    with debug_context():
+        f(*args, **kwargs)

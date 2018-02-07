@@ -21,6 +21,17 @@ def test_setup_cli():
             setup_cli_env()
 
 
+def test_debug_arg():
+    logger.debug('test_debug_arg')
+
+    cfg = os.path.dirname(__file__) + '/conf.yaml'
+    db = os.path.dirname(__file__) + '/happi_db.json'
+
+    with cli_args(['hutch_python', '--cfg', cfg, '--db', db, '--debug']):
+        with restore_logging():
+            setup_cli_env()
+
+
 def test_hutch_ipython_embed():
     logger.debug('test_hutch_ipython_embed')
 

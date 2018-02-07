@@ -1,8 +1,12 @@
 import logging
 from logging.handlers import QueueHandler
 
+import pytest
+
 from hutch_python.log_setup import (DEFAULT_YAML, DIR_LOGS,
-                                    setup_logging, set_console_level)
+                                    setup_logging,
+                                    get_console_handler, set_console_level,
+                                    debug_mode, debug_context, debug_wrapper)
 
 from conftest import restore_logging
 
@@ -18,12 +22,20 @@ def test_setup_logging():
     assert DIR_LOGS.exists()
 
 
-def test_set_console_level(log_queue):
-    logger.debug('test_set_console_level')
+def test_console_handler(log_queue):
+    logger.debug('test_console_handler')
 
+    with pytest.raises(RuntimeError):
+        handler = get_console_handler()
+
+    with restore_logging():
+        setup_queue_console()
+        handler = get_console_handler()
+        assert isinstance(handler, QueueHandler)
+
+
+def setup_queue_console():
     root_logger = logging.getLogger('')
-
-    # Find the QueueHandler
     for handler in root_logger.handlers:
         if isinstance(handler, QueueHandler):
             queue_handler = handler
@@ -31,17 +43,68 @@ def test_set_console_level(log_queue):
     queue_handler.name = 'console'
     queue_handler.level = 20
 
-    # Clear the queue
-    while not log_queue.empty():
-        log_queue.get(block=False)
 
-    # Sanity
+def clear(queue):
+    while not queue.empty():
+        queue.get(block=False)
+
+
+def assert_is_info(queue):
+    clear(queue)
     logger.info('hello')
     logger.debug('goodbye')
-    assert 'hello' in log_queue.get(block=False).getMessage()
-    assert log_queue.empty()
+    assert 'hello' in queue.get(block=False).getMessage()
+    assert queue.empty()
+
+
+def assert_is_debug(queue):
+    clear(queue)
+    logger.debug('goodbye')
+    assert 'goodbye' in queue.get(block=False).getMessage()
+
+
+def test_set_console_level(log_queue):
+    logger.debug('test_set_console_level')
+
+    setup_queue_console()
+    assert_is_info(log_queue)
 
     # Change console level so we get debug statements
-    set_console_level(10)
-    logger.debug('goodbye')
-    assert 'goodbye' in log_queue.get(block=False).getMessage()
+    set_console_level(logging.DEBUG)
+    assert_is_debug(log_queue)
+
+
+def test_debug_mode(log_queue):
+    logger.debug('test_debug_mode')
+
+    setup_queue_console()
+    assert_is_info(log_queue)
+
+    debug_mode(debug=True)
+    assert_is_debug(log_queue)
+
+    debug_mode(debug=False)
+    assert_is_info(log_queue)
+
+
+def test_debug_context(log_queue):
+    logger.debug('test_debug_context')
+
+    setup_queue_console()
+    assert_is_info(log_queue)
+
+    with debug_context():
+        assert_is_debug(log_queue)
+
+    assert_is_info(log_queue)
+
+
+def test_debug_wrapper(log_queue):
+    logger.debug('test_debug_wrapper')
+
+    setup_queue_console()
+    assert_is_info(log_queue)
+
+    debug_wrapper(assert_is_debug, log_queue)
+
+    assert_is_info(log_queue)
