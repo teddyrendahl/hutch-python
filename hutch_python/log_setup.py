@@ -57,8 +57,8 @@ def setup_logging(path_yaml=None, dir_logs=None, default_level=logging.INFO):
 
     user = os.environ['USER']
     timestamp = time.strftime('%d_%Hh%Mm%Ss')
-    log_file = '{}_{}.{}'.format(user, timestamp, 'debug')
-    path_log_file = dir_month / (log_file + '.log')
+    log_file = '{}_{}.{}'.format(user, timestamp, 'log')
+    path_log_file = dir_month / log_file
     path_log_file.touch()
     config['handlers']['debug']['filename'] = str(path_log_file)
 
