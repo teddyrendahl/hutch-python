@@ -1,25 +1,11 @@
 import logging
 import sys
-from logging.handlers import QueueHandler
-from queue import Queue
 
 import pytest
 
 from hutch_python.ipython_log import IPythonLogger
 
-from conftest import restore_logging
-
 logger = logging.getLogger(__name__)
-
-
-@pytest.fixture(scope='function')
-def log_queue():
-    with restore_logging():
-        my_queue = Queue()
-        handler = QueueHandler(my_queue)
-        root_logger = logging.getLogger('')
-        root_logger.addHandler(handler)
-        yield my_queue
 
 
 @pytest.fixture(scope='function')
