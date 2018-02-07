@@ -15,12 +15,8 @@ DIR_LOGS = DIR_MODULE / 'logs'
 
 def setup_logging(path_yaml=None, dir_logs=None, default_level=logging.INFO):
     """
-    Sets up the logging module to make a properly configured logger.
-
-    This will go into the ``logging.yml`` file in the this directory, and
-    try to load the logging configuration. If it fails for any reason, it will
-    just use the default configuration. For more details on how the logger will
-    be configured, see the ``logging.yml`` file.
+    Sets up the logging module to make a properly configured logger using the
+    ``logging.yml`` configuration.
 
     Parameters
     ----------
@@ -46,17 +42,23 @@ def setup_logging(path_yaml=None, dir_logs=None, default_level=logging.INFO):
     else:
         dir_logs = Path(dir_logs)
 
-    # Make the log directory if it doesn't exist
-    if not dir_logs.exists():
-        dir_logs.mkdir()
+    # Subdirectory for year/month
+    dir_month = dir_logs / time.strftime('%Y_%m')
+
+    # Make the log directories if they don't exist
+    # Make sure each level is all permissions
+    for directory in (dir_logs, dir_month):
+        if not directory.exists():
+            directory.mkdir()
+            directory.chmod(0o777)
 
     with open(path_yaml, 'rt') as f:
         config = yaml.safe_load(f.read())
 
     user = os.environ['USER']
-    timestamp = time.strftime('%Y-%m-%d_%H-%M-%S')
+    timestamp = time.strftime('%d_%Hh%Mm%Ss')
     log_file = '{}_{}.{}'.format(user, timestamp, 'debug')
-    path_log_file = dir_logs / (log_file + '.log')
+    path_log_file = dir_month / (log_file + '.log')
     path_log_file.touch()
     config['handlers']['debug']['filename'] = str(path_log_file)
 
