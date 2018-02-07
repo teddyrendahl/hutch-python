@@ -7,7 +7,7 @@ from IPython.terminal.embed import (InteractiveShellEmbed,
 
 from .ipython_log import init_ipython_logger
 from .load_conf import load
-from .log_setup import setup_logging
+from .log_setup import setup_logging, set_console_level
 from .plugins import hutch
 
 
@@ -31,7 +31,12 @@ def setup_cli_env():
     hutch.HAPPI_DB = args.db
 
     # Load objects from the configuration file
-    return load(args.cfg)
+    objs = load(args.cfg)
+
+    # Add cli debug tools
+    objs['_debug_console_level'] = set_console_level
+
+    return objs
 
 
 def hutch_ipython_embed():
