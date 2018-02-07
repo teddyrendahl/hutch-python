@@ -76,7 +76,7 @@ def get_console_level():
     return handler.level
 
 
-def set_console_level(level=20):
+def set_console_level(level=logging.INFO):
     handler = get_console_handler()
     handler.level = level
 
@@ -84,7 +84,7 @@ def set_console_level(level=20):
 def debug_mode(debug=None):
     if debug is None:
         level = get_console_level()
-        return level <= 10
+        return level <= logging.DEBUG
     elif debug:
         set_console_level(level=logging.DEBUG)
     else:
