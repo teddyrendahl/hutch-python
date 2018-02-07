@@ -81,8 +81,11 @@ def set_console_level(level=20):
     handler.level = level
 
 
-def debug_mode(debug=True):
-    if debug:
+def debug_mode(debug=None):
+    if debug is None:
+        level = get_console_level()
+        return level <= 10
+    elif debug:
         set_console_level(level=logging.DEBUG)
     else:
         set_console_level(level=logging.INFO)
@@ -91,7 +94,7 @@ def debug_mode(debug=True):
 @contextmanager
 def debug_context():
     old_level = get_console_level()
-    debug_mode()
+    debug_mode(True)
     yield
     set_console_level(level=old_level)
 

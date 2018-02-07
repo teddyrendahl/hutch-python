@@ -78,12 +78,15 @@ def test_debug_mode(log_queue):
     logger.debug('test_debug_mode')
 
     setup_queue_console()
+    assert not debug_mode()
     assert_is_info(log_queue)
 
     debug_mode(debug=True)
+    assert debug_mode()
     assert_is_debug(log_queue)
 
     debug_mode(debug=False)
+    assert not debug_mode()
     assert_is_info(log_queue)
 
 

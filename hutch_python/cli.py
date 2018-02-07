@@ -32,7 +32,7 @@ def setup_cli_env():
 
     # Debug mode second
     if args.debug:
-        debug_mode()
+        debug_mode(True)
 
     # Set the happi db path
     hutch.HAPPI_DB = args.db
