@@ -63,3 +63,10 @@ def setup_logging(path_yaml=None, dir_logs=None, default_level=logging.INFO):
     config['handlers']['debug']['filename'] = str(path_log_file)
 
     logging.config.dictConfig(config)
+
+
+def set_console_level(level=20):
+    root = logging.getLogger('')
+    for handler in root.handlers:
+        if handler.name == 'console':
+            handler.level = level
