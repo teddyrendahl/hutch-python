@@ -13,7 +13,7 @@ DEFAULT_YAML = DIR_MODULE / 'logging.yml'
 DIR_LOGS = DIR_MODULE / 'logs'
 
 
-def setup_logging(path_yaml=None, dir_logs=None, default_level=logging.INFO):
+def setup_logging(path_yaml=None, dir_logs=None):
     """
     Sets up the logging module to make a properly configured logger using the
     ``logging.yml`` configuration.
@@ -25,9 +25,6 @@ def setup_logging(path_yaml=None, dir_logs=None, default_level=logging.INFO):
 
     dir_logs : str or Path, optional
         Path to the log directory.
-
-    default_level : logging.LEVEL, optional
-        Logging level for the default logging setup if the yaml fails.
     """
     # Get the yaml path
     if path_yaml is None:
