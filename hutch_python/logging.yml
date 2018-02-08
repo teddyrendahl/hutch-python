@@ -19,7 +19,7 @@ handlers:
 
   debug:
     class: logging.handlers.RotatingFileHandler
-    level: DEBUG
+    level: 5
     formatter: file
     maxBytes: 20971520 # 20MB
     backupCount: 10
@@ -27,6 +27,6 @@ handlers:
     delay: 0
 
 root:
-  level: DEBUG
+  level: 5
   handlers: [console, debug]
   propogate: no

@@ -4,6 +4,8 @@ import logging
 from copy import copy
 from contextlib import contextmanager
 from collections import namedtuple
+from logging.handlers import QueueHandler
+from queue import Queue
 
 import pytest
 
@@ -33,6 +35,16 @@ def restore_logging():
     prev_handlers = copy(logging.root.handlers)
     yield
     logging.root.handlers = prev_handlers
+
+
+@pytest.fixture(scope='function')
+def log_queue():
+    with restore_logging():
+        my_queue = Queue()
+        handler = QueueHandler(my_queue)
+        root_logger = logging.getLogger('')
+        root_logger.addHandler(handler)
+        yield my_queue
 
 
 Experiment = namedtuple('Experiment', ('run', 'proposal',

@@ -6,7 +6,7 @@ import traceback
 import functools
 import logging
 
-INPUT_LEVEL = 15
+INPUT_LEVEL = 5
 logger = logging.getLogger(__name__)
 logger.input = functools.partial(logger.log, INPUT_LEVEL)
 

@@ -7,7 +7,8 @@ from IPython.terminal.embed import (InteractiveShellEmbed,
 
 from .ipython_log import init_ipython_logger
 from .load_conf import load
-from .log_setup import setup_logging
+from .log_setup import (setup_logging, set_console_level, debug_mode,
+                        debug_context, debug_wrapper)
 from .plugins import hutch
 
 
@@ -18,20 +19,34 @@ def setup_cli_env():
                         help='Configuration yaml file')
     parser.add_argument('--db', required=True,
                         help='Device database access information')
+    parser.add_argument('--debug', action='store_true', default=False,
+                        help='Start in debug mode')
     args = parser.parse_args()
 
     # Make sure the hutch's directory is in the path
     sys.path.insert(0, os.getcwd())
 
-    # Set up logging
+    # Set up logging first
     log_dir = os.path.join(os.path.dirname(args.cfg), 'logs')
     setup_logging(dir_logs=log_dir)
+
+    # Debug mode second
+    if args.debug:
+        debug_mode(True)
 
     # Set the happi db path
     hutch.HAPPI_DB = args.db
 
     # Load objects from the configuration file
-    return load(args.cfg)
+    objs = load(args.cfg)
+
+    # Add cli debug tools
+    objs['_debug_console_level'] = set_console_level
+    objs['_debug_mode'] = debug_mode
+    objs['_debug_context'] = debug_context
+    objs['_debug_wrapper'] = debug_wrapper
+
+    return objs
 
 
 def hutch_ipython_embed():
