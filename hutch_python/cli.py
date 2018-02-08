@@ -61,6 +61,7 @@ def hutch_ipython_embed():
     This is very hacky, but I couldn't find a better way to adjust the shell
     from a call to embed.
     """
+    logger.info('Starting IPython shell')
     config = load_default_config()
     config.InteractiveShellEmbed = config.TerminalInteractiveShell
     frame = sys._getframe(1)
@@ -76,6 +77,7 @@ def run_script(filename):
     """
     Basic shortcut to running a script in the current hutch python scope.
     """
+    logger.info('Running script %s', filename)
     frame = sys._getframe(1)
     with open(filename) as f:
         code = compile(f.read(), filename, 'exec')
