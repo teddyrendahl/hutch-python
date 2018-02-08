@@ -109,3 +109,6 @@ logs
 
 # Conda tests
 conda-bld-tst
+
+# generated file
+hutch_python/tests/tst/db.py
