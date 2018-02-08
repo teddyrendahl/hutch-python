@@ -1,7 +1,9 @@
 import logging
 import yaml
+import datetime
 from importlib import import_module
 from collections import defaultdict
+from pathlib import Path
 
 import pyfiglet
 
@@ -25,7 +27,7 @@ def load(filename):
     Parameters
     ----------
     filename: str
-        Path the conf.yml file
+        Path to the conf.yml file
 
     Returns
     -------
@@ -37,15 +39,19 @@ def load(filename):
     with open(filename, 'r') as f:
         conf = yaml.load(f)
     hutch_banner(conf.get('hutch', 'hutch').lower())
-    return read_conf(conf)
+    return read_conf(conf, filename)
 
 
-def read_conf(conf):
+def read_conf(conf, filename=None):
     """
     Parameters
     ----------
     conf: dict
         dict interpretation of the original yaml file
+
+    filename: str, optional
+        Path to the conf.yml file. If provided, we can include all the created
+        objects in a special hutch.db module.
 
     Returns
     ------
@@ -54,7 +60,15 @@ def read_conf(conf):
     """
     hutch_python.clear_load()
     plugins = get_plugins(conf)
-    objects = run_plugins(plugins)
+    hutch = conf.get('hutch')
+    if filename is None:
+        objects = run_plugins(plugins)
+    elif hutch is not None:
+        conf_path = Path(filename)
+        hutch_path = conf_path.parent
+        objects = run_plugins(plugins, hutch=hutch, hutch_path=hutch_path)
+    else:
+        logger.warning('hutch was not defined in yaml!')
     return objects
 
 
@@ -94,7 +108,7 @@ def get_plugins(conf):
     return plugins
 
 
-def run_plugins(plugins):
+def run_plugins(plugins, hutch=None, hutch_path=None):
     """
     Create all of the objects, given plugin instructions.
 
@@ -103,12 +117,30 @@ def run_plugins(plugins):
     plugins: dict{int: list}
         Return value from get_plugins
 
+    hutch: str, optional
+        Hutch to create the objects for. If included and conf_dir is also
+        included, we'll put objects into the hutch.db module as we go.
+
+    hutch_path: Path, optional
+        Path to the hutch's directory with the configuration file. This is
+        expected to at least have a hutchname directory with an __init__.py
+        file inside it.
+
     Returns
     ------
     objs: dict{str: object}
         Return value of load
     """
     all_objs = {}
+
+    # Dummy module for easier user imports
+    do_db = None not in (hutch, hutch_path)
+    if do_db:
+        db_module_name = hutch + '.db'
+        db_path = hutch_path / hutch / 'db.py'
+        if not db_path.exists():
+            db_path.touch()
+        db_module = import_module(db_module_name)
 
     plugin_priorities = reversed(sorted(list(plugins.keys())))
     executed_plugins = []
@@ -133,7 +165,27 @@ def run_plugins(plugins):
                     logger.debug(exc, exc_info=True)
             executed_plugins.append(this_plugin)
             all_objs.update(objs)
+            # Update db file as we go
+            if do_db:
+                for name, obj in objs.items():
+                    setattr(db_module, name, obj)
             hutch_python.register_load(this_plugin.name, objs)
+
+    # Annotate db file at the end
+    if do_db:
+        quotes = '"""\n'
+        header = ('The objects referenced in this file are populated by the '
+                  '{0}python\ninitialization. If you wish to use devices '
+                  'from this file, import\nthem from {0}.db after calling the '
+                  '{0}python startup script.\n\n'.format(hutch))
+        body = ('hutch-python last loaded on {}\n'
+                'with the following objects:\n\n')
+        text = quotes + header + body.format(datetime.datetime.now())
+        for name, obj in all_objs.items():
+            text += '{:<20} {}\n'.format(name, obj.__class__)
+        text += quotes
+        with db_path.open('w') as f:
+            f.write(text)
 
     return all_objs
 
