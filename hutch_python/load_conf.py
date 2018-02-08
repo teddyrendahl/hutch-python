@@ -173,7 +173,8 @@ def run_plugins(plugins, hutch=None, hutch_path=None):
     if do_db:
         quotes = '"""\n'
         header = 'Automatically generated file, do not edit.\n\n'
-        body = 'hutch-python last loaded on {}\nwith the following objects:\n\n'
+        body = ('hutch-python last loaded on {}\n'
+                'with the following objects:\n\n')
         text = quotes + header + body.format(datetime.datetime.now())
         for name, obj in all_objs.items():
             text += '{:<20} {}\n'.format(name, obj.__class__)
