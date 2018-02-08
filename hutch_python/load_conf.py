@@ -67,6 +67,8 @@ def read_conf(conf, filename=None):
         conf_path = Path(filename)
         hutch_path = conf_path.parent
         objects = run_plugins(plugins, hutch=hutch, hutch_path=hutch_path)
+    else:
+        logger.warning('hutch was not defined in yaml!')
     return objects
 
 
