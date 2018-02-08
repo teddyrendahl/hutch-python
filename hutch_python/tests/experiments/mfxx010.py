@@ -1,4 +1,5 @@
-from tst.db import unique_device, calc_thing, tst_device_1, tst_device_2
+from tst.db import calc_thing, tst_device_1, tst_device_2
+from beamline import unique_device
 
 
 class User:
