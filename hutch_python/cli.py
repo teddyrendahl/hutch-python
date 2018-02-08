@@ -1,6 +1,7 @@
 import os
 import sys
 import argparse
+import logging
 
 from IPython.terminal.embed import (InteractiveShellEmbed,
                                     load_default_config)
@@ -11,6 +12,7 @@ from .log_setup import (setup_logging, set_console_level, debug_mode,
                         debug_context, debug_wrapper)
 from .plugins import hutch
 
+logger = logging.getLogger(__name__)
 opts_cache = {}
 
 
