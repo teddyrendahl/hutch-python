@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from hutch_python.cli import (setup_cli_env as _setup_cli,
-                              hutch_ipython_embed as _embed)
+                              start_user as _start_user)
 
 # Parse args and collect all the objects
 _obj = _setup_cli()
@@ -8,5 +8,5 @@ _obj = _setup_cli()
 # Bring everything into the global namespace
 globals().update(_obj)
 
-# Start IPython with our shell mods
-_embed()
+# Start IPython OR start user script
+_start_user()
