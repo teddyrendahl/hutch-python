@@ -172,7 +172,10 @@ def run_plugins(plugins, hutch=None, hutch_path=None):
     # Annotate db file at the end
     if do_db:
         quotes = '"""\n'
-        header = 'Automatically generated file, do not edit.\n\n'
+        header = ('The objects referenced in this file are populated by the '
+                  '{0}python\ninitialization. If you wish to use devices '
+                  'from this file, import\nthem from {0}.db after calling the '
+                  '{0}python startup script.\n\n'.format(hutch))
         body = ('hutch-python last loaded on {}\n'
                 'with the following objects:\n\n')
         text = quotes + header + body.format(datetime.datetime.now())
