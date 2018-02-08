@@ -1,5 +1,6 @@
 import logging
 import yaml
+import datetime
 from importlib import import_module
 from collections import defaultdict
 from pathlib import Path
@@ -130,6 +131,7 @@ def run_plugins(plugins, hutch=None, hutch_path=None):
     """
     all_objs = {}
 
+    # Dummy module for easier user imports
     do_db = None not in (hutch, hutch_path)
     if do_db:
         db_module_name = hutch + '.db'
@@ -161,10 +163,23 @@ def run_plugins(plugins, hutch=None, hutch_path=None):
                     logger.debug(exc, exc_info=True)
             executed_plugins.append(this_plugin)
             all_objs.update(objs)
+            # Update db file as we go
             if do_db:
                 for name, obj in objs.items():
                     setattr(db_module, name, obj)
             hutch_python.register_load(this_plugin.name, objs)
+
+    # Annotate db file at the end
+    if do_db:
+        quotes = '"""\n'
+        header = 'Automatically generated file, do not edit.\n\n'
+        body = 'hutch-python last loaded on {} with the following objects:\n\n'
+        text = quotes + header + body.format(datetime.datetime.now())
+        for name, obj in all_objs.items():
+            text += '{:<20} {}\n'.format(name, obj.__class__)
+        text += quotes
+        with db_path.open('w') as f:
+            f.write(text)
 
     return all_objs
 
