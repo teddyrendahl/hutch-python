@@ -64,7 +64,7 @@ def hutch_ipython_embed(stack_offset=0):
     Parameters
     ----------
     stack_offset: int, optional
-        Determines which scope to run the script in.
+        Determines which scope to run ipython in.
         If you're embedding the terminal inside the current scope, leave this
         as zero. If you're embedding the terminal inside a scope that is n
         levels up the stack, set this to n.
