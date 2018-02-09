@@ -23,7 +23,9 @@ def test_tstpython_scripts():
 def test_tstpython_ipython():
     logger.debug('test_tstpython_ipython')
 
-    # This should show the banner and then exit, since we called it here when
-    # we really can't call it here
-    ipy_text = check_output([tstpython])
-    assert b'IPython' in ipy_text
+    # This should show the banner, check if the name unique_device exists, and
+    # then exit. There should be no NameError.
+    ipy_text = check_output([tstpython], universal_newlines=True,
+                            input='unique_device\n')
+    assert 'IPython' in ipy_text
+    assert 'NameError' not in ipy_text
