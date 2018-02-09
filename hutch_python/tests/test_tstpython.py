@@ -23,7 +23,7 @@ def test_tstpython_scripts():
 def test_tstpython_ipython():
     logger.debug('test_tstpython_ipython')
 
-    # OSError because we can't actually enter IPython here.
-    # Any other error means something bad happened.
+    # This should show the banner and then exit, since we called it here when
+    # we really can't call it here
     ipy_text = check_output([tstpython])
     assert b'IPython' in ipy_text
