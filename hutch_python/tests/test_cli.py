@@ -45,8 +45,10 @@ def test_hutch_ipython_embed():
 
 def test_run_script():
     logger.debug('test_run_script')
-    # Checking the output happens in test_tstpython, just make sure we can get
-    # through the code without an exception for coverage
+
+    # Setting the name that script.py needs should avoid a NameError because
+    # this is supposed to run the script in the enclosing frame
+    unique_device = 4  # NOQA
     run_script(Path(__file__).parent / 'script.py')
 
 
@@ -71,4 +73,7 @@ def test_start_user():
             setup_cli_env()
 
     # No OSError because we're just running a print script
+    # Setting the name that script.py needs should avoid a NameError because
+    # this is supposed to run the script in the enclosing frame
+    unique_device = 4  # NOQA
     start_user()
