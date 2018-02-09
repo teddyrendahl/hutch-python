@@ -1,7 +1,13 @@
 import logging
 import importlib
+from types import SimpleNamespace
 
 logger = logging.getLogger(__name__)
+
+
+class IterableNamespace(SimpleNamespace):
+    def __iter__(self):
+        yield from self.__dict__.values()
 
 
 def extract_objs(module_name):
