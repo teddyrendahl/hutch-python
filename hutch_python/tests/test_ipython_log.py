@@ -11,9 +11,12 @@ logger = logging.getLogger(__name__)
 @pytest.fixture(scope='function')
 def fake_ipython():
     # Clear the sys errors, potentially from previous tests
-    del sys.last_type
-    del sys.last_value
-    del sys.last_traceback
+    try:
+        del sys.last_type
+        del sys.last_value
+        del sys.last_traceback
+    except AttributeError:
+        pass
     return FakeIPython()
 
 
