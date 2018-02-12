@@ -5,6 +5,14 @@ from hutch_python import utils
 logger = logging.getLogger(__name__)
 
 
+def test_iterable_namespace():
+    logger.debug('test_iterable_namespace')
+
+    ns = utils.IterableNamespace(a=1, b=2, c=3)
+
+    assert list(ns) == [1, 2, 3]
+
+
 def test_extract_objs():
     logger.debug('test_extract_objs')
     # Has no __all__ keyword

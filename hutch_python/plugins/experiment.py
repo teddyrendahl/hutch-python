@@ -1,9 +1,8 @@
 import logging
 from importlib import import_module
-from types import SimpleNamespace
 
 from ..base_plugin import BasePlugin
-from .. import utils
+from ..utils import extract_objs, IterableNamespace
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +66,7 @@ class Plugin(BasePlugin):
 
             objs = {name.lower(): obj}
         else:
-            objs = utils.extract_objs(module_name)
+            objs = extract_objs(module_name)
         return objs
 
     def do_naming(self, naming_instructions, objs):
@@ -89,7 +88,7 @@ class Plugin(BasePlugin):
                 if len(objs) == 1:
                     return_objs[name] = list(objs.values())[0]
                 else:
-                    return_objs[name] = SimpleNamespace(**objs)
+                    return_objs[name] = IterableNamespace(**objs)
             return return_objs
 
     def get_experiment_name(self):

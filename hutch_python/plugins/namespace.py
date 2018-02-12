@@ -1,10 +1,9 @@
-from types import SimpleNamespace
 from collections import defaultdict
 import inspect
 import logging
 
 from ..base_plugin import BasePlugin
-from .. import utils
+from ..utils import IterableNamespace, find_class
 import hutch_python
 
 logger = logging.getLogger(__name__)
@@ -38,13 +37,13 @@ class Plugin(BasePlugin):
         return return_objs
 
     def get_class_objs(self, opts, prev_objs):
-        class_objs = defaultdict(SimpleNamespace)
+        class_objs = defaultdict(IterableNamespace)
         for cls_name, space_names in opts.items():
             try:
                 if cls_name == 'function':
                     cls = 'function'
                 else:
-                    cls = utils.find_class(cls_name)
+                    cls = find_class(cls_name)
             except Exception as exc:
                 cls = None
                 err = 'Type {} could not be loaded'
@@ -68,7 +67,7 @@ class Plugin(BasePlugin):
         return class_objs
 
     def get_metadata_objs(self, opts, prev_objs):
-        metadata_objs = defaultdict(SimpleNamespace)
+        metadata_objs = defaultdict(IterableNamespace)
         for name, obj in prev_objs.items():
             if hasattr(obj, 'md'):
                 raw_keys = [getattr(obj.md, filt, None) for filt in opts]
@@ -89,7 +88,7 @@ class Plugin(BasePlugin):
                         break
                     name = self.strip_prefix(name, key)
                     if not hasattr(upper_space, key):
-                        setattr(upper_space, key, SimpleNamespace())
+                        setattr(upper_space, key, IterableNamespace())
                     upper_space = getattr(upper_space, key)
                 setattr(upper_space, name, obj)
         return metadata_objs
