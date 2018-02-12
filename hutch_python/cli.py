@@ -3,8 +3,7 @@ import sys
 import argparse
 import logging
 
-from IPython.terminal.embed import (InteractiveShellEmbed,
-                                    load_default_config)
+from IPython.terminal.embed import InteractiveShellEmbed
 
 from .ipython_log import init_ipython_logger
 from .load_conf import load
@@ -58,29 +57,45 @@ def setup_cli_env():
     return objs
 
 
-def hutch_ipython_embed():
+def hutch_ipython_embed(stack_offset=0):
     """
-    This is very hacky, but I couldn't find a better way to adjust the shell
-    from a call to embed.
+    Make a shell, modify it, then run it
+
+    Parameters
+    ----------
+    stack_offset: int, optional
+        Determines which scope to run ipython in.
+        If you're embedding the terminal inside the current scope, leave this
+        as zero. If you're embedding the terminal inside a scope that is n
+        levels up the stack, set this to n.
     """
     logger.info('Starting IPython shell')
-    config = load_default_config()
-    config.InteractiveShellEmbed = config.TerminalInteractiveShell
-    frame = sys._getframe(1)
-    shell = InteractiveShellEmbed.instance(_init_location_id='%s:%s' % (
-        frame.f_code.co_filename, frame.f_lineno), config=config)
+    stack_depth = 2 + stack_offset
+    # 1 = whoever called this function
+    # + 1 = 2 because this is used inside the shell call
+    # + stack_offset for extra levels between this call and user space
+    shell = InteractiveShellEmbed.instance()
     init_ipython_logger(shell)
-    shell(header=u'', stack_depth=2, compile_flags=None,
-          call_location_id='%s:%s' % (frame.f_code.co_filename,
-                                      frame.f_lineno))
+    shell(stack_depth=stack_depth)
 
 
-def run_script(filename):
+def run_script(filename, stack_offset=0):
     """
     Basic shortcut to running a script in the current hutch python scope.
+
+    Parameters
+    ----------
+    stack_offset: int, optional
+        Determines which scope to run the script in.
+        If you're running a script from the current scope, leave this as zero.
+        If you're running a script from a scope that is n levels up the stack,
+        set this to n.
     """
     logger.info('Running script %s', filename)
-    frame = sys._getframe(1)
+    stack_depth = 1 + stack_offset
+    # 1 = whoever called this function
+    # + stack_offset for extra levels between this call and user space
+    frame = sys._getframe(stack_depth)
     with open(filename) as f:
         code = compile(f.read(), filename, 'exec')
         exec(code, frame.f_globals, frame.f_locals)
@@ -93,6 +108,6 @@ def start_user():
     """
     script = opts_cache.get('script')
     if script is None:
-        hutch_ipython_embed()
+        hutch_ipython_embed(stack_offset=1)
     else:
-        run_script(script)
+        run_script(script, stack_offset=1)
