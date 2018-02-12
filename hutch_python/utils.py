@@ -7,7 +7,9 @@ logger = logging.getLogger(__name__)
 
 class IterableNamespace(SimpleNamespace):
     def __iter__(self):
-        yield from self.__dict__.values()
+        # Sorts alphabetically by key
+        for _, obj in sorted(self.__dict__.items()):
+            yield obj
 
 
 def extract_objs(module_name):
