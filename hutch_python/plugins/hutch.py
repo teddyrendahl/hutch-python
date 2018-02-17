@@ -1,5 +1,8 @@
-from pcdsdevices.daq import Daq, make_daq_run_engine
-from pcdsdevices.sim.daq import SimDaq
+import pcdsdevices.daq as daq_module
+import pcdsdevices.sim.pydaq as sim_pydaq
+from pcdsdevices.daq import Daq, calib_cycle, daq_wrapper, daq_decorator
+
+from bluesky import RunEngine
 
 from ..base_plugin import BasePlugin
 from .happi import Plugin as HappiPlugin
@@ -21,13 +24,10 @@ class Plugin(BasePlugin):
         return [HappiPlugin(info=info)]
 
     def get_objects(self):
-        # Make the Daq object
-        hutch = self.info.lower()
         if SIM_DAQ:
-            Cls = SimDaq
-        else:
-            Cls = Daq
-        daq = Cls(name='daq', platform=DAQ_MAP[hutch])
-        # Make the Daq RunEngine
-        RE = make_daq_run_engine(daq)
-        return dict(daq=daq, RE=RE)
+            daq_module.pydaq = sim_pydaq
+        hutch = self.info.lower()
+        RE = RunEngine({})
+        daq = Daq(platform=DAQ_MAP[hutch], RE=RE)
+        return dict(daq=daq, RE=RE, calib_cycle=calib_cycle,
+                    daq_wrapper=daq_wrapper, daq_decorator=daq_decorator)
