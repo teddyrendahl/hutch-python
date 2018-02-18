@@ -18,10 +18,8 @@ opts_cache = {}
 def setup_cli_env():
     # Parse the user's arguments
     parser = argparse.ArgumentParser(description='Launch LCLS Hutch Python')
-    parser.add_argument('--cfg', required=True,
+    parser.add_argument('--cfg', required=False, default=None,
                         help='Configuration yaml file')
-    parser.add_argument('--db', required=True,
-                        help='Device database access information')
     parser.add_argument('--debug', action='store_true', default=False,
                         help='Start in debug mode')
     parser.add_argument('script', nargs='?',
@@ -42,11 +40,8 @@ def setup_cli_env():
     # Save whether we are an interactive session or a script session
     opts_cache['script'] = args.script
 
-    # Set the happi db path
-    hutch.HAPPI_DB = args.db
-
-    # Load objects from the configuration file
-    objs = load(args.cfg)
+    # Load objects based on the configuration file
+    objs = load(cfg=args.cfg, db=args.db)
 
     # Add cli debug tools
     objs['_debug_console_level'] = set_console_level
