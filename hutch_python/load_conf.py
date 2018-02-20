@@ -1,26 +1,24 @@
 import logging
 import yaml
-import datetime
-from importlib import import_module
-from collections import defaultdict
 from pathlib import Path
 
 import pyfiglet
+from bluesky import RunEngine
 
-import hutch_python
+import plan_defaults
+from .cache import LoadCache
+from .constants import HUTCH_COLORS, VALID_KEYS
+from .daq import get_daq_objs
+from .exp_load import get_exp_objs
+from .happi import get_happi_objs
+from .qs_load import get_qs_objs
+from .user_load import get_user_objs
+from .utils import get_current_experiment
 
-HUTCH_COLORS = dict(
-    amo='38;5;27',
-    sxr='38;5;250',
-    xpp='38;5;40',
-    xcs='38;5;93',
-    mfx='38;5;202',
-    cxi='38;5;96',
-    mec='38;5;214')
 logger = logging.getLogger(__name__)
 
 
-def load(cfg=None, db=None):
+def load(cfg=None):
     """
     Read the config file and the database entries.
     From this information we can:
@@ -43,7 +41,7 @@ def load(cfg=None, db=None):
     """
     if cfg is None:
         hutch_banner('hutch')
-        return read_conf({})
+        return load_conf({})
     else:
         with open(cfg, 'r') as f:
             conf = yaml.load(f)
@@ -98,12 +96,11 @@ def load_conf(conf, hutch_dir=None):
         Return value of load
     """
     # Warn user about excess config entries
-    valid_keys = ('hutch', 'db', 'load', 'experiment')
     for key in conf:
-        if key not in valid_keys:
+        if key not in VALID_KEYS:
             txt = ('Found %s in configuration, but this is not a valid key. '
                    'The valid keys are %s')
-            logger.warning(txt, key, valid_keys)
+            logger.warning(txt, key, VALID_KEYS)
 
     # Grab configurations from dict, set defaults, show missing
     try:
@@ -133,16 +130,15 @@ def load_conf(conf, hutch_dir=None):
                          'file.'))
 
     # Make cache namespace
-    cache = LoadCache(module=hutch or 'hutch', cache_name='db')
+    cache = LoadCache(hutch or 'hutch' + '.db')
 
     # Make RunEngine
     RE = RunEngine({})
     cache(RE=RE)
 
     # Collect Plans
-    plans = import_module('.plan_defaults')
-    cache(plans=plans)
-    cache(p=plans)
+    cache(plans=plan_defaults)
+    cache(p=plan_defaults)
 
     # Daq
     if hutch is not None:
@@ -156,15 +152,21 @@ def load_conf(conf, hutch_dir=None):
 
     # Load user files
     if load is not None:
-        load_objs = get_load_objs(load)
+        load_objs = get_user_objs(load)
         cache(**load_objs)
 
     # Auto select experiment if we need to
+    proposal = None
     if experiment is None:
         if hutch is not None:
             try:
-                experiment = get_current_experiment(hutch)
-                logger.info('Selected experiment %s', experiment)
+                # xpplp1216
+                expname = get_current_experiment(hutch)
+                logger.info('Selected active experiment %s', expname)
+                # lp12
+                proposal = expname[3:7]
+                # 16
+                run = expname[:2]
             except Exception:
                 err = 'Failed to select experiment automatically'
                 logger.error(err)
@@ -172,9 +174,13 @@ def load_conf(conf, hutch_dir=None):
 
     # Experiment objects
     if experiment is not None:
-        qs_objs = get_qs_objs(experiment)
+        proposal = experiment['proposal']
+        run = experiment['run']
+
+    if proposal is not None:
+        qs_objs = get_qs_objs(proposal, run)
         cache(**qs_objs)
-        exp_objs = get_exp_objs(experiment)
+        exp_objs = get_exp_objs(proposal, run)
         cache(**exp_objs)
 
     return cache.objs
