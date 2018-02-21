@@ -40,12 +40,16 @@ def load(cfg=None):
         global namespace.
     """
     if cfg is None:
-        hutch_banner('hutch')
+        hutch_banner()
         return load_conf({})
     else:
         with open(cfg, 'r') as f:
             conf = yaml.load(f)
-        hutch_banner(conf.get('hutch', 'hutch').lower())
+        banner = conf.get('hutch')
+        if banner is None:
+            hutch_banner()
+        else:
+            hutch_banner(banner.lower())
         conf_path = Path(cfg)
         hutch_dir = conf_path.parent
         return load_conf(conf, hutch_dir=hutch_dir)
@@ -147,7 +151,7 @@ def load_conf(conf, hutch_dir=None):
 
     # Happi db
     if db is not None:
-        happi_objs = get_happi_objs(db)
+        happi_objs = get_happi_objs(db, hutch)
         cache(**happi_objs)
 
     # Load user files
@@ -183,7 +187,7 @@ def load_conf(conf, hutch_dir=None):
         exp_objs = get_exp_objs(proposal, run)
         cache(**exp_objs)
 
-    return cache.objs
+    return cache.objs.__dict__
 
 
 
@@ -217,7 +221,7 @@ def load_conf(conf, hutch_dir=None):
 #    return all_objs
 
 
-def hutch_banner(hutch_name):
+def hutch_banner(hutch_name='Hutch '):
     text = hutch_name + 'Python'
     f = pyfiglet.Figlet(font='big')
     banner = f.renderText(text)

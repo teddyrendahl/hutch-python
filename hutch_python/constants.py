@@ -1,3 +1,5 @@
+CUR_EXP_SCRIPT = '/reg/g/pcds/engineering_tools/{}/get_cur_exp'
+
 DAQ_MAP = dict(mfx=4,
                tst=0)
 

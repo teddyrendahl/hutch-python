@@ -1,16 +1,16 @@
 from contextlib import contextmanager
+from functools import partial
+from importlib import import_module
+from subprocess import check_output
 from types import SimpleNamespace
-import importlib
 import logging
 
+from .constants import CUR_EXP_SCRIPT
+
+SUCCESS_LEVEL = 35
+logging.addLevelName('SUCCESS', SUCCESS_LEVEL)
 logger = logging.getLogger(__name__)
-
-
-class IterableNamespace(SimpleNamespace):
-    def __iter__(self):
-        # Sorts alphabetically by key
-        for _, obj in sorted(self.__dict__.items()):
-            yield obj
+logger.success = partial(logger.log, SUCCESS_LEVEL)
 
 
 @contextmanager
@@ -31,13 +31,28 @@ def safe_load(name, cls=None):
     if cls is None:
         identifier = name
     else:
-        identifier = ' '.join((name, cls))
+        identifier = ' '.join((name, str(cls)))
     logger.info('Loading %s...', identifier)
     try:
         yield
-        logger.info('Successfully loaded %s', identifier)
+        logger.success('Successfully loaded %s', identifier)
     except Exception:
         logger.error('Failed to load %s', identifier)
+
+
+def get_current_experiment(hutch):
+    """
+    Run a script to get the current experiment.
+    """
+    script = CUR_EXP_SCRIPT.format(hutch)
+    return check_output(script)
+
+
+class IterableNamespace(SimpleNamespace):
+    def __iter__(self):
+        # Sorts alphabetically by key
+        for _, obj in sorted(self.__dict__.items()):
+            yield obj
 
 
 def extract_objs(module_name):
@@ -72,7 +87,7 @@ def extract_objs(module_name):
         call_me = False
     try:
         try:
-            module = importlib.import_module(module_name)
+            module = import_module(module_name)
         except ImportError:
             my_obj = find_object(module_name)
             name = module_name.split('.')[-1]
@@ -112,7 +127,7 @@ def find_object(obj_path):
     parts = obj_path.split('.')
     module_path = '.'.join(parts[:-1])
     class_name = parts[-1]
-    module = importlib.import_module(module_path)
+    module = import_module(module_path)
     return getattr(module, class_name)
 
 

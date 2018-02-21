@@ -37,4 +37,4 @@ class LoadCache:
             The key will be the namespace-accessible name, and the object
             should be the object we are adding.
         """
-        self.objs.__dict__.extend(**objs)
+        self.objs.__dict__.update(**objs)

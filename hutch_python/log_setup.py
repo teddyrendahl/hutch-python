@@ -27,8 +27,9 @@ def setup_logging(dir_logs=None):
         config = yaml.safe_load(f.read())
 
     if dir_logs is None:
-        # Delete debug file from the config
+        # Remove debug file from the config
         del config['handlers']['debug']
+        config['root']['handlers'].remove('debug')
     else:
         # Ensure Path object
         dir_logs = Path(dir_logs)

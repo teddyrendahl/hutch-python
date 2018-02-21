@@ -29,7 +29,10 @@ def setup_cli_env():
     sys.path.insert(0, os.getcwd())
 
     # Set up logging first
-    log_dir = os.path.join(os.path.dirname(args.cfg), 'logs')
+    if args.cfg is None:
+        log_dir = None
+    else:
+        log_dir = os.path.join(os.path.dirname(args.cfg), 'logs')
     setup_logging(dir_logs=log_dir)
 
     # Debug mode second
@@ -40,7 +43,7 @@ def setup_cli_env():
     opts_cache['script'] = args.script
 
     # Load objects based on the configuration file
-    objs = load(cfg=args.cfg, db=args.db)
+    objs = load(cfg=args.cfg)
 
     # Add cli debug tools
     objs['_debug_console_level'] = set_console_level
