@@ -4,15 +4,5 @@ load:
   - beamline.py
 
 experiment:
-  proposal: mfxx0
+  proposal: x0
   run: 10
-  import: experiment.User() as x
-
-namespace:
-  class:
-    function:
-      - fn
-      - funcs
-  metadata:
-    - beamline
-    - stand
