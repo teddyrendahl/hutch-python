@@ -1,4 +1,4 @@
-from types import IterableNamespace
+from .utils import IterableNamespace
 import sys
 
 
