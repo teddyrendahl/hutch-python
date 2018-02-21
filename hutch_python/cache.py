@@ -1,4 +1,3 @@
-from importlib import import_module
 from types import IterableNamespace
 import sys
 
@@ -27,7 +26,6 @@ class LoadCache:
         """
         self.objs = IterableNamespace(**objs)
         sys.modules[module] = self.objs
-
 
     def __call__(self, **objs):
         """

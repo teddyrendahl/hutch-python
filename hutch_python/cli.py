@@ -9,7 +9,6 @@ from .ipython_log import init_ipython_logger
 from .load_conf import load
 from .log_setup import (setup_logging, set_console_level, debug_mode,
                         debug_context, debug_wrapper)
-from .plugins import hutch
 
 logger = logging.getLogger(__name__)
 opts_cache = {}

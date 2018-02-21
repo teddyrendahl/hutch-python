@@ -1,7 +1,6 @@
 import logging
 
-from ..base_plugin import BasePlugin
-from .. import utils
+from .utils import safe_load, extract_objs
 
 logger = logging.getLogger(__name__)
 
@@ -17,11 +16,11 @@ def get_user_objs(load):
         The modules to import
     """
     if isinstance(load, str):
-        return get_user_objects([load])
+        return get_user_objs([load])
     else:
         objs = {}
         for module in load:
-            with utils.safe_load(module):
-                module_objs = utils.extract_objs(module)
+            with safe_load(module):
+                module_objs = extract_objs(module)
                 objs.update(module_objs)
         return objs
