@@ -1,6 +1,7 @@
-import logging
-import importlib
+from contextlib import contextmanager
 from types import SimpleNamespace
+import importlib
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -10,6 +11,33 @@ class IterableNamespace(SimpleNamespace):
         # Sorts alphabetically by key
         for _, obj in sorted(self.__dict__.items()):
             yield obj
+
+
+@contextmanager
+def safe_load(name, cls=None):
+    """
+    Context manager to abort running code and resume the rest of the program if
+    something fails. This can be used to wrap user code with unknown behavior.
+    This will log standard messages to indicate the success state.
+
+    Parameters
+    ----------
+    name: str
+        The name of the load to be logged
+
+    cls: type
+        The class of a loaded object to be logged
+    """
+    if cls is None:
+        identifier = name
+    else:
+        identifier = ' '.join((name, cls))
+    logger.info('Loading %s...', identifier)
+    try:
+        yield
+        logger.info('Successfully loaded %s', identifier)
+    except Exception:
+        logger.error('Failed to load %s', identifier)
 
 
 def extract_objs(module_name):
