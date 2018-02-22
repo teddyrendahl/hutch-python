@@ -39,11 +39,15 @@ def class_namespace(cls, scope=None):
                 return class_space
 
     for name, obj in scope_objs.items():
+        include = False
         if cls == 'function':
             if isfunction(obj):
-                setattr(class_space, name, obj)
+                include = True
         elif isinstance(obj, cls):
+            include = True
+        if include:
             setattr(class_space, name, obj)
+            logger.debug('Include %s in cls=%s namespace', name, cls)
 
     return class_space
 
@@ -98,7 +102,7 @@ def metadata_namespace(md, scope=None):
             else:
                 keys.append(key)
         # Add key to existing namespace branch, create new if needed
-        logger.debug('Add %s to namespace metadata', name)
+        logger.debug('Add %s to metadata namespace', name)
         upper_space = metadata_space
         for key in keys:
             if key is None:

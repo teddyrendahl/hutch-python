@@ -13,8 +13,7 @@ from .happi import get_happi_objs
 from .namespace import class_namespace, metadata_namespace
 from .qs_load import get_qs_objs
 from .user_load import get_user_objs
-from .utils import (get_current_experiment, safe_load, IterableNamespace,
-                    hutch_banner)
+from .utils import get_current_experiment, safe_load, hutch_banner
 
 logger = logging.getLogger(__name__)
 
@@ -185,16 +184,18 @@ def load_conf(conf, hutch_dir=None):
         cache(**exp_objs)
 
     # Default namespaces
-    with safe_load('motors group', IterableNamespace):
-        motors = class_namespace('EpicsMotor', scope='hutch_python.db')
-        cache(m=motors, motors=motors)
-    with safe_load('slits group', IterableNamespace):
-        slits = class_namespace('Slits', scope='hutch_python.db')
-        cache(s=slits, slits=slits)
-    with safe_load('metadata group'):
-        meta = metadata_namespace(['beamline', 'stand'],
-                                  scope='hutch_python.db')
-        cache(**{hutch: meta})
+    if any((cnf is not None for cnf in (hutch, db, load, experiment))):
+        with safe_load('motors group'):
+            motors = class_namespace('EpicsMotor', scope='hutch_python.db')
+            cache(m=motors, motors=motors)
+        with safe_load('slits group'):
+            slits = class_namespace('Slits', scope='hutch_python.db')
+            cache(s=slits, slits=slits)
+    if hutch is not None:
+        with safe_load('metadata group'):
+            meta = metadata_namespace(['beamline', 'stand'],
+                                      scope='hutch_python.db')
+            cache(**{hutch: meta})
 
     # Write db.txt info file to the user's module
     try:
