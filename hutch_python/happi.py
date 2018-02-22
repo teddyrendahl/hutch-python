@@ -41,7 +41,7 @@ def get_happi_objs(db, hutch):
     # Load the happi Client
     client = happi.Client(path=db)
     # Assume we want hutch devices that are active
-    reqs = dict(hutch=hutch, active=True)
+    reqs = dict(beamline=hutch.upper(), active=True)
     containers = client.search(**reqs)
     # Instantiate the devices needed
     dev_namespace = load_devices(*containers, pprint=False)
