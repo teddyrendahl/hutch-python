@@ -5,9 +5,8 @@ from subprocess import check_output
 from types import SimpleNamespace
 import logging
 
-from .constants import CUR_EXP_SCRIPT
+from .constants import CUR_EXP_SCRIPT, CLASS_SEARCH_PATH, SUCCESS_LEVEL
 
-SUCCESS_LEVEL = 35
 logging.addLevelName('SUCCESS', SUCCESS_LEVEL)
 logger = logging.getLogger(__name__)
 logger.success = partial(logger.log, SUCCESS_LEVEL)
@@ -131,9 +130,6 @@ def find_object(obj_path):
     return getattr(module, class_name)
 
 
-CLASS_SEARCH_PATH = ['pcdsdevices.device_types']
-
-
 def find_class(class_path, check_defaults=True):
     """
     Given a string class name, either return the matching built-in type or
@@ -165,3 +161,10 @@ def find_class(class_path, check_defaults=True):
                 except NameError:
                     pass
         raise
+
+
+def strip_prefix(name, strip_text):
+    if name.startswith(strip_text):
+        return name[len(strip_text)+1:]
+    else:
+        return name

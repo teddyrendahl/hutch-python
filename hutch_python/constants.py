@@ -1,5 +1,7 @@
 CUR_EXP_SCRIPT = '/reg/g/pcds/engineering_tools/{}/get_cur_exp'
 
+CLASS_SEARCH_PATH = ['pcdsdevices.device_types']
+
 DAQ_MAP = dict(mfx=4,
                tst=0)
 
@@ -11,5 +13,9 @@ HUTCH_COLORS = dict(
     mfx='38;5;202',
     cxi='38;5;96',
     mec='38;5;214')
+
+INPUT_LEVEL = 5
+
+SUCCESS_LEVEL = 35
 
 VALID_KEYS = ('hutch', 'db', 'load', 'experiment')
