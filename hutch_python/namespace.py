@@ -1,10 +1,8 @@
-from collections import defaultdict
-from importlib import import_module
-import inspect
+from inspect import isfunction
 import logging
-import sys
 
-from .utils import IterableNamespace, find_class, strip_prefix
+from .utils import (IterableNamespace, find_class, strip_prefix,
+                    get_all_objects)
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +13,7 @@ def class_namespace(cls, scope=None):
 
     Parameters
     ----------
-    cls: type
+    cls: type or str
 
     scope: module, namespace, or list of these
         Every object attached to the given modules will be considered for the
@@ -26,34 +24,28 @@ def class_namespace(cls, scope=None):
     -------
     namespace: IterableNamespace
     """
-    class_objs = defaultdict(IterableNamespace)
-    for cls_name, space_names in opts.items():
-        try:
-            if cls_name == 'function':
-                cls = 'function'
-            else:
-                cls = find_class(cls_name)
-        except Exception as exc:
-            cls = None
-            err = 'Type {} could not be loaded'
-            logger.error(err.format(cls_name))
-            logger.debug(exc, exc_info=True)
-            continue
-        for ns_name in space_names:
-            namespace = class_objs[ns_name]
-            logger.debug('Added class namespace for type %s as name %s',
-                         cls, ns_name)
-            for name, obj in prev_objs.items():
-                ok = False
-                if cls == 'function':
-                    if inspect.isfunction(obj):
-                        ok = True
-                elif isinstance(obj, cls):
-                    ok = True
-                if ok:
-                    setattr(namespace, name, obj)
-                    logger.debug('Add %s to namespace %s', name, ns_name)
-    return class_objs
+    logger.debug('Create class_namespace cls=%s, scope=%s', cls, scope)
+    class_space = IterableNamespace()
+    scope_objs = get_all_objects(scope=scope, stack_offset=1)
+
+    if isinstance(cls, str):
+        if cls != 'function':
+            try:
+                cls = find_class(cls)
+            except Exception as exc:
+                err = 'Type {} could not be loaded'
+                logger.error(err.format(cls))
+                logger.debug(exc, exc_info=True)
+                return class_space
+
+    for name, obj in scope_objs.items():
+        if cls == 'function':
+            if isfunction(obj):
+                setattr(class_space, name, obj)
+        elif isinstance(obj, cls):
+            setattr(class_space, name, obj)
+
+    return class_space
 
 
 def metadata_namespace(md, scope=None):
@@ -76,71 +68,44 @@ def metadata_namespace(md, scope=None):
     -------
     namespace: IterableNamespace
     """
-    metadata_objs = defaultdict(IterableNamespace)
-    for name, obj in prev_objs.items():
+    logger.debug('Create metadata_namespace md=%s, scope=%s', md, scope)
+    metadata_space = IterableNamespace()
+    scope_objs = get_all_objects(scope=scope, stack_offset=1)
+
+    for name, obj in scope_objs.items():
+        # Collect obj metadata
         if hasattr(obj, 'md'):
-            raw_keys = [getattr(obj.md, filt, None) for filt in opts]
-            keys = []
-            for key in raw_keys:
-                if isinstance(key, str):
-                    keys.append(key.lower())
-                else:
-                    keys.append(key)
-            if keys[0] is None:
-                continue
-            else:
-                upper_space = metadata_objs[keys[0]]
-            logger.debug('Add %s to namespace metadata', name)
-            name = self.strip_prefix(name, keys[0])
-            for key in keys[1:]:
-                if key is None:
-                    break
-                name = self.strip_prefix(name, key)
-                if not hasattr(upper_space, key):
-                    setattr(upper_space, key, IterableNamespace())
-                upper_space = getattr(upper_space, key)
-            setattr(upper_space, name, obj)
-    return metadata_objs
-
-
-def get_all_objects(scope=None, stack_offset=0):
-    """
-    Get all of the objects that fall within the scope.
-
-    Parameters
-    ----------
-    scope: module, namespace, or list of these, optional
-        If this is omitted, we'll include all objects that have been loaded by
-        hutch_python and everything in the caller's global frame.
-
-    stack_offset: int, optional
-        If scope was not provided, we'll use stack_offset to determine which
-        frame is the user's frame. Leave this at zero if you want the objects
-        in the caller's frame, and increase it by one for each level up the
-        stack your frame is.
-
-    Returns
-    -------
-    objs: dict
-    """
-    if scope is None:
-        stack_depth = 1 + stack_offset
-        frame = sys._getframe(stack_depth)
-        objs = get_all_objects(scope='hutch_python.db')
-        objs.update(frame.f_globals)
-        return objs
-    else:
-        if isinstance(scope, list):
-            objs = {}
-            for s in scope:
-                objs.extend(get_all_objects(scope=s))
-            return objs
+            raw_keys = [getattr(obj.md, filt, None) for filt in md]
+        # Fallback: try using_the_name
         else:
-            if isinstance(scope, str):
-                try:
-                    scope = import_module(scope)
-                except ImportError:
-                    logger.debug('Cannot get_all_objects from %s', scope,
-                                 exc_info=True)
-                    return {}
-            return scope.__dict__.copy()
+            name_keys = name.split('_')
+            raw_keys = [None] * len(md)
+            for i, key in enumerate(name_keys):
+                if i >= len(md):
+                    break
+                if key == md[i]:
+                    raw_keys[i] = key
+                else:
+                    break
+        # Abandon if no matches
+        if raw_keys[0] is None:
+            continue
+        # Force lowercase
+        keys = []
+        for key in raw_keys:
+            if isinstance(key, str):
+                keys.append(key.lower())
+            else:
+                keys.append(key)
+        # Add key to existing namespace branch, create new if needed
+        logger.debug('Add %s to namespace metadata', name)
+        upper_space = metadata_space
+        for key in keys:
+            if key is None:
+                break
+            name = strip_prefix(name, key)
+            if not hasattr(upper_space, key):
+                setattr(upper_space, key, IterableNamespace())
+            upper_space = getattr(upper_space, key)
+        setattr(upper_space, name, obj)
+    return metadata_space

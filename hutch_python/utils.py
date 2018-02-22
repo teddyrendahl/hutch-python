@@ -4,8 +4,12 @@ from importlib import import_module
 from subprocess import check_output
 from types import SimpleNamespace
 import logging
+import sys
 
-from .constants import CUR_EXP_SCRIPT, CLASS_SEARCH_PATH, SUCCESS_LEVEL
+import pyfiglet
+
+from .constants import (CUR_EXP_SCRIPT, CLASS_SEARCH_PATH, HUTCH_COLORS,
+                        SUCCESS_LEVEL)
 
 logging.addLevelName('SUCCESS', SUCCESS_LEVEL)
 logger = logging.getLogger(__name__)
@@ -168,3 +172,55 @@ def strip_prefix(name, strip_text):
         return name[len(strip_text)+1:]
     else:
         return name
+
+
+def get_all_objects(scope=None, stack_offset=0):
+    """
+    Get all of the objects that fall within the scope.
+
+    Parameters
+    ----------
+    scope: module, namespace, or list of these, optional
+        If this is omitted, we'll include all objects that have been loaded by
+        hutch_python and everything in the caller's global frame.
+
+    stack_offset: int, optional
+        If scope was not provided, we'll use stack_offset to determine which
+        frame is the user's frame. Leave this at zero if you want the objects
+        in the caller's frame, and increase it by one for each level up the
+        stack your frame is.
+
+    Returns
+    -------
+    objs: dict
+    """
+    if scope is None:
+        stack_depth = 1 + stack_offset
+        frame = sys._getframe(stack_depth)
+        objs = get_all_objects(scope='hutch_python.db')
+        objs.update(frame.f_globals)
+        return objs
+    else:
+        if isinstance(scope, list):
+            objs = {}
+            for s in scope:
+                objs.extend(get_all_objects(scope=s))
+            return objs
+        else:
+            if isinstance(scope, str):
+                try:
+                    scope = import_module(scope)
+                except ImportError:
+                    logger.debug('Cannot get_all_objects from %s', scope,
+                                 exc_info=True)
+                    return {}
+            return scope.__dict__.copy()
+
+
+def hutch_banner(hutch_name='Hutch '):
+    text = hutch_name + 'Python'
+    f = pyfiglet.Figlet(font='big')
+    banner = f.renderText(text)
+    if hutch_name in HUTCH_COLORS:
+        banner = '\x1b[{}m'.format(HUTCH_COLORS[hutch_name]) + banner
+    print(banner)

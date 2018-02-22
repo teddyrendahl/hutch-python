@@ -2,18 +2,19 @@ import logging
 import yaml
 from pathlib import Path
 
-import pyfiglet
 from bluesky import RunEngine
 
-from . import  plan_defaults
+from . import plan_defaults
 from .cache import LoadCache
-from .constants import HUTCH_COLORS, VALID_KEYS
+from .constants import VALID_KEYS
 from .daq import get_daq_objs
 from .exp_load import get_exp_objs
 from .happi import get_happi_objs
+from .namespace import class_namespace, metadata_namespace
 from .qs_load import get_qs_objs
 from .user_load import get_user_objs
-from .utils import get_current_experiment
+from .utils import (get_current_experiment, safe_load, IterableNamespace,
+                    hutch_banner)
 
 logger = logging.getLogger(__name__)
 
@@ -90,10 +91,6 @@ def load_conf(conf, hutch_dir=None):
         directory e.g. mfx
         If this is missing we'll be starting a mostly empty session.
 
-    db: Path or str, optional
-        Path object that points to a happi database. This currently only
-        support the json file format.
-
     Returns
     ------
     objs: dict{str: object}
@@ -134,7 +131,7 @@ def load_conf(conf, hutch_dir=None):
                          'file.'))
 
     # Make cache namespace
-    cache = LoadCache(hutch or 'hutch' + '.db')
+    cache = LoadCache(hutch or 'hutch' + '.db', hutch_dir=hutch_dir)
 
     # Make RunEngine
     RE = RunEngine({})
@@ -187,44 +184,22 @@ def load_conf(conf, hutch_dir=None):
         exp_objs = get_exp_objs(proposal, run)
         cache(**exp_objs)
 
+    # Default namespaces
+    with safe_load('motors group', IterableNamespace):
+        motors = class_namespace('EpicsMotor', scope='hutch_python.db')
+        cache(m=motors, motors=motors)
+    with safe_load('slits group', IterableNamespace):
+        slits = class_namespace('Slits', scope='hutch_python.db')
+        cache(s=slits, slits=slits)
+    with safe_load('metadata group'):
+        meta = metadata_namespace(['beamline', 'stand'],
+                                  scope='hutch_python.db')
+        cache(**{hutch: meta})
+
+    # Write db.txt info file to the user's module
+    try:
+        cache.write_file()
+    except OSError:
+        logger.warning('No permissions to write db.txt file')
+
     return cache.objs.__dict__
-
-
-
-#    all_objs = {}
-#
-#    # Dummy module for easier user imports
-#    do_db = None not in (hutch, hutch_path)
-#    if do_db:
-#        db_module_name = hutch + '.db'
-#        db_path = hutch_path / hutch / 'db.py'
-#        if not db_path.exists():
-#            db_path.touch()
-#        db_module = import_module(db_module_name)
-#
-#    # Annotate db file at the end
-#    if do_db:
-#        quotes = '"""\n'
-#        header = ('The objects referenced in this file are populated by the '
-#                  '{0}python\ninitialization. If you wish to use devices '
-#                  'from this file, import\nthem from {0}.db after calling the '
-#                  '{0}python startup script.\n\n'.format(hutch))
-#        body = ('hutch-python last loaded on {}\n'
-#                'with the following objects:\n\n')
-#        text = quotes + header + body.format(datetime.datetime.now())
-#        for name, obj in all_objs.items():
-#            text += '{:<20} {}\n'.format(name, obj.__class__)
-#        text += quotes
-#        with db_path.open('w') as f:
-#            f.write(text)
-#
-#    return all_objs
-
-
-def hutch_banner(hutch_name='Hutch '):
-    text = hutch_name + 'Python'
-    f = pyfiglet.Figlet(font='big')
-    banner = f.renderText(text)
-    if hutch_name in HUTCH_COLORS:
-        banner = '\x1b[{}m'.format(HUTCH_COLORS[hutch_name]) + banner
-    print(banner)
