@@ -21,3 +21,4 @@ def get_exp_objs(proposal, run):
     with safe_load(expname):
         module = import_module(module_name)
         return dict(x=module.User())
+    return {}

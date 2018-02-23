@@ -58,3 +58,4 @@ def get_qs_objs(proposal, run):
 
         dev_namespace = load_devices(*qs_client.all_devices, pprint=False)
         return dev_namespace.__dict__
+    return {}

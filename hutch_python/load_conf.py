@@ -130,7 +130,7 @@ def load_conf(conf, hutch_dir=None):
                          'file.'))
 
     # Make cache namespace
-    cache = LoadCache(hutch or 'hutch' + '.db', hutch_dir=hutch_dir)
+    cache = LoadCache((hutch or 'hutch') + '.db', hutch_dir=hutch_dir)
 
     # Make RunEngine
     RE = RunEngine({})
@@ -184,18 +184,13 @@ def load_conf(conf, hutch_dir=None):
         cache(**exp_objs)
 
     # Default namespaces
-    if any((cnf is not None for cnf in (hutch, db, load, experiment))):
-        with safe_load('motors group'):
-            motors = class_namespace('EpicsMotor', scope='hutch_python.db')
-            cache(m=motors, motors=motors)
-        with safe_load('slits group'):
-            slits = class_namespace('Slits', scope='hutch_python.db')
-            cache(s=slits, slits=slits)
-    if hutch is not None:
-        with safe_load('metadata group'):
+    with safe_load('default groups'):
+        default_class_namespace('EpicsMotor', 'motors', cache)
+        default_class_namespace('Slits', 'slits', cache)
+        if hutch is not None:
             meta = metadata_namespace(['beamline', 'stand'],
                                       scope='hutch_python.db')
-            cache(**{hutch: meta})
+            cache(**meta.__dict__)
 
     # Write db.txt info file to the user's module
     try:
@@ -204,3 +199,9 @@ def load_conf(conf, hutch_dir=None):
         logger.warning('No permissions to write db.txt file')
 
     return cache.objs.__dict__
+
+
+def default_class_namespace(cls, name, cache):
+    objs = class_namespace(cls, scope='hutch_python.db')
+    if len(objs) > 0:
+        cache(**{name: objs, name[0]: objs})

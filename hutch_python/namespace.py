@@ -2,7 +2,7 @@ from inspect import isfunction
 import logging
 
 from .utils import (IterableNamespace, find_class, strip_prefix,
-                    get_all_objects)
+                    extract_objs)
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +26,7 @@ def class_namespace(cls, scope=None):
     """
     logger.debug('Create class_namespace cls=%s, scope=%s', cls, scope)
     class_space = IterableNamespace()
-    scope_objs = get_all_objects(scope=scope, stack_offset=1)
+    scope_objs = extract_objs(scope=scope, stack_offset=1)
 
     if isinstance(cls, str):
         if cls != 'function':
@@ -74,7 +74,7 @@ def metadata_namespace(md, scope=None):
     """
     logger.debug('Create metadata_namespace md=%s, scope=%s', md, scope)
     metadata_space = IterableNamespace()
-    scope_objs = get_all_objects(scope=scope, stack_offset=1)
+    scope_objs = extract_objs(scope=scope, stack_offset=1)
 
     for name, obj in scope_objs.items():
         # Collect obj metadata

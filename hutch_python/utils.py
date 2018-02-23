@@ -39,8 +39,9 @@ def safe_load(name, cls=None):
     try:
         yield
         logger.success('Successfully loaded %s', identifier)
-    except Exception:
+    except Exception as exc:
         logger.error('Failed to load %s', identifier)
+        logger.debug(exc, exc_info=True)
 
 
 def get_current_experiment(hutch):
@@ -57,60 +58,68 @@ class IterableNamespace(SimpleNamespace):
         for _, obj in sorted(self.__dict__.items()):
             yield obj
 
+    def __len__(self):
+        return len(self.__dict__)
 
-def extract_objs(module_name):
+
+def extract_objs(scope=None, skip_hidden=True, stack_offset=0):
     """
-    Import module and return all the objects without a _ prefix. If an __all__
+    Return all objects within scope without a _ prefix. If an __all__
     keyword exists, follow that keyword's instructions instead.
-
-    If this is a single object in a module rather than a module, import just
-    that object.
-
-    If this is a callable and it ends in (), call it and import the return
-    value. Note that this includes classes.
 
     Parameters
     ----------
-    module_name: str
-        Filename, module name, or path to object in module
+    scope: module, namespace, or list of these, optional
+        If this is omitted, we'll include all objects that have been loaded by
+        hutch_python and everything in the caller's global frame.
+
+    skip_hidden: bool, optional
+        If changed from True to False, we'll include objects with leading
+        underscores.
+
+    stack_offset: int, optional
+        If scope was not provided, we'll use stack_offset to determine which
+        frame is the user's frame. Leave this at zero if you want the objects
+        in the caller's frame, and increase it by one for each level up the
+        stack your frame is.
 
     Returns
     -------
     objs: dict
-        Mapping from name in file to object
+        Mapping from name in scope to object
     """
-    objs = {}
-    # Allow filenames
-    if module_name.endswith('.py'):
-        module_name = module_name[:-3]
-    elif module_name.endswith('()'):
-        module_name = module_name[:-2]
-        call_me = True
+    if scope is None:
+        stack_depth = 1 + stack_offset
+        frame = sys._getframe(stack_depth)
+        objs = extract_objs(scope='hutch_python.db',
+                            skip_hidden=skip_hidden,
+                            stack_offset=stack_offset)
+        objs.update(frame.f_globals)
     else:
-        call_me = False
-    try:
-        try:
-            module = import_module(module_name)
-        except ImportError:
-            my_obj = find_object(module_name)
-            name = module_name.split('.')[-1]
-            # call_me, maybe
-            if call_me:
-                objs[name] = my_obj()
-            else:
-                objs[name] = my_obj
-            return objs
-    except Exception as exc:
-        logger.error('Error loading %s', module_name)
-        logger.debug(exc, exc_info=True)
-        return objs
-    all_kwd = getattr(module, '__all__', None)
+        if isinstance(scope, list):
+            objs = {}
+            for s in scope:
+                objs.extend(extract_objs(scope=s,
+                                         skip_hidden=skip_hidden,
+                                         stack_offset=stack_offset))
+        else:
+            if isinstance(scope, str):
+                if scope.endswith('.py'):
+                    scope = scope[:-3]
+                scope = import_module(scope)
+            objs = scope.__dict__.copy()
+
+    all_kwd = getattr(objs, '__all__', None)
     if all_kwd is None:
-        all_kwd = [a for a in dir(module) if a[0] != '_']
-    for attr in all_kwd:
-        obj = getattr(module, attr)
-        objs[attr] = obj
-    return objs
+        if skip_hidden:
+            return {k: v for k, v in objs.items() if k[0] != '_'}
+        else:
+            return objs
+    else:
+        all_objs = {}
+        for kwd in all_kwd:
+            all_objs[kwd] = objs.get(kwd)
+        return all_objs
 
 
 def find_object(obj_path):
@@ -172,49 +181,6 @@ def strip_prefix(name, strip_text):
         return name[len(strip_text)+1:]
     else:
         return name
-
-
-def get_all_objects(scope=None, stack_offset=0):
-    """
-    Get all of the objects that fall within the scope.
-
-    Parameters
-    ----------
-    scope: module, namespace, or list of these, optional
-        If this is omitted, we'll include all objects that have been loaded by
-        hutch_python and everything in the caller's global frame.
-
-    stack_offset: int, optional
-        If scope was not provided, we'll use stack_offset to determine which
-        frame is the user's frame. Leave this at zero if you want the objects
-        in the caller's frame, and increase it by one for each level up the
-        stack your frame is.
-
-    Returns
-    -------
-    objs: dict
-    """
-    if scope is None:
-        stack_depth = 1 + stack_offset
-        frame = sys._getframe(stack_depth)
-        objs = get_all_objects(scope='hutch_python.db')
-        objs.update(frame.f_globals)
-        return objs
-    else:
-        if isinstance(scope, list):
-            objs = {}
-            for s in scope:
-                objs.extend(get_all_objects(scope=s))
-            return objs
-        else:
-            if isinstance(scope, str):
-                try:
-                    scope = import_module(scope)
-                except ImportError:
-                    logger.debug('Cannot get_all_objects from %s', scope,
-                                 exc_info=True)
-                    return {}
-            return scope.__dict__.copy()
 
 
 def hutch_banner(hutch_name='Hutch '):
