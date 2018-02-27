@@ -1,6 +1,9 @@
+import logging
 from importlib import import_module
 
 from .utils import safe_load
+
+logger = logging.getLogger(__name__)
 
 
 def get_exp_objs(proposal, run):
@@ -16,6 +19,7 @@ def get_exp_objs(proposal, run):
     run: str or int
         The run number, e.g. 16
     """
+    logger.debug('get_exp_objs(%s, %s)', proposal, run)
     expname = proposal.lower() + str(run)
     module_name = 'experiments.' + expname
     with safe_load(expname):

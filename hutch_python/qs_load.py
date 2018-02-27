@@ -21,6 +21,7 @@ username and password like:
 
 
 """
+import logging
 import os.path
 from configparser import NoOptionError, ConfigParser
 
@@ -30,9 +31,13 @@ from happi.backends.qs_db import QSBackend
 
 from .utils import safe_load
 
+logger = logging.getLogger(__name__)
+
 
 def get_qs_objs(proposal, run):
+    logger.debug('get_qs_objs(%s, %s)', proposal, run)
     with safe_load('questionnaire'):
+        proposal = proposal.upper()
         # Determine which method of authentication we are going to use.
         # Search for a configuration file, either in the current directory
         # or hidden in the users home directory. If not found, attempt to

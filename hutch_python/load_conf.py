@@ -186,7 +186,7 @@ def load_conf(conf, hutch_dir=None):
                 # lp12
                 proposal = expname[3:7]
                 # 16
-                run = expname[:2]
+                run = expname[-2:]
             except Exception:
                 err = 'Failed to select experiment automatically'
                 logger.error(err)
@@ -207,6 +207,7 @@ def load_conf(conf, hutch_dir=None):
     with safe_load('default groups'):
         default_class_namespace('EpicsMotor', 'motors', cache)
         default_class_namespace('Slits', 'slits', cache)
+        default_class_namespace(object, 'all_objects', cache)
         if hutch is not None:
             meta = metadata_namespace(['beamline', 'stand'],
                                       scope='hutch_python.db')

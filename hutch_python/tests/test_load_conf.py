@@ -1,7 +1,10 @@
 import logging
 import os.path
 
+import hutch_python.qs_load
 from hutch_python.load_conf import load, load_conf
+
+from .conftest import QSBackend
 
 logger = logging.getLogger(__name__)
 
@@ -31,3 +34,17 @@ def test_skip_failures():
     # Should not raise
     load_conf(dict(hutch=345243, db=12351324, experiment=2341234, load=123454,
                    bananas='dole'))
+
+
+def test_auto_experiment(fake_curexp_script):
+    logger.debug('test_auto_experiment')
+    hutch_python.qs_load.QSBackend = QSBackend
+    objs = load_conf(dict(hutch='tst'))
+    assert objs['inj_x'].run == '15'
+    assert objs['inj_x'].proposal == 'LR12'
+
+
+def test_cannot_auto():
+    logger.debug('test_cannot_auto')
+    # Fail silently
+    load_conf(dict(hutch='tst'))
