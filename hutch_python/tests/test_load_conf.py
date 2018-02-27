@@ -29,4 +29,5 @@ def test_conf_empty():
 def test_skip_failures():
     logger.debug('test_skip_failures')
     # Should not raise
-    load_conf(dict(hutch=345243, db=12351324, experiment=2341234))
+    load_conf(dict(hutch=345243, db=12351324, experiment=2341234, load=123454,
+                   bananas='dole'))
