@@ -49,7 +49,7 @@ def get_current_experiment(hutch):
     Run a script to get the current experiment.
     """
     script = CUR_EXP_SCRIPT.format(hutch)
-    return check_output(script)
+    return check_output(script.split(' '), universal_newlines=True).strip('\n')
 
 
 class IterableNamespace(SimpleNamespace):
@@ -99,7 +99,7 @@ def extract_objs(scope=None, skip_hidden=True, stack_offset=0):
         if isinstance(scope, list):
             objs = {}
             for s in scope:
-                objs.extend(extract_objs(scope=s,
+                objs.update(extract_objs(scope=s,
                                          skip_hidden=skip_hidden,
                                          stack_offset=stack_offset))
         else:
@@ -109,7 +109,7 @@ def extract_objs(scope=None, skip_hidden=True, stack_offset=0):
                 scope = import_module(scope)
             objs = scope.__dict__.copy()
 
-    all_kwd = getattr(objs, '__all__', None)
+    all_kwd = objs.get('__all__')
     if all_kwd is None:
         if skip_hidden:
             return {k: v for k, v in objs.items() if k[0] != '_'}
@@ -171,12 +171,17 @@ def find_class(class_path, check_defaults=True):
                 try:
                     return find_class(default + '.' + class_path,
                                       check_defaults=False)
-                except NameError:
+                except AttributeError:
                     pass
-        raise
+        raise ImportError('Could not find_class for {}'.format(class_path))
 
 
 def strip_prefix(name, strip_text):
+    """
+    For underscore-separated names:
+    strip_prefix('mfx_device', 'mfx') -> 'device'
+    strip_prefix('notmfx', 'mfx') -> 'notmfx'
+    """
     if name.startswith(strip_text):
         return name[len(strip_text)+1:]
     else:
