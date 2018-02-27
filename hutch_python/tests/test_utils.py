@@ -23,13 +23,6 @@ def test_extract_objs():
     # Has an __all__ keyword
     objs = utils.extract_objs('sample_module_2.py')
     assert objs == dict(just_this=5.0)
-    # Doesn't exist
-    objs = utils.extract_objs('fake_module_243esd')
-    assert objs == {}
-    objs = utils.extract_objs('sample_module_1.hey')
-    assert objs['hey'] == '4horses'
-    objs = utils.extract_objs('sample_module_1.some_func()')
-    assert objs['some_func'] == 4
 
 
 def test_find_class():

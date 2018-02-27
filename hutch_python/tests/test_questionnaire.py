@@ -1,12 +1,11 @@
 import logging
 
-import pytest
 import happi
 
-import hutch_python.plugins.questionnaire
-from hutch_python.plugins.questionnaire import Plugin
+import hutch_python.qs_load
+from hutch_python.qs_load import get_qs_objs
 
-from ..conftest import QSBackend
+from .conftest import QSBackend
 
 logger = logging.getLogger(__name__)
 
@@ -15,36 +14,20 @@ def clear_happi_cache():
     happi.loader.cache = {}
 
 
-def test_questionnaire_plugin():
-    logger.debug("test_questionnaire_plugin")
-    conf = {'experiment': {'run': '15', 'proposal': 'LR12'},
-            'questionnaire': True}
-    plugin = Plugin(conf)
-    hutch_python.plugins.questionnaire.QSBackend = QSBackend
-    objs = plugin.get_objects()
-    clear_happi_cache()
+def test_qs_load():
+    logger.debug('test_qs_load')
+    hutch_python.qs_load.QSBackend = QSBackend
+    objs = get_qs_objs('LR12', '15')
     assert objs['inj_x'].run == '15'
     assert objs['inj_x'].proposal == 'LR12'
     assert objs['inj_x'].kerberos == 'True'
 
 
-def test_questionnaire_bad_conf():
-    logger.debug('test_questionnaire_bad_conf')
-    conf = {'experiment': {}, 'questionnaire': True}
-    plugin = Plugin(conf)
-    hutch_python.plugins.questionnaire.QSBackend = QSBackend
-    with pytest.raises(ValueError):
-        plugin.get_objects()
-
-
 def test_ws_auth_conf(temporary_config):
     logger.debug('test_ws_auth_conf')
-    conf = {'experiment': {'run': '15', 'proposal': 'LR12'},
-            'questionnaire': True}
-    plugin = Plugin(conf)
-    hutch_python.plugins.questionnaire.QSBackend = QSBackend
-    objs = plugin.get_objects()
+    hutch_python.qs_load.QSBackend = QSBackend
     clear_happi_cache()
+    objs = get_qs_objs('LR12', '15')
     assert objs['inj_x'].kerberos == 'False'
     assert objs['inj_x'].user == 'user'
     assert objs['inj_x'].pw == 'pw'

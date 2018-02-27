@@ -1,9 +1,15 @@
+from pathlib import Path
+
 CUR_EXP_SCRIPT = '/reg/g/pcds/engineering_tools/{}/get_cur_exp'
 
 CLASS_SEARCH_PATH = ['pcdsdevices.device_types']
 
 DAQ_MAP = dict(mfx=4,
                tst=0)
+
+DIR_MODULE = Path(__file__).resolve().parent
+
+FILE_YAML = DIR_MODULE / 'logging.yml'
 
 HUTCH_COLORS = dict(
     amo='38;5;27',

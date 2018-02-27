@@ -105,23 +105,43 @@ def load_conf(conf, hutch_dir=None):
     # Grab configurations from dict, set defaults, show missing
     try:
         hutch = conf['hutch']
+        if not isinstance(hutch, str):
+            logger.error('Invalid hutch conf %s, must be string.', hutch)
+            hutch = None
     except KeyError:
         hutch = None
         logger.info('Missing hutch from conf. Will skip DAQ.')
     try:
-        db = Path(conf['db'])
+        db = conf['db']
+        if isinstance(db, str):
+            if db[0] == '/':
+                db = Path(db)
+            else:
+                db = Path(hutch_dir) / db
+        else:
+            logger.error('Invalid db conf %s, must be string.', db)
+            db = None
     except KeyError:
         db = None
         logger.info(('Missing db from conf. Will skip loading from shared '
                      'database.'))
     try:
         load = conf['load']
+        if not isinstance(load, (str, list)):
+            logger.error('Invalid load conf %s, must be string or list', load)
+            load = None
     except KeyError:
         load = None
         logger.info('Missing load from conf. Will skip loading hutch files.')
 
     try:
         experiment = conf['experiment']
+        if (not isinstance(experiment, dict)
+                or 'proposal' not in experiment
+                or 'run' not in experiment):
+            logger.error(('Invalid experiment selection %s, must be a dict '
+                          'with keys "proposal" and "run"'), experiment)
+            experiment = None
     except KeyError:
         experiment = None
         if hutch is None:

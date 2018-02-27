@@ -5,12 +5,11 @@ import logging.config
 from contextlib import contextmanager
 from pathlib import Path
 
+from .constants import FILE_YAML
+
 import yaml
 
 logger = logging.getLogger(__name__)
-
-DIR_MODULE = Path(__file__).resolve().parent
-FILE_YAML = DIR_MODULE / 'logging.yml'
 
 
 def setup_logging(dir_logs=None):

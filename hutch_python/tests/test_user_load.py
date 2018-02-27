@@ -1,16 +1,14 @@
 import logging
 
-from hutch_python.plugins.load import Plugin
+from hutch_python.user_load import get_user_objs
 
 logger = logging.getLogger(__name__)
 
 
-def test_load_plugin():
-    logger.debug('test_load_plugin')
+def test_user_load():
+    logger.debug('test_user_load')
     info = ['sample_module_1', 'sample_module_2.py']
-    conf = dict(load=info)
-    plugin = Plugin(conf)
-    objs = plugin.get_objects()
+    objs = get_user_objs(info)
     assert objs['hey'] == '4horses'
     assert objs['milk'] == 'cows'
     assert objs['some_int'] == 5

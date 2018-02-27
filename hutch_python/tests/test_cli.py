@@ -16,9 +16,8 @@ def test_setup_cli():
     logger.debug('test_setup_cli')
 
     cfg = os.path.dirname(__file__) + '/conf.yaml'
-    db = os.path.dirname(__file__) + '/happi_db.json'
 
-    with cli_args(['hutch_python', '--cfg', cfg, '--db', db]):
+    with cli_args(['hutch_python', '--cfg', cfg]):
         with restore_logging():
             setup_cli_env()
 
@@ -27,9 +26,8 @@ def test_debug_arg():
     logger.debug('test_debug_arg')
 
     cfg = os.path.dirname(__file__) + '/conf.yaml'
-    db = os.path.dirname(__file__) + '/happi_db.json'
 
-    with cli_args(['hutch_python', '--cfg', cfg, '--db', db, '--debug']):
+    with cli_args(['hutch_python', '--cfg', cfg, '--debug']):
         with restore_logging():
             setup_cli_env()
 
@@ -56,9 +54,8 @@ def test_start_user():
     logger.debug('test_start_user')
 
     cfg = os.path.dirname(__file__) + '/conf.yaml'
-    db = os.path.dirname(__file__) + '/happi_db.json'
 
-    with cli_args(['hutch_python', '--cfg', cfg, '--db', db]):
+    with cli_args(['hutch_python', '--cfg', cfg]):
         with restore_logging():
             setup_cli_env()
 
@@ -68,7 +65,7 @@ def test_start_user():
 
     script = str(Path(__file__).parent / 'script.py')
 
-    with cli_args(['hutch_python', '--cfg', cfg, '--db', db, script]):
+    with cli_args(['hutch_python', '--cfg', cfg, script]):
         with restore_logging():
             setup_cli_env()
 
