@@ -14,10 +14,12 @@ def test_class_namespace():
     float_space = class_namespace(float, scope)
     str_space = class_namespace(str, scope)
     func_space = class_namespace('function', scope)
+    err_space = class_namespace('erqwerasd', scope)
     assert int_space.one == 1
     assert float_space.two == 2.0
     assert str_space.three == '3'
     assert func_space.four(1) == 4
+    assert len(err_space) == 0
 
 
 def test_metadata_namespace():
@@ -47,3 +49,19 @@ def test_metadata_namespace():
     assert mfx.obj4 == obj4
     assert xpp.sb2.obj5 == obj5
     assert mfx.dia.hello == obj6
+
+
+def test_metadata_namespace_fallback():
+    logger.debug('test_metadata_namespace_fallback')
+    # objects without md, so use name
+    obj1 = SimpleNamespace()
+    obj2 = SimpleNamespace()
+    obj3 = SimpleNamespace()
+    scope = SimpleNamespace(mfx_dia_obj1=obj1, mfx_dia_obj2=obj2,
+                            mfx_dg2_obj3=obj3)
+    md = ['beamline', 'stand']
+    namespaces = metadata_namespace(md, scope=scope)
+    mfx = namespaces.mfx
+    assert mfx.dia.obj1 == obj1
+    assert mfx.dia.obj2 == obj2
+    assert mfx.dg2.obj3 == obj3

@@ -80,17 +80,10 @@ def metadata_namespace(md, scope=None):
         # Collect obj metadata
         if hasattr(obj, 'md'):
             raw_keys = [getattr(obj.md, filt, None) for filt in md]
-        # Fallback: try using_the_name
+        # Fallback: use_the_name
         else:
             name_keys = name.split('_')
-            raw_keys = [None] * len(md)
-            for i, key in enumerate(name_keys):
-                if i >= len(md):
-                    break
-                if key == md[i]:
-                    raw_keys[i] = key
-                else:
-                    break
+            raw_keys = name_keys[:len(md)]
         # Abandon if no matches
         if raw_keys[0] is None:
             continue
