@@ -6,6 +6,7 @@ import pytest
 
 from hutch_python.cli import (setup_cli_env, hutch_ipython_embed, run_script,
                               start_user)
+from hutch_python.daq import set_daq_sim
 
 from conftest import cli_args, restore_logging
 
@@ -38,6 +39,18 @@ def test_debug_arg():
     with cli_args(['hutch_python', '--cfg', cfg, '--debug']):
         with restore_logging():
             setup_cli_env()
+
+
+def test_sim_arg():
+    logger.debug('test_sim_arg')
+
+    cfg = os.path.dirname(__file__) + '/conf.yaml'
+
+    with cli_args(['hutch_python', '--cfg', cfg, '--sim']):
+        with restore_logging():
+            setup_cli_env()
+
+    set_daq_sim(False)
 
 
 def test_hutch_ipython_embed():
