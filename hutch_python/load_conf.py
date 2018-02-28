@@ -4,6 +4,7 @@ from pathlib import Path
 
 from bluesky import RunEngine
 from bluesky.callbacks.best_effort import BestEffortCallback
+from bluesky.utils import install_kicker
 
 from . import plan_defaults
 from .cache import LoadCache
@@ -160,6 +161,7 @@ def load_conf(conf, hutch_dir=None):
     RE = RunEngine({})
     bec = BestEffortCallback()
     RE.subscribe(bec)
+    install_kicker()
     cache(RE=RE)
 
     # Collect Plans
