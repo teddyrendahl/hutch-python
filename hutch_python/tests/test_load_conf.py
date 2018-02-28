@@ -1,5 +1,6 @@
 import logging
 import os.path
+from types import SimpleNamespace
 
 import hutch_python.qs_load
 from hutch_python.load_conf import load, load_conf
@@ -12,9 +13,10 @@ logger = logging.getLogger(__name__)
 def test_file_load():
     logger.debug('test_file_load')
     objs = load(os.path.join(os.path.dirname(__file__), 'conf.yaml'))
-    should_have = ('x', 'unique_device', 'calc_thing')
+    should_have = ('x', 'unique_device', 'calc_thing', 'daq')
+    err = '{} was overriden by a namespace'
     for elem in should_have:
-        assert elem in objs
+        assert not isinstance(objs[elem], SimpleNamespace), err.format(elem)
 
 
 def test_no_file():
