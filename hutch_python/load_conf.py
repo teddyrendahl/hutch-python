@@ -22,9 +22,8 @@ def load(cfg=None):
     """
     Read the config file and the database entries.
     From this information we can:
-        - Display the banner by calling `hutch_banner`
         - Find the hutch's launch directory
-        - Load the hutch's objects by calling `read_conf`
+        - Load the hutch's objects by calling `load_conf`
 
     Parameters
     ----------
@@ -40,16 +39,10 @@ def load(cfg=None):
         global namespace.
     """
     if cfg is None:
-        hutch_banner()
         return load_conf({})
     else:
         with open(cfg, 'r') as f:
             conf = yaml.load(f)
-        banner = conf.get('hutch')
-        if banner is None:
-            hutch_banner()
-        else:
-            hutch_banner(banner.lower())
         conf_path = Path(cfg)
         hutch_dir = conf_path.parent
         return load_conf(conf, hutch_dir=hutch_dir)
@@ -59,6 +52,8 @@ def load_conf(conf, hutch_dir=None):
     """
     Step through the objcet loading procedure, consulting conf as needed.
     The procedure is:
+        - Check the configuration for errors
+        - Display the banner by calling `hutch_banner`
         - Use 'hutch' conf to create hutch.db importable namespace to stash the
           objects. This will be literally hutch.db if hutch is not provided, or
           the hutch name e.g. mfx.db
@@ -105,7 +100,9 @@ def load_conf(conf, hutch_dir=None):
     # Grab configurations from dict, set defaults, show missing
     try:
         hutch = conf['hutch']
-        if not isinstance(hutch, str):
+        if isinstance(hutch, str):
+            hutch = hutch.lower()
+        else:
             logger.error('Invalid hutch conf %s, must be string.', hutch)
             hutch = None
     except KeyError:
@@ -148,6 +145,12 @@ def load_conf(conf, hutch_dir=None):
             logger.info(('Missing hutch and experiment from conf. Will not '
                          'load objects from questionnaire or experiment '
                          'file.'))
+
+    # Display the banner
+    if hutch is None:
+        hutch_banner()
+    else:
+        hutch_banner(hutch)
 
     # Make cache namespace
     cache = LoadCache((hutch or 'hutch') + '.db', hutch_dir=hutch_dir)
