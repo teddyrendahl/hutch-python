@@ -3,6 +3,7 @@ import yaml
 from pathlib import Path
 
 from bluesky import RunEngine
+from bluesky.callbacks.best_effort import BestEffortCallback
 
 from . import plan_defaults
 from .cache import LoadCache
@@ -157,6 +158,8 @@ def load_conf(conf, hutch_dir=None):
 
     # Make RunEngine
     RE = RunEngine({})
+    bec = BestEffortCallback()
+    RE.subscribe(bec)
     cache(RE=RE)
 
     # Collect Plans
