@@ -161,8 +161,12 @@ def load_conf(conf, hutch_dir=None):
     RE = RunEngine({})
     bec = BestEffortCallback()
     RE.subscribe(bec)
-    install_kicker()
     cache(RE=RE)
+    try:
+        install_kicker()
+    except RuntimeError:
+        # Probably don't have a display if this failed, so nothing to kick
+        pass
 
     # Collect Plans
     cache(plans=plan_defaults)
