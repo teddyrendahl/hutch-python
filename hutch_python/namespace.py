@@ -82,6 +82,8 @@ def metadata_namespace(md, scope=None):
             raw_keys = [getattr(obj.md, filt, None) for filt in md]
         # Fallback: use_the_name
         else:
+            if '_' not in name:
+                continue
             name_keys = name.split('_')
             raw_keys = name_keys[:len(md)]
         # Abandon if no matches
