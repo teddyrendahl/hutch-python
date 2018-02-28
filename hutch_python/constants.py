@@ -1,6 +1,6 @@
 from pathlib import Path
 
-CUR_EXP_SCRIPT = '/reg/g/pcds/engineering_tools/{}/get_cur_exp'
+CUR_EXP_SCRIPT = '/reg/g/pcds/engineering_tools/{0}/scripts/get_curr_exp {0}'
 
 CLASS_SEARCH_PATH = ['pcdsdevices.device_types']
 
