@@ -5,6 +5,7 @@ import logging
 
 from IPython.terminal.embed import InteractiveShellEmbed
 
+from .daq import set_daq_sim
 from .ipython_log import init_ipython_logger
 from .load_conf import load
 from .log_setup import (setup_logging, set_console_level, debug_mode,
@@ -21,6 +22,8 @@ def setup_cli_env():
                         help='Configuration yaml file')
     parser.add_argument('--debug', action='store_true', default=False,
                         help='Start in debug mode')
+    parser.add_argument('--sim', action='store_true', default=False,
+                        help='Run with simulated DAQ')
     parser.add_argument('script', nargs='?',
                         help='Run a script instead of running interactively')
     args = parser.parse_args()
@@ -35,9 +38,13 @@ def setup_cli_env():
         log_dir = os.path.join(os.path.dirname(args.cfg), 'logs')
     setup_logging(dir_logs=log_dir)
 
-    # Debug mode second
+    # Debug mode next
     if args.debug:
         debug_mode(True)
+
+    # Now other flags
+    if args.sim:
+        set_daq_sim(True)
 
     # Save whether we are an interactive session or a script session
     opts_cache['script'] = args.script
