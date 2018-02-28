@@ -27,6 +27,7 @@ install:
   - conda update -q conda conda-build
   - conda config --append channels conda-forge
   - conda config --append channels $PCDS_CHANNEL
+  - conda config --append channels pcds-tag
   - conda config --append channels lightsource2-tag
   # Useful for debugging any issues with conda
   - conda info -a
