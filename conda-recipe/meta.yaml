@@ -23,6 +23,7 @@ requirements:
     - pyfiglet
     - happi >=0.5.0
     - pcdsdevices >=0.3.0
+    - psdm_qs_cli >=0.2.0
 
 test:
   imports:
