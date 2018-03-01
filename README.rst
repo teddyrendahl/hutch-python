@@ -29,11 +29,8 @@ This module requires Python 3.6+ and the following utilities:
    happi database, and from the experiment questionaire.
 - `bluesky <https://github.com/nsls-ii/bluesky>`_ for scanning
 - ``pyfiglet`` for hutch banners (think big ``xpppython`` on startup)
-
-In the future, we plan to support the following extra features:
-
-- `lightpath <https://github.com/slaclab/lightpath>`_ will enable specification of a path object to include
-
+- `lightpath <https://github.com/slaclab/lightpath>`_ organizes devices
+  devices to provide a summarized state of the beamline as a whole
 
 Installation
 ------------
