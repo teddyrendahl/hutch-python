@@ -1,199 +1,240 @@
 import logging
 import yaml
-import datetime
-from importlib import import_module
-from collections import defaultdict
 from pathlib import Path
 
-import pyfiglet
+from bluesky import RunEngine
+from bluesky.callbacks.best_effort import BestEffortCallback
+from bluesky.utils import install_kicker
 
-import hutch_python
+from . import plan_defaults
+from .cache import LoadCache
+from .constants import VALID_KEYS
+from .daq import get_daq_objs
+from .exp_load import get_exp_objs
+from .happi import get_happi_objs
+from .namespace import class_namespace, metadata_namespace
+from .qs_load import get_qs_objs
+from .user_load import get_user_objs
+from .utils import get_current_experiment, safe_load, hutch_banner
 
-HUTCH_COLORS = dict(
-    amo='38;5;27',
-    sxr='38;5;250',
-    xpp='38;5;40',
-    xcs='38;5;93',
-    mfx='38;5;202',
-    cxi='38;5;96',
-    mec='38;5;214')
 logger = logging.getLogger(__name__)
 
 
-def load(filename):
+def load(cfg=None):
     """
-    Load the hutch-specific conf.yml file.
+    Read the config file and the database entries.
+    From this information we can:
+        - Find the hutch's launch directory
+        - Load the hutch's objects by calling `load_conf`
 
     Parameters
     ----------
-    filename: str
-        Path to the conf.yml file
+    cfg: str, optional
+        Path to the conf.yml file. If this is missing, we'll end up with a very
+        empty environment.
 
     Returns
     -------
     objs: dict{str: object}
-        All objects defined by the file that need to make it into the
+        All objects defined by the files that need to make it into the
         environment. The strings are the names that will be accessible in the
         global namespace.
     """
-    with open(filename, 'r') as f:
-        conf = yaml.load(f)
-    hutch_banner(conf.get('hutch', 'hutch').lower())
-    return read_conf(conf, filename)
-
-
-def read_conf(conf, filename=None):
-    """
-    Parameters
-    ----------
-    conf: dict
-        dict interpretation of the original yaml file
-
-    filename: str, optional
-        Path to the conf.yml file. If provided, we can include all the created
-        objects in a special hutch.db module.
-
-    Returns
-    ------
-    objs: dict{str: object}
-        Return value of load
-    """
-    hutch_python.clear_load()
-    plugins = get_plugins(conf)
-    hutch = conf.get('hutch')
-    if filename is None:
-        objects = run_plugins(plugins)
-    elif hutch is not None:
-        conf_path = Path(filename)
-        hutch_path = conf_path.parent
-        objects = run_plugins(plugins, hutch=hutch, hutch_path=hutch_path)
+    if cfg is None:
+        return load_conf({})
     else:
-        logger.warning('hutch was not defined in yaml!')
-    return objects
+        with open(cfg, 'r') as f:
+            conf = yaml.load(f)
+        conf_path = Path(cfg)
+        hutch_dir = conf_path.parent
+        return load_conf(conf, hutch_dir=hutch_dir)
 
 
-def get_plugins(conf):
+def load_conf(conf, hutch_dir=None):
     """
+    Step through the objcet loading procedure, consulting conf as needed.
+    The procedure is:
+        - Check the configuration for errors
+        - Display the banner by calling `hutch_banner`
+        - Use 'hutch' conf to create hutch.db importable namespace to stash the
+          objects. This will be literally hutch.db if hutch is not provided, or
+          the hutch name e.g. mfx.db
+        - Create a `RunEngine`
+        - import and group basic plans into an importable namespace
+        - Use 'hutch' conf to create a Daq object and add daq plan tools into
+          the plans namespace
+        - Use 'db' conf to load devices from happi beamline database
+        - Use 'load' conf to bring up the user's beamline files
+        - Use 'experiment' conf to select the current experiment
+            - If 'experiment' was missing, autoselect experiment using 'hutch'
+        - Use current experiment to load experiment objects from questionnaire
+        - Use current experiment to load experiment file
+
+    If a conf entry is missing, we'll note it in a logger.info message.
+    If an extra conf entry is found, we'll note it in a logger.warning message.
+    If an automatically selected file is missing, we'll note it in a
+    logger.warning message.
+    All other errors will be noted in a logger.error message.
+
     Parameters
     ----------
     conf: dict
         dict interpretation of the original yaml file
 
-    Returns
-    -------
-    plugins: dict{int: list}
-        Mapping from priority level to list of instantiated plugins at that
-        prority.
-    """
-    plugins = defaultdict(list)
-
-    for plugin_name, info in conf.items():
-        try:
-            module = import_module('hutch_python.plugins.' + plugin_name)
-        except ImportError:
-            module = None
-            err = 'Plugin {} is not available, skipping'
-            logger.warning(err.format(plugin_name))
-            continue
-        this_plugin = module.Plugin(conf, info)
-        try:
-            pre_plugins = this_plugin.pre_plugins()
-        except Exception:
-            pre_plugins = []
-            err = 'Error in {} pre-plugins, skipping'
-            logger.warning(err.format(plugin_name))
-        for plugin in pre_plugins + [this_plugin]:
-            plugins[this_plugin.priority].append(plugin)
-
-    return plugins
-
-
-def run_plugins(plugins, hutch=None, hutch_path=None):
-    """
-    Create all of the objects, given plugin instructions.
-
-    Parameters
-    ----------
-    plugins: dict{int: list}
-        Return value from get_plugins
-
-    hutch: str, optional
-        Hutch to create the objects for. If included and conf_dir is also
-        included, we'll put objects into the hutch.db module as we go.
-
-    hutch_path: Path, optional
-        Path to the hutch's directory with the configuration file. This is
-        expected to at least have a hutchname directory with an __init__.py
-        file inside it.
+    hutch_dir: Path or str, optional
+        Path object that points to the hutch's launch directory. This is the
+        directory that includes the 'experiments' directory and a hutchname
+        directory e.g. mfx
+        If this is missing we'll be starting a mostly empty session.
 
     Returns
     ------
     objs: dict{str: object}
         Return value of load
     """
-    all_objs = {}
+    # Warn user about excess config entries
+    for key in conf:
+        if key not in VALID_KEYS:
+            txt = ('Found %s in configuration, but this is not a valid key. '
+                   'The valid keys are %s')
+            logger.warning(txt, key, VALID_KEYS)
 
-    # Dummy module for easier user imports
-    do_db = None not in (hutch, hutch_path)
-    if do_db:
-        db_module_name = hutch + '.db'
-        db_path = hutch_path / hutch / 'db.py'
-        if not db_path.exists():
-            db_path.touch()
-        db_module = import_module(db_module_name)
+    # Grab configurations from dict, set defaults, show missing
+    try:
+        hutch = conf['hutch']
+        if isinstance(hutch, str):
+            hutch = hutch.lower()
+        else:
+            logger.error('Invalid hutch conf %s, must be string.', hutch)
+            hutch = None
+    except KeyError:
+        hutch = None
+        logger.info('Missing hutch from conf. Will skip DAQ.')
+    try:
+        db = conf['db']
+        if isinstance(db, str):
+            if db[0] == '/':
+                db = Path(db)
+            else:
+                db = Path(hutch_dir) / db
+        else:
+            logger.error('Invalid db conf %s, must be string.', db)
+            db = None
+    except KeyError:
+        db = None
+        logger.info(('Missing db from conf. Will skip loading from shared '
+                     'database.'))
+    try:
+        load = conf['load']
+        if not isinstance(load, (str, list)):
+            logger.error('Invalid load conf %s, must be string or list', load)
+            load = None
+    except KeyError:
+        load = None
+        logger.info('Missing load from conf. Will skip loading hutch files.')
 
-    plugin_priorities = reversed(sorted(list(plugins.keys())))
-    executed_plugins = []
+    try:
+        experiment = conf['experiment']
+        if (not isinstance(experiment, dict)
+                or 'proposal' not in experiment
+                or 'run' not in experiment):
+            logger.error(('Invalid experiment selection %s, must be a dict '
+                          'with keys "proposal" and "run"'), experiment)
+            experiment = None
+    except KeyError:
+        experiment = None
+        if hutch is None:
+            logger.info(('Missing hutch and experiment from conf. Will not '
+                         'load objects from questionnaire or experiment '
+                         'file.'))
 
-    for prio in plugin_priorities:
-        for this_plugin in plugins[prio]:
+    # Display the banner
+    if hutch is None:
+        hutch_banner()
+    else:
+        hutch_banner(hutch)
+
+    # Make cache namespace
+    cache = LoadCache((hutch or 'hutch') + '.db', hutch_dir=hutch_dir)
+
+    # Make RunEngine
+    RE = RunEngine({})
+    bec = BestEffortCallback()
+    RE.subscribe(bec)
+    cache(RE=RE)
+    try:
+        install_kicker()
+    except RuntimeError:
+        # Probably don't have a display if this failed, so nothing to kick
+        pass
+
+    # Collect Plans
+    cache(plans=plan_defaults)
+    cache(p=plan_defaults)
+
+    # Daq
+    if hutch is not None:
+        daq_objs = get_daq_objs(hutch, RE)
+        cache(**daq_objs)
+
+    # Happi db
+    if db is not None:
+        happi_objs = get_happi_objs(db, hutch)
+        cache(**happi_objs)
+
+    # Load user files
+    if load is not None:
+        load_objs = get_user_objs(load)
+        cache(**load_objs)
+
+    # Auto select experiment if we need to
+    proposal = None
+    if experiment is None:
+        if hutch is not None:
             try:
-                objs = this_plugin.get_objects()
-            except Exception as exc:
-                objs = None
-                err = 'Plugin {} failed to load, skipping'
-                logger.error(err.format(this_plugin.name))
-                logger.debug(exc, exc_info=True)
-                continue
-            for past_plugin in executed_plugins:
-                try:
-                    past_plugin.future_plugin_hook(this_plugin.name, objs)
-                except Exception as exc:
-                    err = 'Plugin {} post-hook failed for plugin {}'
-                    logger.error(err.format(past_plugin.name,
-                                            this_plugin.name))
-                    logger.debug(exc, exc_info=True)
-            executed_plugins.append(this_plugin)
-            all_objs.update(objs)
-            # Update db file as we go
-            if do_db:
-                for name, obj in objs.items():
-                    setattr(db_module, name, obj)
-            hutch_python.register_load(this_plugin.name, objs)
+                # xpplp1216
+                expname = get_current_experiment(hutch)
+                logger.info('Selected active experiment %s', expname)
+                # lp12
+                proposal = expname[3:7]
+                # 16
+                run = expname[-2:]
+            except Exception:
+                err = 'Failed to select experiment automatically'
+                logger.error(err)
+                logger.debug(err, exc_info=True)
 
-    # Annotate db file at the end
-    if do_db:
-        quotes = '"""\n'
-        header = ('The objects referenced in this file are populated by the '
-                  '{0}python\ninitialization. If you wish to use devices '
-                  'from this file, import\nthem from {0}.db after calling the '
-                  '{0}python startup script.\n\n'.format(hutch))
-        body = ('hutch-python last loaded on {}\n'
-                'with the following objects:\n\n')
-        text = quotes + header + body.format(datetime.datetime.now())
-        for name, obj in all_objs.items():
-            text += '{:<20} {}\n'.format(name, obj.__class__)
-        text += quotes
-        with db_path.open('w') as f:
-            f.write(text)
+    # Experiment objects
+    if experiment is not None:
+        proposal = experiment['proposal']
+        run = experiment['run']
 
-    return all_objs
+    if proposal is not None:
+        qs_objs = get_qs_objs(proposal, run)
+        cache(**qs_objs)
+        exp_objs = get_exp_objs(proposal, run)
+        cache(**exp_objs)
+
+    # Default namespaces
+    with safe_load('default groups'):
+        default_class_namespace('EpicsMotor', 'motors', cache)
+        default_class_namespace('Slits', 'slits', cache)
+        if hutch is not None:
+            meta = metadata_namespace(['beamline', 'stand'],
+                                      scope='hutch_python.db')
+            cache(**meta.__dict__)
+        default_class_namespace(object, 'all_objects', cache)
+
+    # Write db.txt info file to the user's module
+    try:
+        cache.write_file()
+    except OSError:
+        logger.warning('No permissions to write db.txt file')
+
+    return cache.objs.__dict__
 
 
-def hutch_banner(hutch_name):
-    text = hutch_name + 'Python'
-    f = pyfiglet.Figlet(font='big')
-    banner = f.renderText(text)
-    if hutch_name in HUTCH_COLORS:
-        banner = '\x1b[{}m'.format(HUTCH_COLORS[hutch_name]) + banner
-    print(banner)
+def default_class_namespace(cls, name, cache):
+    objs = class_namespace(cls, scope='hutch_python.db')
+    if len(objs) > 0:
+        cache(**{name: objs, name[0]: objs})

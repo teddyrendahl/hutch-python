@@ -5,11 +5,11 @@ import logging
 
 from IPython.terminal.embed import InteractiveShellEmbed
 
+from .daq import set_daq_sim
 from .ipython_log import init_ipython_logger
 from .load_conf import load
 from .log_setup import (setup_logging, set_console_level, debug_mode,
                         debug_context, debug_wrapper)
-from .plugins import hutch
 
 logger = logging.getLogger(__name__)
 opts_cache = {}
@@ -18,12 +18,12 @@ opts_cache = {}
 def setup_cli_env():
     # Parse the user's arguments
     parser = argparse.ArgumentParser(description='Launch LCLS Hutch Python')
-    parser.add_argument('--cfg', required=True,
+    parser.add_argument('--cfg', required=False, default=None,
                         help='Configuration yaml file')
-    parser.add_argument('--db', required=True,
-                        help='Device database access information')
     parser.add_argument('--debug', action='store_true', default=False,
                         help='Start in debug mode')
+    parser.add_argument('--sim', action='store_true', default=False,
+                        help='Run with simulated DAQ')
     parser.add_argument('script', nargs='?',
                         help='Run a script instead of running interactively')
     args = parser.parse_args()
@@ -32,21 +32,25 @@ def setup_cli_env():
     sys.path.insert(0, os.getcwd())
 
     # Set up logging first
-    log_dir = os.path.join(os.path.dirname(args.cfg), 'logs')
+    if args.cfg is None:
+        log_dir = None
+    else:
+        log_dir = os.path.join(os.path.dirname(args.cfg), 'logs')
     setup_logging(dir_logs=log_dir)
 
-    # Debug mode second
+    # Debug mode next
     if args.debug:
         debug_mode(True)
+
+    # Now other flags
+    if args.sim:
+        set_daq_sim(True)
 
     # Save whether we are an interactive session or a script session
     opts_cache['script'] = args.script
 
-    # Set the happi db path
-    hutch.HAPPI_DB = args.db
-
-    # Load objects from the configuration file
-    objs = load(args.cfg)
+    # Load objects based on the configuration file
+    objs = load(cfg=args.cfg)
 
     # Add cli debug tools
     objs['_debug_console_level'] = set_console_level

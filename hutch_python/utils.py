@@ -1,8 +1,55 @@
-import logging
-import importlib
+from contextlib import contextmanager
+from functools import partial
+from importlib import import_module
+from subprocess import check_output
 from types import SimpleNamespace
+import logging
+import sys
 
+import pyfiglet
+
+from .constants import (CUR_EXP_SCRIPT, CLASS_SEARCH_PATH, HUTCH_COLORS,
+                        SUCCESS_LEVEL)
+
+logging.addLevelName('SUCCESS', SUCCESS_LEVEL)
 logger = logging.getLogger(__name__)
+logger.success = partial(logger.log, SUCCESS_LEVEL)
+
+
+@contextmanager
+def safe_load(name, cls=None):
+    """
+    Context manager to abort running code and resume the rest of the program if
+    something fails. This can be used to wrap user code with unknown behavior.
+    This will log standard messages to indicate the success state.
+
+    Parameters
+    ----------
+    name: str
+        The name of the load to be logged
+
+    cls: type
+        The class of a loaded object to be logged
+    """
+    if cls is None:
+        identifier = name
+    else:
+        identifier = ' '.join((name, str(cls)))
+    logger.info('Loading %s...', identifier)
+    try:
+        yield
+        logger.success('Successfully loaded %s', identifier)
+    except Exception as exc:
+        logger.error('Failed to load %s', identifier)
+        logger.debug(exc, exc_info=True)
+
+
+def get_current_experiment(hutch):
+    """
+    Run a script to get the current experiment.
+    """
+    script = CUR_EXP_SCRIPT.format(hutch)
+    return check_output(script.split(' '), universal_newlines=True).strip('\n')
 
 
 class IterableNamespace(SimpleNamespace):
@@ -11,60 +58,68 @@ class IterableNamespace(SimpleNamespace):
         for _, obj in sorted(self.__dict__.items()):
             yield obj
 
+    def __len__(self):
+        return len(self.__dict__)
 
-def extract_objs(module_name):
+
+def extract_objs(scope=None, skip_hidden=True, stack_offset=0):
     """
-    Import module and return all the objects without a _ prefix. If an __all__
+    Return all objects within scope without a _ prefix. If an __all__
     keyword exists, follow that keyword's instructions instead.
-
-    If this is a single object in a module rather than a module, import just
-    that object.
-
-    If this is a callable and it ends in (), call it and import the return
-    value. Note that this includes classes.
 
     Parameters
     ----------
-    module_name: str
-        Filename, module name, or path to object in module
+    scope: module, namespace, or list of these, optional
+        If this is omitted, we'll include all objects that have been loaded by
+        hutch_python and everything in the caller's global frame.
+
+    skip_hidden: bool, optional
+        If changed from True to False, we'll include objects with leading
+        underscores.
+
+    stack_offset: int, optional
+        If scope was not provided, we'll use stack_offset to determine which
+        frame is the user's frame. Leave this at zero if you want the objects
+        in the caller's frame, and increase it by one for each level up the
+        stack your frame is.
 
     Returns
     -------
     objs: dict
-        Mapping from name in file to object
+        Mapping from name in scope to object
     """
-    objs = {}
-    # Allow filenames
-    if module_name.endswith('.py'):
-        module_name = module_name[:-3]
-    elif module_name.endswith('()'):
-        module_name = module_name[:-2]
-        call_me = True
+    if scope is None:
+        stack_depth = 1 + stack_offset
+        frame = sys._getframe(stack_depth)
+        objs = extract_objs(scope='hutch_python.db',
+                            skip_hidden=skip_hidden,
+                            stack_offset=stack_offset)
+        objs.update(frame.f_globals)
     else:
-        call_me = False
-    try:
-        try:
-            module = importlib.import_module(module_name)
-        except ImportError:
-            my_obj = find_object(module_name)
-            name = module_name.split('.')[-1]
-            # call_me, maybe
-            if call_me:
-                objs[name] = my_obj()
-            else:
-                objs[name] = my_obj
-            return objs
-    except Exception as exc:
-        logger.error('Error loading %s', module_name)
-        logger.debug(exc, exc_info=True)
-        return objs
-    all_kwd = getattr(module, '__all__', None)
+        if isinstance(scope, list):
+            objs = {}
+            for s in scope:
+                objs.update(extract_objs(scope=s,
+                                         skip_hidden=skip_hidden,
+                                         stack_offset=stack_offset))
+        else:
+            if isinstance(scope, str):
+                if scope.endswith('.py'):
+                    scope = scope[:-3]
+                scope = import_module(scope)
+            objs = scope.__dict__.copy()
+
+    all_kwd = objs.get('__all__')
     if all_kwd is None:
-        all_kwd = [a for a in dir(module) if a[0] != '_']
-    for attr in all_kwd:
-        obj = getattr(module, attr)
-        objs[attr] = obj
-    return objs
+        if skip_hidden:
+            return {k: v for k, v in objs.items() if k[0] != '_'}
+        else:
+            return objs
+    else:
+        all_objs = {}
+        for kwd in all_kwd:
+            all_objs[kwd] = objs.get(kwd)
+        return all_objs
 
 
 def find_object(obj_path):
@@ -84,11 +139,8 @@ def find_object(obj_path):
     parts = obj_path.split('.')
     module_path = '.'.join(parts[:-1])
     class_name = parts[-1]
-    module = importlib.import_module(module_path)
+    module = import_module(module_path)
     return getattr(module, class_name)
-
-
-CLASS_SEARCH_PATH = ['pcdsdevices.device_types']
 
 
 def find_class(class_path, check_defaults=True):
@@ -119,6 +171,27 @@ def find_class(class_path, check_defaults=True):
                 try:
                     return find_class(default + '.' + class_path,
                                       check_defaults=False)
-                except NameError:
+                except AttributeError:
                     pass
-        raise
+        raise ImportError('Could not find_class for {}'.format(class_path))
+
+
+def strip_prefix(name, strip_text):
+    """
+    For underscore-separated names:
+    strip_prefix('mfx_device', 'mfx') -> 'device'
+    strip_prefix('notmfx', 'mfx') -> 'notmfx'
+    """
+    if name.startswith(strip_text):
+        return name[len(strip_text)+1:]
+    else:
+        return name
+
+
+def hutch_banner(hutch_name='Hutch '):
+    text = hutch_name + 'Python'
+    f = pyfiglet.Figlet(font='big')
+    banner = f.renderText(text)
+    if hutch_name in HUTCH_COLORS:
+        banner = '\x1b[{}m'.format(HUTCH_COLORS[hutch_name]) + banner
+    print(banner)

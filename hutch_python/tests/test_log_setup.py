@@ -1,10 +1,10 @@
 import logging
 from logging.handlers import QueueHandler
+from pathlib import Path
 
 import pytest
 
-from hutch_python.log_setup import (DEFAULT_YAML, DIR_LOGS,
-                                    setup_logging,
+from hutch_python.log_setup import (setup_logging,
                                     get_console_handler, set_console_level,
                                     debug_mode, debug_context, debug_wrapper)
 
@@ -15,11 +15,15 @@ logger = logging.getLogger(__name__)
 
 def test_setup_logging():
     logger.debug('test_setup_logging')
+    dir_logs = Path(__file__).parent / 'logs'
 
     with restore_logging():
-        setup_logging(path_yaml=DEFAULT_YAML)
+        setup_logging()
 
-    assert DIR_LOGS.exists()
+    with restore_logging():
+        setup_logging(dir_logs=dir_logs)
+
+    assert dir_logs.exists()
 
 
 def test_console_handler(log_queue):

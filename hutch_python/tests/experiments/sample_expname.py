@@ -1,6 +1,6 @@
-def sample_plan():
-    return 5
+class User:
+    def sample_plan():
+        return 5
 
-
-def another():
-    return 4
+    def another():
+        return 4

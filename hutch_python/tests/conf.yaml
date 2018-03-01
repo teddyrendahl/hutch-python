@@ -1,18 +1,9 @@
 hutch: tst
 
-load:
-  - beamline.py
+db: happi_db.json
+
+load: tst.beamline
 
 experiment:
-  proposal: mfxx0
+  proposal: x0
   run: 10
-  import: experiment.User() as x
-
-namespace:
-  class:
-    function:
-      - fn
-      - funcs
-  metadata:
-    - beamline
-    - stand

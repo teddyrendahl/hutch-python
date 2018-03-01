@@ -9,6 +9,8 @@ from queue import Queue
 
 import pytest
 
+import hutch_python.utils
+
 # We need to have the tests directory importable to match what we'd have in a
 # real hutch-python install
 sys.path.insert(0, os.path.dirname(__file__))
@@ -99,3 +101,11 @@ def temporary_config():
     yield
     # Remove the file
     os.remove('qs.cfg')
+
+
+@pytest.fixture(scope='function')
+def fake_curexp_script():
+    old_script = hutch_python.utils.CUR_EXP_SCRIPT
+    hutch_python.utils.CUR_EXP_SCRIPT = 'echo {}lr1215'
+    yield
+    hutch_python.utils.CUR_EXP_SCRIPT = old_script

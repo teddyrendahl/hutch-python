@@ -111,4 +111,4 @@ logs
 conda-bld-tst
 
 # generated file
-hutch_python/tests/tst/db.py
+hutch_python/tests/tst/db.txt
