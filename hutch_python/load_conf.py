@@ -11,7 +11,7 @@ from .cache import LoadCache
 from .constants import VALID_KEYS
 from .daq import get_daq_objs
 from .exp_load import get_exp_objs
-from .happi import get_happi_objs
+from .happi import get_happi_objs, get_lightpath
 from .namespace import class_namespace, metadata_namespace
 from .qs_load import get_qs_objs
 from .user_load import get_user_objs
@@ -63,7 +63,8 @@ def load_conf(conf, hutch_dir=None):
         - import and group basic plans into an importable namespace
         - Use 'hutch' conf to create a Daq object and add daq plan tools into
           the plans namespace
-        - Use 'db' conf to load devices from happi beamline database
+        - Use 'db' conf to load devices from happi beamline database and create
+          a lightpath
         - Use 'load' conf to bring up the user's beamline files
         - Use 'experiment' conf to select the current experiment
             - If 'experiment' was missing, autoselect experiment using 'hutch'
@@ -177,11 +178,12 @@ def load_conf(conf, hutch_dir=None):
         daq_objs = get_daq_objs(hutch, RE)
         cache(**daq_objs)
 
-    # Happi db
+    # Happi db and Lightpath
     if db is not None:
         happi_objs = get_happi_objs(db, hutch)
         cache(**happi_objs)
-
+        bp = get_lightpath(db, hutch)
+        cache(**{"{}_beampath".format(hutch.lower()): bp})
     # Load user files
     if load is not None:
         load_objs = get_user_objs(load)
