@@ -22,7 +22,11 @@ def get_exp_objs(proposal, run):
     logger.debug('get_exp_objs(%s, %s)', proposal, run)
     expname = proposal.lower() + str(run)
     module_name = 'experiments.' + expname
-    with safe_load(expname):
+    try:
         module = import_module(module_name)
+    except ImportError:
+        logger.info('Skip missing experiment file %s.py', expname)
+        return {}
+    with safe_load(expname):
         return dict(x=module.User())
     return {}
