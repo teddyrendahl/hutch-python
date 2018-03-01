@@ -25,15 +25,12 @@ This module requires Python 3.6+ and the following utilities:
 - ``coloredlogs``, for colored logging
 - `pcdsdevices <https://github.com/pcdshub/pcdsdevices>`_ for our Device abstraction layers
 - ``pydaq`` for running the DAQ
-- `happi <https://github.com/slaclab/happi>`_ to enable device loading from a
+- `happi <https://github.com/pcdshub/happi>`_ to enable device loading from a
    happi database, and from the experiment questionaire.
 - `bluesky <https://github.com/nsls-ii/bluesky>`_ for scanning
 - ``pyfiglet`` for hutch banners (think big ``xpppython`` on startup)
-
-In the future, we plan to support the following extra features:
-
-- `lightpath <https://github.com/slaclab/lightpath>`_ will enable specification of a path object to include
-
+- `lightpath <https://github.com/pcdshub/lightpath>`_ organizes devices
+  devices to provide a summarized state of the beamline as a whole
 
 Installation
 ------------

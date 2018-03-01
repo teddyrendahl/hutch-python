@@ -19,7 +19,7 @@
         "stand": null,
         "system": null,
         "type": "Device",
-        "z": -1.0
+        "z": 1.0
     },
     "Tst:Dev:2": {
         "_id": "Tst:Dev:2",
@@ -41,7 +41,7 @@
         "stand": null,
         "system": null,
         "type": "Device",
-        "z": -1.0
+        "z": 2.0
     },
     "Tst:Dev:3": {
         "_id": "Tst:Dev:3",
