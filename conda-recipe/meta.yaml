@@ -26,6 +26,7 @@ requirements:
     - pcdsdaq >=1.0.0
     - psdm_qs_cli >=0.2.0
     - lightpath >=0.3.0
+    - cookiecutter >=1.6.0
 
 test:
   imports:
