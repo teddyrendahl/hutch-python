@@ -26,7 +26,7 @@ def setup_cli_env():
                         help='Start in debug mode')
     parser.add_argument('--sim', action='store_true', default=False,
                         help='Run with simulated DAQ')
-    parser.add_argument('--create', action='store_true', default=False,
+    parser.add_argument('--create', action='store', default=False,
                         help='Create a new hutch deployment')
     parser.add_argument('script', nargs='?',
                         help='Run a script instead of running interactively')
@@ -37,7 +37,8 @@ def setup_cli_env():
 
     # Options that mean skipping the python environment
     if args.create:
-        cookiecutter(str(DIR_MODULE / 'cookiecutter'))
+        cookiecutter(str(DIR_MODULE / 'cookiecutter'), no_input=True,
+                     extra_context=dict(hutch=args.create))
         return {}
 
     # Set up logging first
