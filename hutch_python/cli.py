@@ -4,8 +4,10 @@ import argparse
 import logging
 
 from IPython.terminal.embed import InteractiveShellEmbed
+from cookiecutter.main import cookiecutter
 from pcdsdaq.sim import set_sim_mode as set_daq_sim
 
+from .constants import DIR_MODULE
 from .ipython_log import init_ipython_logger
 from .load_conf import load
 from .log_setup import (setup_logging, set_console_level, debug_mode,
@@ -24,12 +26,19 @@ def setup_cli_env():
                         help='Start in debug mode')
     parser.add_argument('--sim', action='store_true', default=False,
                         help='Run with simulated DAQ')
+    parser.add_argument('--create', action='store_true', default=False,
+                        help='Create a new hutch deployment')
     parser.add_argument('script', nargs='?',
                         help='Run a script instead of running interactively')
     args = parser.parse_args()
 
     # Make sure the hutch's directory is in the path
     sys.path.insert(0, os.getcwd())
+
+    # Options that mean skipping the python environment
+    if args.create:
+        cookiecutter(str(DIR_MODULE / 'cookiecutter'))
+        return {}
 
     # Set up logging first
     if args.cfg is None:

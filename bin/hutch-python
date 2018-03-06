@@ -5,8 +5,9 @@ from hutch_python.cli import (setup_cli_env as _setup_cli,
 # Parse args and collect all the objects
 _obj = _setup_cli()
 
-# Bring everything into the global namespace
-globals().update(_obj)
+if _obj:
+    # Bring everything into the global namespace
+    globals().update(_obj)
 
-# Start IPython OR start user script
-_start_user()
+    # Start IPython OR start user script
+    _start_user()
