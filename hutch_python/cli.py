@@ -4,8 +4,8 @@ import argparse
 import logging
 
 from IPython.terminal.embed import InteractiveShellEmbed
+from pcdsdaq.sim import set_sim_mode as set_daq_sim
 
-from .daq import set_daq_sim
 from .ipython_log import init_ipython_logger
 from .load_conf import load
 from .log_setup import (setup_logging, set_console_level, debug_mode,
