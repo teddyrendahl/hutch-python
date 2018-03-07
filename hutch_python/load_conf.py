@@ -198,7 +198,7 @@ def load_conf(conf, hutch_dir=None):
                 expname = get_current_experiment(hutch)
                 logger.info('Selected active experiment %s', expname)
                 # lp12
-                proposal = expname[3:7]
+                proposal = expname[3:-2]
                 # 16
                 run = expname[-2:]
             except Exception:
