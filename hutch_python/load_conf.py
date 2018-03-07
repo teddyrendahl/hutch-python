@@ -175,8 +175,9 @@ def load_conf(conf, hutch_dir=None):
 
     # Daq
     if hutch is not None:
-        daq_objs = get_daq_objs(hutch, RE)
-        cache(**daq_objs)
+        with safe_load('daq'):
+            daq_objs = get_daq_objs(hutch, RE)
+            cache(**daq_objs)
 
     # Happi db and Lightpath
     if db is not None:
