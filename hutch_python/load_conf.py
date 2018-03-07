@@ -175,8 +175,9 @@ def load_conf(conf, hutch_dir=None):
 
     # Daq
     if hutch is not None:
-        daq_objs = get_daq_objs(hutch, RE)
-        cache(**daq_objs)
+        with safe_load('daq'):
+            daq_objs = get_daq_objs(hutch, RE)
+            cache(**daq_objs)
 
     # Happi db and Lightpath
     if db is not None:
@@ -198,7 +199,7 @@ def load_conf(conf, hutch_dir=None):
                 expname = get_current_experiment(hutch)
                 logger.info('Selected active experiment %s', expname)
                 # lp12
-                proposal = expname[3:7]
+                proposal = expname[3:-2]
                 # 16
                 run = expname[-2:]
             except Exception:
