@@ -54,6 +54,8 @@ Experiment = namedtuple('Experiment', ('run', 'proposal',
 
 
 class QSBackend:
+    empty = False
+
     def __init__(self, run, proposal, use_kerberos=True, user=None, pw=None):
         self.run = run
         self.proposal = proposal
@@ -79,7 +81,9 @@ class QSBackend:
             'pw': self.pw,
             'kerberos': self.kerberos,
             'proposal': self.proposal}]
-        if multiples:
+        if self.empty:
+            return None
+        elif multiples:
             return devices
         else:
             return devices[0]
