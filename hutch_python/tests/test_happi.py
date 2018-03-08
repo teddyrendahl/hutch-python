@@ -1,5 +1,7 @@
 import os.path
 import logging
+import simplejson
+import tempfile
 
 from hutch_python.happi import get_happi_objs, get_lightpath
 
@@ -14,6 +16,11 @@ def test_happi_objs():
     objs = get_happi_objs(db, 'tst')
     assert len(objs) == 2
     assert all([obj.active for obj in objs.values()])
+    # Make sure we can handle an empty JSON file
+    with tempfile.NamedTemporaryFile('w+') as tmp:
+        simplejson.dump(dict(), tmp)
+        tmp.seek(0)
+        assert get_happi_objs(tmp.name, 'tst') == {}
 
 
 def test_get_lightpath():
