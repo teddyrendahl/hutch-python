@@ -1,4 +1,5 @@
 import os
+import shutil
 import logging
 from pathlib import Path
 
@@ -6,18 +7,20 @@ import pytest
 
 from hutch_python.cli import (setup_cli_env, hutch_ipython_embed, run_script,
                               start_user)
+from hutch_python import constants
 
 from conftest import cli_args, restore_logging
 
 logger = logging.getLogger(__name__)
 
+CFG_PATH = Path(os.path.dirname(__file__)) / 'conf.yaml'
+CFG = str(CFG_PATH)
+
 
 def test_setup_cli_normal():
     logger.debug('test_setup_cli')
 
-    cfg = os.path.dirname(__file__) + '/conf.yaml'
-
-    with cli_args(['hutch_python', '--cfg', cfg]):
+    with cli_args(['hutch_python', '--cfg', CFG]):
         with restore_logging():
             setup_cli_env()
 
@@ -33,9 +36,7 @@ def test_setup_cli_no_args():
 def test_debug_arg():
     logger.debug('test_debug_arg')
 
-    cfg = os.path.dirname(__file__) + '/conf.yaml'
-
-    with cli_args(['hutch_python', '--cfg', cfg, '--debug']):
+    with cli_args(['hutch_python', '--cfg', CFG, '--debug']):
         with restore_logging():
             setup_cli_env()
 
@@ -43,11 +44,30 @@ def test_debug_arg():
 def test_sim_arg():
     logger.debug('test_sim_arg')
 
-    cfg = os.path.dirname(__file__) + '/conf.yaml'
-
-    with cli_args(['hutch_python', '--cfg', cfg, '--sim']):
+    with cli_args(['hutch_python', '--cfg', CFG, '--sim']):
         with restore_logging():
             setup_cli_env()
+
+
+def test_create_arg():
+    logger.debug('test_create_arg')
+
+    hutch = 'temp_create'
+    test_dir = CFG_PATH.parent.parent.parent / hutch
+    if test_dir.exists():
+        shutil.rmtree(test_dir)
+
+    with cli_args(['hutch_python', '--create', hutch]):
+        setup_cli_env()
+
+    assert test_dir.exists()
+
+    with cli_args(['hutch_python', '--cfg', str(test_dir / 'conf.yml')]):
+        constants.DAQ_MAP[hutch] = 0
+        with restore_logging():
+            setup_cli_env()
+
+    shutil.rmtree(test_dir)
 
 
 def test_hutch_ipython_embed():
@@ -71,9 +91,7 @@ def test_run_script():
 def test_start_user():
     logger.debug('test_start_user')
 
-    cfg = os.path.dirname(__file__) + '/conf.yaml'
-
-    with cli_args(['hutch_python', '--cfg', cfg]):
+    with cli_args(['hutch_python', '--cfg', CFG]):
         with restore_logging():
             setup_cli_env()
 
@@ -83,7 +101,7 @@ def test_start_user():
 
     script = str(Path(__file__).parent / 'script.py')
 
-    with cli_args(['hutch_python', '--cfg', cfg, script]):
+    with cli_args(['hutch_python', '--cfg', CFG, script]):
         with restore_logging():
             setup_cli_env()
 

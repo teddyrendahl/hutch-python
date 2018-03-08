@@ -181,10 +181,12 @@ def load_conf(conf, hutch_dir=None):
 
     # Happi db and Lightpath
     if db is not None:
-        happi_objs = get_happi_objs(db, hutch)
-        cache(**happi_objs)
-        bp = get_lightpath(db, hutch)
-        cache(**{"{}_beampath".format(hutch.lower()): bp})
+        with safe_load('database'):
+            happi_objs = get_happi_objs(db, hutch)
+            cache(**happi_objs)
+            bp = get_lightpath(db, hutch)
+            cache(**{"{}_beampath".format(hutch.lower()): bp})
+
     # Load user files
     if load is not None:
         load_objs = get_user_objs(load)
