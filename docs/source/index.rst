@@ -20,9 +20,10 @@
    :hidden:
 
    yaml_files
+   hutch
+   db
    load
    experiment
-   namespace
 
 .. toctree::
    :maxdepth: 1
