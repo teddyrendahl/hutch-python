@@ -47,6 +47,10 @@ def get_happi_objs(db, hutch):
     # Assume we want hutch devices that are active
     reqs = dict(beamline=hutch.upper(), active=True)
     containers = client.search(**reqs)
+    if not containers:
+        logger.warning("No devices found in database for %s",
+                       hutch.upper())
+        return dict()
     # Instantiate the devices needed
     dev_namespace = load_devices(*containers, pprint=False)
     return dev_namespace.__dict__
