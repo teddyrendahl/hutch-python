@@ -9,8 +9,7 @@ Hutch Python
    :alt: Code Coverage
 
 Hutch Python is the launcher and config reader for LCLS interactive IPython
-sessions. This will replace the existing Python 2 ``pyhutch`` modules
-(blbase/blutil/blinst) for scripting during experiments.
+sessions.
 
 Requirements
 ------------
@@ -21,22 +20,43 @@ This module is intended to be run using the latest pcds release in the
 This module requires Python 3.6+ and the following utilities:
 
 - ``ipython``, for improved interactive sessions
+- `pcdsdaq <https://github.com/pcdshub/pcdsdaq>`_
+  for using the daq in scans
+- `pcdsdevices <https://github.com/pcdshub/pcdsdevices>`_
+  for our Device abstraction layers
+- `happi <https://github.com/pcdshub/happi>`_
+  to enable device loading from a happi database
+- `psdm_qs_cli <https://github.com/slaclab/psdm_qs_cli>`_
+  as an optional happi dependency for loading from the experiment
+  questionnaire
+- `lightpath <https://github.com/pcdshub/lightpath>`_
+  organizes devices to provide a summarized state of the beamline as a whole
 - ``pyyaml``, for reading config files
 - ``coloredlogs``, for colored logging
-- `pcdsdevices <https://github.com/pcdshub/pcdsdevices>`_ for our Device abstraction layers
-- ``pydaq`` for running the DAQ
-- `happi <https://github.com/pcdshub/happi>`_ to enable device loading from a
-   happi database, and from the experiment questionaire.
-- `bluesky <https://github.com/nsls-ii/bluesky>`_ for scanning
 - ``pyfiglet`` for hutch banners (think big ``xpppython`` on startup)
-- `lightpath <https://github.com/pcdshub/lightpath>`_ organizes devices
-  devices to provide a summarized state of the beamline as a whole
+- `cookiecutter <https://github.com/audreyr/cookiecutter>`_
+  for starting new hutch repos
+
+To connect to the LCLS DAQ, your environment must have access to
+- ``pydaq`` for connecting to and running the daq
+- ``pycdb`` for changing daq object configurations
+- ``pyami`` for viewing data from the daq
+
+These are not available outside of the slac intranet, and in some cases
+must be sync'd with the active DAQ versions, independent of all other
+packages.
+
+To automatically select the current experiment, you must run with access to
+the LCLS NFS directories.
 
 Installation
 ------------
 
-This module is not yet ready for users. When completed, the included conda
-recipe will install all optional requirements by default. It is assumed that
-every user will want all of the features. It is up to you to install this
-module differently if you do not want the added dependencies. In the future,
-this will be installable via conda channel.
+The easiest way to install ``hutch-python`` is through
+`conda <https://conda.io/miniconda.html>_`. The requirements have not yet
+been consolidated into one conda channel, but we plan to place everything in
+the ``pcds-tag`` channel in the future. Currently, to pick up all
+dependencies, run this command:
+
+``conda install hutch-python -c pcds-tag -c pydm-tag -c lightsource2-tag
+-c defaults -c conda-forge``
