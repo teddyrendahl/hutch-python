@@ -60,7 +60,11 @@ def get_qs_objs(proposal, run):
         else:
             qs_client = happi.Client(database=QSBackend(run, proposal,
                                                         use_kerberos=True))
-
+        # Create namespace
+        if not qs_client.all_devices:
+            logger.warning("No devices found in PCDS Questionnaire for %s",
+                           proposal)
+            return dict()
         dev_namespace = load_devices(*qs_client.all_devices, pprint=False)
         return dev_namespace.__dict__
     return {}
