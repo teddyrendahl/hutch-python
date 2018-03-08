@@ -1,5 +1,8 @@
 dev
 
+# Ignore generated database file
+{{ cookiecutter.hutch }}/db.txt
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
