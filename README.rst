@@ -8,7 +8,7 @@ Hutch Python
    :target: https://codecov.io/gh/pcdshub/hutch-python
    :alt: Code Coverage
 
-Hutch Python is the launcher and config reader for LCLS interactive IPython
+``hutch-python`` is the launcher and config reader for LCLS interactive IPython
 sessions.
 
 Requirements
@@ -38,6 +38,7 @@ This module requires Python 3.6+ and the following utilities:
   for starting new hutch repos
 
 To connect to the LCLS DAQ, your environment must have access to
+
 - ``pydaq`` for connecting to and running the daq
 - ``pycdb`` for changing daq object configurations
 - ``pyami`` for viewing data from the daq
@@ -53,7 +54,8 @@ Installation
 ------------
 
 The easiest way to install ``hutch-python`` is through
-`conda <https://conda.io/miniconda.html>_`. The requirements have not yet
+`conda <https://conda.io/docs>`_, which is easy to
+`install <https://conda.io/miniconda.html>`_. The requirements have not yet
 been consolidated into one conda channel, but we plan to place everything in
 the ``pcds-tag`` channel in the future. Currently, to pick up all
 dependencies, run this command:
