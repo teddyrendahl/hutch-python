@@ -91,9 +91,12 @@ def extract_objs(scope=None, skip_hidden=True, stack_offset=0):
     if scope is None:
         stack_depth = 1 + stack_offset
         frame = sys._getframe(stack_depth)
-        objs = extract_objs(scope='hutch_python.db',
-                            skip_hidden=skip_hidden,
-                            stack_offset=stack_offset)
+        try:
+            objs = extract_objs(scope='hutch_python.db',
+                                skip_hidden=skip_hidden,
+                                stack_offset=stack_offset)
+        except ImportError:
+            objs = {}
         objs.update(frame.f_globals)
     else:
         if isinstance(scope, list):
