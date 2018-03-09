@@ -10,26 +10,28 @@
    :caption: Getting Started
    :hidden:
 
-   installation
-   invokation
-   hutch_setup
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Configuration
-   :hidden:
-
-   yaml_files
-   hutch
-   db
-   load
+   start_options
+   tutorial
+   import_from_db
+   useful_utilities
+   beamline
    experiment
+   other_modules
 
 .. toctree::
    :maxdepth: 1
-   :caption: Developer API
+   :caption: Developer Documentation
    :hidden:
 
-   base_plugin
+   environment
+   hutch_setup
+   yaml_files
+   debug
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Internal API Reference
+   :hidden:
+
    log_setup
    utils

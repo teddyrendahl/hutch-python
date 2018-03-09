@@ -9,7 +9,7 @@ Hutch Python
    :alt: Code Coverage
 
 ``hutch-python`` is the launcher and config reader for LCLS interactive IPython
-sessions.
+sessions. The documentation is hosted at `<pcdshub.github.io/hutch-python>`_.
 
 Requirements
 ------------
@@ -50,15 +50,3 @@ packages.
 To automatically select the current experiment, you must run with access to
 the LCLS NFS directories.
 
-Installation
-------------
-
-The easiest way to install ``hutch-python`` is through
-`conda <https://conda.io/docs>`_, which is easy to
-`install <https://conda.io/miniconda.html>`_. The requirements have not yet
-been consolidated into one conda channel, but we plan to place everything in
-the ``pcds-tag`` channel in the future. Currently, to pick up all
-dependencies, run this command:
-
-``conda install hutch-python -c pcds-tag -c pydm-tag -c lightsource2-tag
--c defaults -c conda-forge``

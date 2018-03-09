@@ -8,7 +8,3 @@ utils.py
 
 .. autosummary::
    :toctree: generated
-   
-   hutch_python.utils.extract_objs
-   hutch_python.utils.find_object
-   hutch_python.utils.find_class
