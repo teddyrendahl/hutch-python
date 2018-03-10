@@ -10,12 +10,19 @@
    :caption: Getting Started
    :hidden:
 
-   start_options
+   start
    tutorial
-   import_from_db
-   useful_utilities
+
+.. toctree::
+   :maxdepth: 1
+   :caption: User Documentation
+   :hidden:
+
+   startup
+   database
    beamline
    experiment
+   user_utils
    other_modules
 
 .. toctree::
@@ -33,5 +40,11 @@
    :caption: Internal API Reference
    :hidden:
 
+   cache
+   cli
+   ipython_log
+   load_conf
+   load_parts
    log_setup
+   namespace
    utils

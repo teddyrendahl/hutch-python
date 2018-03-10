@@ -7,7 +7,7 @@ A connection to the Questionnaire webservice is made and the devices that have
 enough information to be turned into Python objects are instantiated. There are
 two possible methods of authentication to the QuestionnaireClient, Kerberos and
 WS-Auth. The first is simpler but is not possible for all users, we therefore
-search for a configuration file named `qs.cfg`, either hidden in the current
+search for a configuration file named ``qs.cfg``, either hidden in the current
 directory or the users home directory. This should contain the user and
 password needed to authenticate into the QuestionnaireClient. The format of
 this configuration file is the standard .ini structure and should define the

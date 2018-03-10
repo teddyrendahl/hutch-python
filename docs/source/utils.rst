@@ -1,10 +1,16 @@
-Utility Functions
-=================
-
-These are utilities used internally in various plugins. The functions in this module are subject to change, so avoid using them outside of this package.
-
 utils.py
---------
+========
+
+.. automodule:: hutch_python.utils
 
 .. autosummary::
    :toctree: generated
+
+   safe_load
+   get_current_experiment
+   IterableNamespace
+   extract_objs
+   find_object
+   find_class
+   strip_prefix
+   hutch_banner

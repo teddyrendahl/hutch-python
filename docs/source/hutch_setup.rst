@@ -2,7 +2,7 @@ Hutch Setup
 ===========
 
 ``hutch-python`` is meant to be run in the context of a specific hutch.
-Hutch repos are stored online at https://github.com/pcdshub/hutchname,
+Hutch repos are stored online at ``https://github.com/pcdshub/hutchname``,
 and in our directory tree at ``/reg/g/pcds/pyps/apps/hutch-python/hutchname``.
 
 If your hutch does not have a repository, you've found the correct page.
@@ -18,7 +18,7 @@ Replacing ``hutchname`` with your hutch's name:
 #. ``cd hutchname``
 #. ``git init``
 #. ``git add *``
-#. ``git commit -m "ENH: Add hutchname from template``
+#. ``git commit -m "ENH: Add hutchname from template"``
 #. ``git remote add origin https://github.com/pcdshub/hutchname.git``
 #. In a browser, navigate to `<https://github.com/pcdshub>`_ and log in.
 #. Click ``New`` to make a new repo, name it ``hutchname``, do not initialize with README, gitignore, or license.

@@ -24,8 +24,9 @@ def load(cfg=None):
     """
     Read the config file and the database entries.
     From this information we can:
-        - Find the hutch's launch directory
-        - Load the hutch's objects by calling `load_conf`
+
+    - Find the hutch's launch directory
+    - Load the hutch's objects by calling `load_conf.load_conf`
 
     Parameters
     ----------
@@ -54,22 +55,23 @@ def load_conf(conf, hutch_dir=None):
     """
     Step through the objcet loading procedure, consulting conf as needed.
     The procedure is:
-        - Check the configuration for errors
-        - Display the banner by calling `hutch_banner`
-        - Use 'hutch' conf to create hutch.db importable namespace to stash the
-          objects. This will be literally hutch.db if hutch is not provided, or
-          the hutch name e.g. mfx.db
-        - Create a `RunEngine`
-        - import and group basic plans into an importable namespace
-        - Use 'hutch' conf to create a Daq object and add daq plan tools into
-          the plans namespace
-        - Use 'db' conf to load devices from happi beamline database and create
-          a lightpath
-        - Use 'load' conf to bring up the user's beamline files
-        - Use 'experiment' conf to select the current experiment
-            - If 'experiment' was missing, autoselect experiment using 'hutch'
-        - Use current experiment to load experiment objects from questionnaire
-        - Use current experiment to load experiment file
+
+    - Check the configuration for errors
+    - Display the banner by calling `hutch_banner`
+    - Use 'hutch' conf to create hutch.db importable namespace to stash the
+      objects. This will be literally hutch.db if hutch is not provided, or
+      the hutch name e.g. mfx.db
+    - Create a ``RunEngine``
+    - import and group basic plans into an importable namespace
+    - Use 'hutch' conf to create a Daq object and add daq plan tools into
+      the plans namespace
+    - Use 'db' conf to load devices from happi beamline database and create
+      a lightpath
+    - Use 'load' conf to bring up the user's beamline files
+    - Use 'experiment' conf to select the current experiment
+        - If 'experiment' was missing, autoselect experiment using 'hutch'
+    - Use current experiment to load experiment objects from questionnaire
+    - Use current experiment to load experiment file
 
     If a conf entry is missing, we'll note it in a logger.info message.
     If an extra conf entry is found, we'll note it in a logger.warning message.

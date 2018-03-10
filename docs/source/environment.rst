@@ -23,8 +23,8 @@ Personal Install
 You may wish to install ``hutch-python`` into your own environment for
 development purposes. This can be achieved trivially if your environment is in
 `conda <https://conda.io/docs>`_. If your environment is not in conda, I
-highly suggest downloading `miniconda <https://conda.io/miniconda.html>`_.
-And giving it a try.
+highly suggest downloading `miniconda <https://conda.io/miniconda.html>`_
+and giving it a try.
 
 The requirements have not yet been consolidated into one conda channel, but we
 plan to place everything in the ``pcds-tag`` channel in the future. Currently,

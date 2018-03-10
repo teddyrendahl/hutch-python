@@ -7,9 +7,9 @@ specification can be used to limit the number of devices that are loaded.
 The plugin then handles; initalizing the ``happi.Client``, finding the
 containers that match the specified requirements, then using the device
 loading utilities from happi to create instantiated devices. The same database
-information can be used to create a `lightpath.BeamPath` object that provides a
-convenient way to visualize all the devices that may block the beam on the way
-to the interaction point.
+information can be used to create a ``lightpath.BeamPath`` object that provides
+a convenient way to visualize all the devices that may block the beam on the
+way to the interaction point.
 
 Example
 -------

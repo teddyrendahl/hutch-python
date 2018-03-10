@@ -1,3 +1,8 @@
+"""
+cache.py is responsible for grouping all loaded objects and making sure they
+are available in the ``xxx.db`` virtual module. It is used extensively in
+`load_conf.load_conf`.
+"""
 from pathlib import Path
 import datetime
 import sys

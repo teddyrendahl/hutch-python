@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 def get_exp_objs(proposal, run):
     """
     Load the correct experiment module. This will import User from
-    `experiments.{propsal}{run}` and create User(), storing it as x.
+    ``experiments.{propsal}{run}`` and create User(), storing it as x.
 
     Parameters
     ----------
