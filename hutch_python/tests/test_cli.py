@@ -7,7 +7,7 @@ import pytest
 
 from hutch_python.cli import (setup_cli_env, hutch_ipython_embed, run_script,
                               start_user)
-from hutch_python import constants
+from hutch_python.load_conf import load
 
 from conftest import cli_args, restore_logging
 
@@ -58,15 +58,12 @@ def test_create_arg():
         shutil.rmtree(test_dir)
 
     with cli_args(['hutch_python', '--create', hutch]):
-        setup_cli_env()
-
-    assert test_dir.exists()
-
-    with cli_args(['hutch_python', '--cfg', str(test_dir / 'conf.yml')]):
-        constants.DAQ_MAP[hutch] = 0
         with restore_logging():
             setup_cli_env()
 
+    assert test_dir.exists()
+
+    load(str(test_dir / 'conf.yml'))
     shutil.rmtree(test_dir)
 
 
