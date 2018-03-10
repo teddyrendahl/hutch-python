@@ -1,26 +1,3 @@
-"""
-This plugin depends on a JSON happi database stored somewhere in the file
-system. The path of this file is supplied in the YAML as ``filename``.
-Finally, if a smaller subsection of the databse is desired, a requirements
-specification can be used to limit the number of devices that are loaded.
-
-The plugin then handles; initalizing the ``happi.Client``, finding the
-containers that match the specified requirements, then using the device
-loading utilities from happi to create instantiated devices. The same database
-information can be used to create a ``lightpath.BeamPath`` object that provides
-a convenient way to visualize all the devices that may block the beam on the
-way to the interaction point.
-
-Example
--------
-.. code:: YAML
-
-    happi:
-        filename: path/to/my_db.json
-        requirements:
-            active: True
-            beamline: MFX
-"""
 import logging
 
 import happi
@@ -32,15 +9,24 @@ logger = logging.getLogger(__name__)
 
 def get_happi_objs(db, hutch):
     """
-    Get the relevant happi objects for hutch from db.
+    Get the relevant devices for ``hutch`` from ``db``.
+
+    This depends on a JSON ``happi`` database stored somewhere in the file
+    system and handles setting up the ``happi.Client`` and querying the data
+    base for devices.
 
     Parameters
     ----------
-    db: str
+    db: ``str``
         Path to database
 
-    hutch: str
+    hutch: ``str``
         Name of hutch
+
+    Returns
+    -------
+    objs: ``dict``
+        A mapping from device name to device
     """
     # Load the happi Client
     client = happi.Client(path=db)
@@ -54,15 +40,21 @@ def get_happi_objs(db, hutch):
 
 def get_lightpath(db, hutch):
     """
-    Create a lightpath from relevant happi objects
+    Create a lightpath from relevant ``happi`` objects.
 
     Parameters
     ----------
-    db: str
+    db: ``str``
         Path to database
 
-    hutch: str
+    hutch: ``str``
         Name of hutch
+
+    Returns
+    -------
+    path: ``lightpath.BeamPath``
+        Object that provides a convenient way to visualize all the devices
+        that may block the beam on the way to the interaction point.
     """
     # Load the happi Client
     client = happi.Client(path=db)

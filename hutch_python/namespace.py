@@ -1,3 +1,6 @@
+"""
+This module provides utilities for grouping objects into namespaces.
+"""
 from inspect import isfunction
 import logging
 
@@ -9,20 +12,20 @@ logger = logging.getLogger(__name__)
 
 def class_namespace(cls, scope=None):
     """
-    Create a namespace that contains objects of a specific type.
+    Create a ``namespace`` that contains objects of a specific type.
 
     Parameters
     ----------
-    cls: type or str
+    cls: ``type`` or ``str``
 
-    scope: module, namespace, or list of these
+    scope: ``module``, ``namespace``, or ``list`` of these
         Every object attached to the given modules will be considered for the
-        class_namespace. If scope is omitted, we'll check all objects loaded by
-        hutch_python and everything in the caller's global frame.
+        `class_namespace`. If ``scope`` is omitted, we'll check all objects
+        loaded by ``hutch-python`` and everything in the caller's global frame.
 
     Returns
     -------
-    namespace: IterableNamespace
+    namespace: `IterableNamespace`
     """
     logger.debug('Create class_namespace cls=%s, scope=%s', cls, scope)
     class_space = IterableNamespace()
@@ -54,23 +57,23 @@ def class_namespace(cls, scope=None):
 
 def metadata_namespace(md, scope=None):
     """
-    Create a namespace that accumulates objects and creates a tree based on
+    Create a ``namespace`` that accumulates objects and creates a tree based on
     their metadata.
 
     Parameters
     ----------
-    md: list of str
+    md: ``list`` of ``str``
         Each of the metadata categories to group objects by, in order from the
         root of the tree to the leaves.
 
-    scope: module, namespace, or list of these
+    scope: ``module``, ``namespace``, or ``list`` of these
         Every object attached to the given modules will be considered for the
-        metadata_namespace. If scope is omitted, we'll check all objects loaded
-        by hutch_python and everything in the caller's global frame.
+        `metadata_namespace`. If ``scope`` is omitted, we'll check all objects
+        loaded by ``hutch-python`` and everything in the caller's global frame.
 
     Returns
     -------
-    namespace: IterableNamespace
+    namespace: `IterableNamespace`
     """
     logger.debug('Create metadata_namespace md=%s, scope=%s', md, scope)
     metadata_space = IterableNamespace()

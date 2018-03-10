@@ -1,3 +1,7 @@
+"""
+This module is responsible for reading and interpreting the ``conf.yml`` file.
+The file's specification can be found on the `yaml_files` page.
+"""
 import logging
 import yaml
 from pathlib import Path
@@ -22,24 +26,24 @@ logger = logging.getLogger(__name__)
 
 def load(cfg=None):
     """
-    Read the config file and the database entries.
-    From this information we can:
+    Read the config file and convert the yaml format into a ``dict``.
 
-    - Find the hutch's launch directory
-    - Load the hutch's objects by calling `load_conf.load_conf`
+    This method:
+
+    - Finds the hutch's launch directory
+    - Loads the hutch's objects by calling `load_conf.load_conf`
 
     Parameters
     ----------
-    cfg: str, optional
-        Path to the conf.yml file. If this is missing, we'll end up with a very
-        empty environment.
+    cfg: ``str``, optional
+        Path to the ``conf.yml`` file.
+        If this is missing, we'll end up with a very empty environment.
 
     Returns
     -------
-    objs: dict{str: object}
-        All objects defined by the files that need to make it into the
-        environment. The strings are the names that will be accessible in the
-        global namespace.
+    objs: ``dict{str: object}``
+        All objects defined by ``conf.yml``. The strings are the names
+        that will be accessible in the global namespace.
     """
     if cfg is None:
         return load_conf({})
@@ -53,47 +57,52 @@ def load(cfg=None):
 
 def load_conf(conf, hutch_dir=None):
     """
-    Step through the objcet loading procedure, consulting conf as needed.
+    Step through the object loading procedure, given a configuration.
+
     The procedure is:
 
     - Check the configuration for errors
     - Display the banner by calling `hutch_banner`
-    - Use 'hutch' conf to create hutch.db importable namespace to stash the
-      objects. This will be literally hutch.db if hutch is not provided, or
-      the hutch name e.g. mfx.db
-    - Create a ``RunEngine``
-    - import and group basic plans into an importable namespace
-    - Use 'hutch' conf to create a Daq object and add daq plan tools into
-      the plans namespace
-    - Use 'db' conf to load devices from happi beamline database and create
-      a lightpath
-    - Use 'load' conf to bring up the user's beamline files
-    - Use 'experiment' conf to select the current experiment
-        - If 'experiment' was missing, autoselect experiment using 'hutch'
+    - Use ``hutch`` key to create ``hutch.db`` importable namespace to
+      stash the objects. This will be literally ``hutch.db`` if hutch is
+      not provided, or the hutch name e.g. ``mfx.db``.
+    - Create a ``RunEngine``, ``RE``
+    - Import ``plan_defaults`` and include as ``p``, ``plans``
+    - Use ``hutch`` key to create a ``daq`` object with ``RE`` registered
+    - Use ``db`` key to load devices from the ``happi`` beamline database
+      and create a ``hutch_beampath`` object from ``lightpath``
+    - Use ``load`` key to bring up the user's ``beamline`` modules
+    - Use ``experiment`` key to select the current experiment
+
+        - If ``experiment`` was missing, autoselect experiment using
+          ``hutch`` key
+
     - Use current experiment to load experiment objects from questionnaire
     - Use current experiment to load experiment file
 
-    If a conf entry is missing, we'll note it in a logger.info message.
-    If an extra conf entry is found, we'll note it in a logger.warning message.
+    If a conf key is missing, we'll note it in a ``logger.info`` message.
+    If an extra conf entry is found, we'll note it in a ``logger.warning``
+    message.
     If an automatically selected file is missing, we'll note it in a
-    logger.warning message.
+    ``logger.info`` message.
     All other errors will be noted in a logger.error message.
 
     Parameters
     ----------
-    conf: dict
-        dict interpretation of the original yaml file
+    conf: ``dict``
+        ``dict`` interpretation of the original yaml file
 
-    hutch_dir: Path or str, optional
-        Path object that points to the hutch's launch directory. This is the
-        directory that includes the 'experiments' directory and a hutchname
-        directory e.g. mfx
-        If this is missing we'll be starting a mostly empty session.
+    hutch_dir: ``Path`` or ``str``, optional
+        ``Path`` object that points to the hutch's launch directory. This is
+        the directory that includes the ``experiments`` directory and a
+        hutchname directory e.g. ``mfx``
+        If this is missing, we'll be unable to write the ``db.txt`` file or do
+        relative filepath database selection for ``happi``.
 
     Returns
     ------
-    objs: dict{str: object}
-        Return value of load
+    objs: ``dict{str: object}``
+        See the return value of `load`
     """
     # Warn user about excess config entries
     for key in conf:
@@ -242,6 +251,23 @@ def load_conf(conf, hutch_dir=None):
 
 
 def default_class_namespace(cls, name, cache):
+    """
+    Create a class namespace and add it to the cache.
+
+    This is an internal utility function for `load_conf.load_conf` that creates
+    an `IterableNamespace`, names it, gives it a shortened name, and then
+    registers both names to the `LoadCache` if the namespace isn't empty.
+
+    Parameters
+    ----------
+    cls: ``type`` or ``str``
+        The class to use for the namespace
+
+    name: ``str``
+        The name of the namespace
+
+    cache: `LoadCache`
+    """
     objs = class_namespace(cls, scope='hutch_python.db')
     if len(objs) > 0:
         cache(**{name: objs, name[0]: objs})

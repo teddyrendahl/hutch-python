@@ -21,8 +21,12 @@ Replacing ``hutchname`` with your hutch's name:
 #. ``git commit -m "ENH: Add hutchname from template"``
 #. ``git remote add origin https://github.com/pcdshub/hutchname.git``
 #. In a browser, navigate to `<https://github.com/pcdshub>`_ and log in.
-#. Click ``New`` to make a new repo, name it ``hutchname``, do not initialize with README, gitignore, or license.
+#. Click ``New`` to make a new repo, name it ``hutchname``, do not
+   initialize with README, gitignore, or license.
 #. ``git push origin master``
+#. As the hutch operator account, create a file named ``.qs.cfg`` in the opr's
+   home area. Follow the specification of `get_qs_objs` to ensure we can load
+   user objects from the questionnaire.
 
 Updating a Hutch's Launch Scripts
 ---------------------------------

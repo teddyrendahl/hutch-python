@@ -1,38 +1,15 @@
-load_parts
-==========
+load submodules
+===============
 
 Submodules used by :py:mod:`load_conf`
 
-daq.py
-------
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
 
-.. automodule:: hutch_python.daq
-   :members:
-
-
-exp_load.py
------------
-
-.. automodule:: hutch_python.exp_load
-   :members:
-
-
-happi.py
---------
-
-.. automodule:: hutch_python.happi
-   :members:
-
-
-qs_load.py
-----------
-
-.. automodule:: hutch_python.qs_load
-   :members:
-
-
-user_load.py
-------------
-
-.. automodule:: hutch_python.user_load
-   :members:
+   hutch_python.daq.get_daq_objs
+   hutch_python.happi.get_happi_objs
+   hutch_python.happi.get_lightpath
+   hutch_python.user_load.get_user_objs
+   hutch_python.qs_load.get_qs_objs
+   hutch_python.exp_load.get_exp_objs

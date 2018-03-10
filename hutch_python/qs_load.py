@@ -1,26 +1,3 @@
-"""
-This plugin depends on the QSBackend in `happi`. Not intended to be run
-individually, it is expected that the requisite information is passed in the
-`experiment` section. This includes the proposal id and run.
-
-A connection to the Questionnaire webservice is made and the devices that have
-enough information to be turned into Python objects are instantiated. There are
-two possible methods of authentication to the QuestionnaireClient, Kerberos and
-WS-Auth. The first is simpler but is not possible for all users, we therefore
-search for a configuration file named ``qs.cfg``, either hidden in the current
-directory or the users home directory. This should contain the user and
-password needed to authenticate into the QuestionnaireClient. The format of
-this configuration file is the standard .ini structure and should define the
-username and password like:
-
-.. code::
-
-    [DEFAULT]
-    user = MY_USERNAME
-    pw = MY_PASSWORD
-
-
-"""
 import logging
 import os.path
 from configparser import NoOptionError, ConfigParser
@@ -35,6 +12,40 @@ logger = logging.getLogger(__name__)
 
 
 def get_qs_objs(proposal, run):
+    """
+    Gather user objects from the experiment questionnaire.
+
+    Connects to the questionnaire webservice via the ``happi`` ``QSBackend``
+    using ``psdm_qs_cli`` to collect well-defined devices.
+
+    There are two possible methods of authentication to the
+    ``QuestionnaireClient``, ``Kerberos`` and ``WS-Auth``. The first is simpler
+    but is not possible for all users, we therefore search for a configuration
+    file named ``qs.cfg``, either hidden in the current directory or the users
+    home directory. This should contain the username and password needed to
+    authenticate into the ``QuestionnaireClient``. The format of this
+    configuration file is the standard ``.ini`` structure and should define the
+    username and password like:
+
+    .. code::
+
+        [DEFAULT]
+        user = MY_USERNAME
+        pw = MY_PASSWORD
+
+    Parameters
+    ----------
+    proposal: ``str``
+        The experiment's proposal number
+
+    run: ``str``
+        A string representation of the run number
+
+    Returns
+    -------
+    objs: ``dict``
+        Mapping from questionnaire ``python name`` to loaded object.
+    """
     logger.debug('get_qs_objs(%s, %s)', proposal, run)
     with safe_load('questionnaire'):
         proposal = proposal.upper()

@@ -1,5 +1,7 @@
 """
-IPython plugin to log inputs, outputs, and tracebacks to the debug stream.
+This module modifies an ``ipython`` shell to log inputs, outputs, and
+tracebacks to a custom ``logger.input`` level. The ``INPUT`` level is lower
+than the ``DEBUG`` level to avoid a terminal echo in debug mode.
 """
 import sys
 import traceback
@@ -13,12 +15,30 @@ logger.input = functools.partial(logger.log, INPUT_LEVEL)
 
 
 class IPythonLogger:
+    """
+    Class that logs the most recent inputs, outputs, and exceptions at the
+    custom ``INPUT`` level.
+
+    Parameters
+    ----------
+    ipython: ``ipython`` ``Shell``
+        The active ``ipython`` ``Shell``, perhaps the one returned by
+        ``IPython.get_ipython()``.
+    """
     def __init__(self, ipython):
         self.prev_err = None
         self.In = ipython.user_ns['In']
         self.Out = ipython.user_ns['Out']
 
     def log(self):
+        """
+        Logs the most recent inputs, outputs and exceptions.
+
+        - Always logs the most recent input
+        - If this input has a corresponding output, log the output
+        - If there has been an error in the interactive session since the last
+          call to `log`, log the error
+        """
         try:
             line_num = len(self.In) - 1
             if line_num == 0:
@@ -43,5 +63,17 @@ class IPythonLogger:
 
 
 def init_ipython_logger(ip):
+    """
+    Initialize the `IPythonLogger`.
+
+    This involves adding the ``INPUT`` log level and registering
+    `IPythonLogger.log` to run on the ``post-execute`` event.
+
+    Parameters
+    ----------
+    ip: ``ipython`` ``Shell``
+        The active ``ipython`` ``Shell``, perhaps the one returned by
+        ``IPython.get_ipython()``.
+    """
     logging.addLevelName('INPUT', INPUT_LEVEL)
     ip.events.register('post_execute', IPythonLogger(ip).log)
