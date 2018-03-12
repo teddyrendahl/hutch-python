@@ -9,7 +9,8 @@ Hutch Python
    :alt: Code Coverage
 
 ``hutch-python`` is the launcher and config reader for LCLS interactive IPython
-sessions. The documentation is hosted at `<pcdshub.github.io/hutch-python>`_.
+sessions. The documentation is hosted at
+`<https://pcdshub.github.io/hutch-python>`_.
 
 Requirements
 ------------
