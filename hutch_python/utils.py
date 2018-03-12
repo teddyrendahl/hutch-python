@@ -1,3 +1,8 @@
+"""
+Module that contains general-use utilities. Some of these are useful outside of
+``hutch-python``, while others are used in multiple places throughout the
+module.
+"""
 from contextlib import contextmanager
 from functools import partial
 from importlib import import_module
@@ -19,17 +24,21 @@ logger.success = partial(logger.log, SUCCESS_LEVEL)
 @contextmanager
 def safe_load(name, cls=None):
     """
-    Context manager to abort running code and resume the rest of the program if
+    Context manager to safely run a block of code.
+
+    This will abort running code and resume the rest of the program if
     something fails. This can be used to wrap user code with unknown behavior.
-    This will log standard messages to indicate the success state.
+    This will log standard messages to indicate success or failure.
 
     Parameters
     ----------
-    name: str
-        The name of the load to be logged
+    name: ``str``
+        The name of the load to be logged. This will be used in the log
+        message.
 
-    cls: type
-        The class of a loaded object to be logged
+    cls: ``type``, optional
+        The class of a loaded object to be logged. This will be used in the log
+        message.
     """
     if cls is None:
         identifier = name
@@ -46,13 +55,36 @@ def safe_load(name, cls=None):
 
 def get_current_experiment(hutch):
     """
-    Run a script to get the current experiment.
+    Get the current experiment for ``hutch``.
+
+    This currently works by running an external script on NFS, but this will be
+    changed in the future.
+
+    Parameters
+    ----------
+    hutch: ``str``
+        The hutch we would like to know the current experiment of
+
+    Returns
+    -------
+    expname: ``str``
+        Full experiment name, e.g. ``xppls2516``
     """
     script = CUR_EXP_SCRIPT.format(hutch)
     return check_output(script.split(' '), universal_newlines=True).strip('\n')
 
 
 class IterableNamespace(SimpleNamespace):
+    """
+    ``SimpleNamespace`` that can be iterated through.
+
+    This means we can call funtions like ``list`` on these objects to see all
+    of their contents, we can put them into ``for loops``, and we can use them
+    in ``generator expressions``.
+
+    This class also has the added feature where ``len`` will correctly tell you
+    the number of objects in the ``namespace``.
+    """
     def __iter__(self):
         # Sorts alphabetically by key
         for _, obj in sorted(self.__dict__.items()):
@@ -64,36 +96,41 @@ class IterableNamespace(SimpleNamespace):
 
 def extract_objs(scope=None, skip_hidden=True, stack_offset=0):
     """
-    Return all objects within scope without a _ prefix. If an __all__
-    keyword exists, follow that keyword's instructions instead.
+    Return all objects with the ``scope``.
+
+    This can be though of as a ``*`` import, and it obeys the ``__all__``
+    keyword functionality.
 
     Parameters
     ----------
-    scope: module, namespace, or list of these, optional
-        If this is omitted, we'll include all objects that have been loaded by
+    scope: ``module``, ``namespace``, or ``list`` of these, optional
+        If provided, we'll import from this object.
+        If omitted, we'll include all objects that have been loaded by
         hutch_python and everything in the caller's global frame.
 
-    skip_hidden: bool, optional
-        If changed from True to False, we'll include objects with leading
-        underscores.
+    skip_hidden: ``bool``, optional
+        If ``True``, we'll omit objects with leading underscores.
 
-    stack_offset: int, optional
-        If scope was not provided, we'll use stack_offset to determine which
-        frame is the user's frame. Leave this at zero if you want the objects
-        in the caller's frame, and increase it by one for each level up the
-        stack your frame is.
+    stack_offset: ``int``, optional
+        If ``scope`` was not provided, we'll use ``stack_offset`` to determine
+        which frame is the user's frame. Leave this at zero if you want the
+        objects in the caller's frame, and increase it by one for each level
+        up the stack your frame is.
 
     Returns
     -------
-    objs: dict
+    objs: ``dict``
         Mapping from name in scope to object
     """
     if scope is None:
         stack_depth = 1 + stack_offset
         frame = sys._getframe(stack_depth)
-        objs = extract_objs(scope='hutch_python.db',
-                            skip_hidden=skip_hidden,
-                            stack_offset=stack_offset)
+        try:
+            objs = extract_objs(scope='hutch_python.db',
+                                skip_hidden=skip_hidden,
+                                stack_offset=stack_offset)
+        except ImportError:
+            objs = {}
         objs.update(frame.f_globals)
     else:
         if isinstance(scope, list):
@@ -128,12 +165,12 @@ def find_object(obj_path):
 
     Parameters
     ----------
-    obj_path: str
+    obj_path: ``str``
         String module path to an object
 
     Returns
     -------
-    obj: Object
+    obj: ``object``
         That object
     """
     parts = obj_path.split('.')
@@ -145,20 +182,23 @@ def find_object(obj_path):
 
 def find_class(class_path, check_defaults=True):
     """
+    Find a ``type`` object given a ``str``.
+
     Given a string class name, either return the matching built-in type or
     import the correct module and return the type.
 
     Parameters
     ----------
-    class_path: str
-        Built-in type name or import path e.g. ophyd.device.Device
+    class_path: ``str``
+        Built-in type name or import path e.g. ``ophyd.device.Device``
 
-    check_defaults: bool
-        If True, try checking for context for each module in CLASS_SEARCH_PATH
+    check_defaults: ``bool``
+        If ``True``, try checking inside each module in ``CLASS_SEARCH_PATH``
 
     Returns
     -------
-    cls: type
+    cls: ``type``
+        The class we found
     """
     try:
         if '.' in class_path:
@@ -178,9 +218,23 @@ def find_class(class_path, check_defaults=True):
 
 def strip_prefix(name, strip_text):
     """
-    For underscore-separated names:
-    strip_prefix('mfx_device', 'mfx') -> 'device'
-    strip_prefix('notmfx', 'mfx') -> 'notmfx'
+    Strip the first section of an underscore-separated ``name``.
+
+    If the first section matches the ``strip_text``, we'll remove it.
+    Otherwise, the object will remain unchanged.
+
+    Parameters
+    ----------
+    name: ``str``
+        underscore_separated_name to strip from
+
+    strip_text: ``str``
+        Text to strip from the name, if it matches the first segment
+
+    Returns
+    -------
+    stripped: ``str``
+        The ``name``, modified or unmodified.
     """
     if name.startswith(strip_text):
         return name[len(strip_text)+1:]
@@ -189,6 +243,14 @@ def strip_prefix(name, strip_text):
 
 
 def hutch_banner(hutch_name='Hutch '):
+    """
+    Display the hutch's banner.
+
+    Parameters
+    ----------
+    hutch_name: ``str``
+        Name of the hutch to produce a banner for.
+    """
     text = hutch_name + 'Python'
     f = pyfiglet.Figlet(font='big')
     banner = f.renderText(text)

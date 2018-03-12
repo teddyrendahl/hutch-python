@@ -1,3 +1,8 @@
+"""
+This module defines the command-line interface arguments for the
+``hutch-python`` script. It also provides utilities that are only used at
+startup.
+"""
 import os
 import sys
 import argparse
@@ -16,20 +21,37 @@ from .log_setup import (setup_logging, set_console_level, debug_mode,
 logger = logging.getLogger(__name__)
 opts_cache = {}
 
+# Define the parser
+parser = argparse.ArgumentParser(prog='hutch-python',
+                                 description='Launch LCLS Hutch Python')
+parser.add_argument('--cfg', required=False, default=None,
+                    help='Configuration yaml file')
+parser.add_argument('--debug', action='store_true', default=False,
+                    help='Start in debug mode')
+parser.add_argument('--sim', action='store_true', default=False,
+                    help='Run with simulated DAQ')
+parser.add_argument('--create', action='store', default=False,
+                    help='Create a new hutch deployment')
+parser.add_argument('script', nargs='?',
+                    help='Run a script instead of running interactively')
+
+# Append to module docs
+__doc__ += '\n::\n\n    ' + parser.format_help().replace('\n', '\n    ')
+
 
 def setup_cli_env():
+    """
+    Parse the user's arguments and gather the session's objects.
+
+    Inlcudes objects defined by `load_conf.load` as well as debug methods
+    from :mod:`log_setup`.
+
+    Returns
+    -------
+    objs: ``dict``
+        Mapping of object name ``str`` to object
+    """
     # Parse the user's arguments
-    parser = argparse.ArgumentParser(description='Launch LCLS Hutch Python')
-    parser.add_argument('--cfg', required=False, default=None,
-                        help='Configuration yaml file')
-    parser.add_argument('--debug', action='store_true', default=False,
-                        help='Start in debug mode')
-    parser.add_argument('--sim', action='store_true', default=False,
-                        help='Run with simulated DAQ')
-    parser.add_argument('--create', action='store', default=False,
-                        help='Create a new hutch deployment')
-    parser.add_argument('script', nargs='?',
-                        help='Run a script instead of running interactively')
     args = parser.parse_args()
 
     # Make sure the hutch's directory is in the path
@@ -73,7 +95,7 @@ def setup_cli_env():
 
 def hutch_ipython_embed(stack_offset=0):
     """
-    Make a shell, modify it, then run it
+    Make a shell, customize it, then run it
 
     Parameters
     ----------
@@ -117,8 +139,9 @@ def run_script(filename, stack_offset=0):
 
 def start_user():
     """
-    Based on what setup_cli has seen from the args, either start an ipython
-    session or run the given script.
+    Picks `hutch_ipython_embed` or `run_script` based on the args.
+
+    This is meant to be called directly in the ``hutch-python`` script.
     """
     script = opts_cache.get('script')
     if script is None:

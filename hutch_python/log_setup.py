@@ -1,3 +1,7 @@
+"""
+This module is used to set up and manipulate the ``logging`` configuration for
+utilities like debug mode.
+"""
 import os
 import time
 import logging
@@ -14,12 +18,14 @@ logger = logging.getLogger(__name__)
 
 def setup_logging(dir_logs=None):
     """
-    Sets up the logging module to make a properly configured logger using the
-    ``logging.yml`` configuration.
+    Sets up the ``logging`` configuration.
+
+    Uses ``logging.yml`` to define the config
+    and manages the ``log`` directory paths.
 
     Parameters
     ----------
-    dir_logs : str or Path, optional
+    dir_logs: ``str`` or ``Path``, optional
         Path to the log directory. If omitted, we won't use a log file.
     """
     with open(FILE_YAML, 'rt') as f:
@@ -54,6 +60,14 @@ def setup_logging(dir_logs=None):
 
 
 def get_console_handler():
+    """
+    Helper function to find the console ``StreamHandler``.
+
+    Returns
+    -------
+    console: ``StreamHandler``
+        The ``Handler`` that prints to the screen.
+    """
     root = logging.getLogger('')
     for handler in root.handlers:
         if handler.name == 'console':
@@ -62,16 +76,51 @@ def get_console_handler():
 
 
 def get_console_level():
+    """
+    Helper function to get the console's log level.
+
+    Returns
+    -------
+    level: ``int``
+        Compare to ``logging.INFO``, ``logging.DEBUG``, etc. to see which log
+        messages will be printed to the screen.
+    """
     handler = get_console_handler()
     return handler.level
 
 
 def set_console_level(level=logging.INFO):
+    """
+    Helper function to set the console's log level.
+
+    Parameters
+    ----------
+    level: ``int``
+        Likely one of ``logging.INFO``, ``logging.DEBUG``, etc.
+    """
     handler = get_console_handler()
     handler.level = level
 
 
 def debug_mode(debug=None):
+    """
+    Enable, disable, or check if we're in debug mode.
+
+    Debug mode means that the console's logging level is ``logging.DEBUG`` or
+    lower, which means we'll see all of the internal log messages that usually
+    are not sent to the screen.
+
+    Parameters
+    ----------
+    debug: ``bool``, optional
+        If provided, we'll turn debug mode on (``True``) or off (``False``)
+
+    Returns
+    -------
+    debug: ``bool`` or ``None``
+        Returned if `debug_mode` is called with no arguments. This is ``True`
+        if we're in debug mode, and ``False`` otherwise.
+    """
     if debug is None:
         level = get_console_level()
         return level <= logging.DEBUG
@@ -83,6 +132,16 @@ def debug_mode(debug=None):
 
 @contextmanager
 def debug_context():
+    """
+    Context manager for running a block of code in `debug_mode`.
+
+    For example:
+
+    .. code-block:: python
+
+        with debug_context():
+            buggy_function()
+    """
     old_level = get_console_level()
     debug_mode(True)
     yield
@@ -90,5 +149,19 @@ def debug_context():
 
 
 def debug_wrapper(f, *args, **kwargs):
+    """
+    Wrapper for running a function in `debug_mode`.
+
+    Parameters
+    ----------
+    f: ``function``
+        Wrapped function to call
+
+    *args:
+        Function arguments
+
+    **kwargs:
+        Function keyword arguments
+    """
     with debug_context():
         f(*args, **kwargs)
