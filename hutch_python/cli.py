@@ -2,6 +2,7 @@ import os
 import sys
 import argparse
 import logging
+import matplotlib.pyplot as plt
 
 from IPython.terminal.embed import InteractiveShellEmbed
 from cookiecutter.main import cookiecutter
@@ -90,6 +91,8 @@ def hutch_ipython_embed(stack_offset=0):
     # + stack_offset for extra levels between this call and user space
     shell = InteractiveShellEmbed.instance()
     init_ipython_logger(shell)
+    shell.enable_matplotlib()
+    plt.ion()
     shell(stack_depth=stack_depth)
 
 
