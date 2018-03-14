@@ -57,6 +57,10 @@ def setup_logging(dir_logs=None):
         config['handlers']['debug']['filename'] = str(path_log_file)
 
     logging.config.dictConfig(config)
+    # Disable parso logging because it spams DEBUG messages
+    # https://github.com/ipython/ipython/issues/10946
+    logging.getLogger('parso.python.diff').disabled = True
+    logging.getLogger('parso.cache').disabled = True
 
 
 def get_console_handler():
