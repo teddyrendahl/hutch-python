@@ -36,10 +36,8 @@ steps. In order, the startup sequence is as follows:
     using ``happi`` and ``psdm_qs_cli``.
   - Import ``User`` class from experiment file and instantiate ``User()``.
   - Attach all questionnaire objects to the ``User()`` object
-
-    - If there was no experiment file, make a ``SimpleNamespace()`` object
-      instead
-
+  - If there was no experiment file, make a ``SimpleNamespace()`` object
+    instead
   - Set this object to be ``x`` and ``user``.
 
 - Groups Load
