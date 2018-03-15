@@ -1,5 +1,6 @@
 import logging
 from importlib import import_module
+from types import SimpleNamespace
 
 from .utils import safe_load
 
@@ -24,8 +25,9 @@ def get_exp_objs(proposal, run):
 
     Returns
     -------
-    exp: ``dict``
-        ``dict(x=User())``
+    user: ``object`` or ``SimpleNamespace``
+        Either the user's class instantiated or a blank namespace for other
+        experiment-specific objects to be attached to.
     """
     logger.debug('get_exp_objs(%s, %s)', proposal, run)
     expname = proposal.lower() + str(run)
@@ -34,7 +36,7 @@ def get_exp_objs(proposal, run):
         module = import_module(module_name)
     except ImportError:
         logger.info('Skip missing experiment file %s.py', expname)
-        return {}
+        return SimpleNamespace()
     with safe_load(expname):
-        return dict(x=module.User())
-    return {}
+        return module.User()
+    return SimpleNamespace()
