@@ -228,8 +228,10 @@ def load_conf(conf, hutch_dir=None):
     if proposal is not None:
         qs_objs = get_qs_objs(proposal, run)
         cache(**qs_objs)
-        exp_objs = get_exp_objs(proposal, run)
-        cache(**exp_objs)
+        user = get_exp_objs(proposal, run)
+        for name, obj in qs_objs.items():
+            setattr(user, name, obj)
+        cache(x=user, user=user)
 
     # Default namespaces
     with safe_load('default groups'):

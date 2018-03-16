@@ -44,6 +44,7 @@ def test_auto_experiment(fake_curexp_script):
     objs = load_conf(dict(hutch='tst'))
     assert objs['inj_x'].run == '15'
     assert objs['inj_x'].proposal == 'LR12'
+    assert objs['x'].inj_x == objs['inj_x']
 
 
 def test_cannot_auto():
