@@ -34,6 +34,22 @@ def test_iterable_namespace():
     assert len(ns) == 3
 
 
+def test_count_leaves():
+    logger.debug('test_count_leaves')
+
+    ns0 = utils.IterableNamespace(a=utils.IterableNamespace())
+    ns1 = utils.IterableNamespace(a=1, b=utils.IterableNamespace())
+    ns2 = utils.IterableNamespace(a=utils.IterableNamespace(a=1),
+                                  b=utils.IterableNamespace(b=2))
+    ns3 = utils.IterableNamespace(a=1,
+                                  b=utils.IterableNamespace(a=1, b=2))
+
+    assert utils.count_ns_leaves(ns0) == 0
+    assert utils.count_ns_leaves(ns1) == 1
+    assert utils.count_ns_leaves(ns2) == 2
+    assert utils.count_ns_leaves(ns3) == 3
+
+
 def test_extract_objs():
     logger.debug('test_extract_objs')
     # Has no __all__ keyword

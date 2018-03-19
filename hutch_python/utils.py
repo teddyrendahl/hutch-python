@@ -94,6 +94,23 @@ class IterableNamespace(SimpleNamespace):
         return len(self.__dict__)
 
 
+def count_ns_leaves(namespace):
+    """
+    Count the number of objects in a nested `IterableNamespace`.
+
+    Given an `IterableNamespace` that contains other `IterableNamespace`
+    objects that may in themselves contain `IterableNamespace` objects,
+    determine how many non-`IterableNamespace` objects are in the tree.
+    """
+    count = 0
+    for obj in namespace:
+        if isinstance(obj, IterableNamespace):
+            count += count_ns_leaves(obj)
+        else:
+            count += 1
+    return count
+
+
 def extract_objs(scope=None, skip_hidden=True, stack_offset=0):
     """
     Return all objects with the ``scope``.

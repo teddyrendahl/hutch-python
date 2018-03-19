@@ -19,7 +19,8 @@ from .happi import get_happi_objs, get_lightpath
 from .namespace import class_namespace, metadata_namespace
 from .qs_load import get_qs_objs
 from .user_load import get_user_objs
-from .utils import get_current_experiment, safe_load, hutch_banner
+from .utils import (get_current_experiment, safe_load, hutch_banner,
+                    count_ns_leaves)
 
 logger = logging.getLogger(__name__)
 
@@ -240,7 +241,11 @@ def load_conf(conf, hutch_dir=None):
         if hutch is not None:
             meta = metadata_namespace(['beamline', 'stand'],
                                       scope='hutch_python.db')
-            cache(**meta.__dict__)
+            # Prune meta, remove branches with only one object
+            for name, space in meta.__dict__.items():
+                if count_ns_leaves(space) > 1:
+                    cache(**{name: space})
+
         default_class_namespace(object, 'all_objects', cache)
 
     # Write db.txt info file to the user's module
