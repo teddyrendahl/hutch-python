@@ -99,12 +99,12 @@ pw=pw
 @pytest.fixture(scope='function')
 def temporary_config():
     # Write to our configuration
-    with open('qs.cfg', '+w') as f:
+    with open('web.cfg', '+w') as f:
         f.write(cfg)
     # Allow the test to run
     yield
     # Remove the file
-    os.remove('qs.cfg')
+    os.remove('web.cfg')
 
 
 @pytest.fixture(scope='function')
