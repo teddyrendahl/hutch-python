@@ -55,7 +55,9 @@ def get_qs_objs(proposal, run):
         # launch the client via Kerberos
         cfg = ConfigParser()
         cfgs = cfg.read(['qs.cfg', '.qs.cfg',
-                         os.path.expanduser('~/.qs.cfg')])
+                         os.path.expanduser('~/.qs.cfg'),
+                         'web.cfg', '.web.cfg',
+                         os.path.expanduser('~/.web.cfg')])
         # Ws-auth
         if cfgs:
             user = cfg.get('DEFAULT', 'user', fallback=None)
