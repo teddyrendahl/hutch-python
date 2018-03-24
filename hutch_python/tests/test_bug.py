@@ -22,6 +22,7 @@ class FakeSession:
 
     def __init__(self):
         self.auth = None
+
     def post(self, url, json_dump):
         r = Response()
         r.status_code = 201

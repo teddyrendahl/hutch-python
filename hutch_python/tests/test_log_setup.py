@@ -51,6 +51,7 @@ def test_get_session_logfiles():
         assert all([log.startswith(debug_handler.baseFilename)
                     for log in get_session_logfiles()])
 
+
 def setup_queue_console():
     root_logger = logging.getLogger('')
     for handler in root_logger.handlers:

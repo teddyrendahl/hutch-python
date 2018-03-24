@@ -16,7 +16,6 @@ import yaml
 logger = logging.getLogger(__name__)
 
 
-
 def setup_logging(dir_logs=None):
     """
     Sets up the ``logging`` configuration.
