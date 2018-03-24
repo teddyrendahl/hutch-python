@@ -111,9 +111,9 @@ def get_text_from_editor():
         subprocess.call(['vim', f.name])
         # Read and clean the file
         f.seek(0)
-        text = ''.join([line for line in f.readlines()
+        text = ''.join([line.lstrip() for line in f.readlines()
                         if line and not line.lstrip().startswith('#')])
-        return textwrap.wrap(text, width=90)
+        return '\n'.join(textwrap.wrap(text, width=100))
 
 
 def report_bug(title=None, description=None, author=None,
