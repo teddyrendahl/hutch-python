@@ -2,6 +2,7 @@
 Automated Bug Reporting
 """
 import os
+import uuid
 import getpass
 import logging
 import textwrap
@@ -9,9 +10,13 @@ import tempfile
 import warnings
 import subprocess
 
+import requests
+import simplejson
 from IPython.core.history import HistoryAccessor
+from jinja2 import Environment, PackageLoader
 
 from .log_setup import get_session_logfiles
+from .constants import BUG_REPORT_PATH
 
 
 logger = logging.getLogger(__name__)
@@ -196,10 +201,54 @@ def report_bug(title=None, description=None, author=None,
     except RuntimeError:
         logger.warning("No debug RotatingFileHandler configured for session")
         logfiles = list()
-    return {'title': title, 'author': author, 'commands': commands,
-            'description': description, 'env': conda_env,
-            'logfiles': logfiles, 'output': captured_output,
-            'dev_pkgs': dev_pkgs}
+    # Save the report to JSON
+    return save_report({'title': title, 'author': author, 'commands': commands,
+                        'description': description, 'env': conda_env,
+                        'logfiles': logfiles, 'output': captured_output,
+                        'dev_pkgs': dev_pkgs})
+
+
+def save_report(report):
+    """
+    Ship the report to the bug report directory
+    """
+    path = os.path.join(BUG_REPORT_PATH, '{}.json'.format(str(uuid.uuid4())))
+    logger.info("Saving JSON representation of bug report %s", path)
+    simplejson.dump(report, open(path, 'w+'))
+    return path
+
+
+def post_to_github(path, user, pw=None, delete=True):
+    """
+    Load a saved report and post an issue to GitHub
+    """
+    report = simplejson.load(open(path, 'r'))
+    if not pw:
+        pw = getpass.getpass()
+    # Our url to create issues via POST
+    url = 'https://api.github.com/repos/teddyrendahl/Bug-Reports/issues'
+    # Create the body of the template
+    env = Environment(loader=PackageLoader('hutch_python'),
+                      trim_blocks=True, lstrip_blocks=True)
+    template = env.get_template('issue.template')
+    body = template.render(report)
+    # Requests session
+    session = requests.Session()
+    session.auth = (user, pw)
+    issue = {'title': report['title'],
+             'body': body,
+             'assignee': None,
+             'milestone': None,
+             'labels': []}  # TODO: Determine hutch to create issue for
+    # Post to GitHub
+    r = session.post(url, simplejson.dumps(issue))
+    if r.status_code == 201:
+        logger.info("Succesfully created GitHub issue")
+        if delete:
+            os.remove(path)
+    else:
+        logger.exception("Could not create GitHub issue. HTTP Status Code: %s",
+                         r.status_code)
 
 
 message = """\
