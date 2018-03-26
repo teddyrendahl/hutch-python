@@ -185,7 +185,13 @@ def report_bug(title=None, description=None, author=None,
             # Only select the last command by default
             prior_commands = 1
     # Grab specified number of commands
-    commands = get_last_n_commands(prior_commands)
+    try:
+        commands = get_last_n_commands(prior_commands)
+    # If the user somehow has no IPython history this is raised. A very rare
+    # occurence except for in Continuous Integration tests
+    except OSError:
+        logger.exception
+        commands = ''
     # Get a more specific description
     description = description or get_text_from_editor()
     # Find the author
