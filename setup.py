@@ -10,5 +10,5 @@ setup(name='hutch-python',
       include_package_data=True,
       description=('Launcher and Config Reader for '
                    'LCLS Interactive IPython Sessions'),
-      scripts=['bin/hutch-python']
+      scripts=['bin/hutch-python', 'bin/post-issues']
       )
