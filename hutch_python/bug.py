@@ -13,6 +13,8 @@ import subprocess
 import requests
 import simplejson
 from IPython.core.history import HistoryAccessor
+from IPython.core.magic import Magics, magics_class, line_magic
+from IPython.utils.io import capture_output
 from jinja2 import Environment, PackageLoader
 
 from .log_setup import get_session_logfiles
@@ -255,6 +257,20 @@ def post_to_github(path, user, pw=None, delete=True):
     else:
         logger.exception("Could not create GitHub issue. HTTP Status Code: %s",
                          r.status_code)
+
+
+@magics_class
+class BugMagics(Magics):
+
+    @line_magic
+    def report_bug(self, line):
+        # Enter both the DEBUG context and store the output of our command
+        with capture_output() as shell_output:
+            self.shell.run_cell(line)
+        # Show the capture output to the user
+        shell_output.show()
+        # Create the report
+        report_bug(prior_commands=1, captured_output=shell_output.stdout)
 
 
 message = """\
