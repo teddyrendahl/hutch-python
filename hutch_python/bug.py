@@ -1,5 +1,33 @@
 """
-Automated Bug Reporting
+One advantage of standardizing the logging system and startup scripts with
+hutch-python is programatically being able to gather information about the
+currrent Python environment. One common use case for much of this information
+is being able to diagnose software bugs after the fact if we are diligent about
+recording the pertinent information. The `hutch_python.bug.report_bug` command
+wraps much of this functionality up by asking a few simple questions of the
+operator and noting the current environment and log file. By the end of the
+function we should have:
+
+    * A one line description of the problem
+    * A more verbose explanation of the issue and how it affets operations
+    * A name to follow up with additional questions / closeout
+    * The commands entered by the operator
+    * The current CONDA environment
+    * Relevant logfiles written to by this Python session
+    * Capture output printed to the terminal
+    * Any packages installed in "development" mode
+
+This command is available as both an actual Python function and an IPython
+magic. The ladder allows you to pinpoint the exact function that is causing
+issues.
+
+.. code-block:: python
+
+   %report_bug my_buggy_function()
+
+If you call `report_bug` as a regular function you can specify a number of past
+commands you want to include in the overall report. This allows you to
+posthumously report issues without running the actual function again.
 """
 import os
 import uuid
@@ -160,17 +188,8 @@ def report_bug(title=None, description=None, author=None,
 
     Returns
     -------
-    report : dict
-        A dictionary with the keys:
-
-            * title
-            * description
-            * author
-            * commands
-            * env
-            * logfiles
-            * output
-            * dev_pkgs
+    path : str
+        A path to the created JSON file
     """
     logger.debug("Reporting a bug from the IPython terminal ...")
     if not title:
@@ -219,6 +238,25 @@ def report_bug(title=None, description=None, author=None,
 def save_report(report):
     """
     Ship the report to the bug report directory
+
+    Parameters
+    ----------
+    report : dict
+        A dictionary with the keys:
+
+            * title
+            * description
+            * author
+            * commands
+            * env
+            * logfiles
+            * output
+            * dev_pkgs
+
+    Returns
+    -------
+    path : str
+        A path to the created JSON file
     """
     path = os.path.join(BUG_REPORT_PATH, '{}.json'.format(str(uuid.uuid4())))
     logger.info("Saving JSON representation of bug report %s", path)
@@ -229,6 +267,22 @@ def save_report(report):
 def post_to_github(path, user, pw=None, delete=True):
     """
     Load a saved report and post an issue to GitHub
+
+    Parameters
+    ----------
+    path: str
+        Path to issue JSON file
+
+    user: str
+        Username of GitHub profile
+
+    pw : str, optional
+        Password for GitHub profile. This will be queried for if not provided
+        in the function call.
+
+    delete : bool, optional
+        Delete the JSON file after the GitHub issue has been created
+        succesfully
     """
     report = simplejson.load(open(path, 'r'))
     if not pw:
@@ -261,9 +315,11 @@ def post_to_github(path, user, pw=None, delete=True):
 
 @magics_class
 class BugMagics(Magics):
+    """Magics function for report_bug function"""
 
     @line_magic
     def report_bug(self, line):
+        """Creates a bug_report while running the given line"""
         # Enter both the DEBUG context and store the output of our command
         with capture_output() as shell_output:
             self.shell.run_cell(line)
