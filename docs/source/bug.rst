@@ -1,6 +1,6 @@
 bug.py
 ======
-Functionality associatted with bug reports
+Functionality associated with bug reports
 
 .. autosummary::
    :toctree: generated

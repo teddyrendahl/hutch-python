@@ -1,7 +1,7 @@
 """
 One advantage of standardizing the logging system and startup scripts with
-hutch-python is programatically being able to gather information about the
-currrent Python environment. One common use case for much of this information
+hutch-python is programmatically being able to gather information about the
+current Python environment. One common use case for much of this information
 is being able to diagnose software bugs after the fact if we are diligent about
 recording the pertinent information. The `hutch_python.bug.report_bug` command
 wraps much of this functionality up by asking a few simple questions of the
@@ -9,7 +9,7 @@ operator and noting the current environment and log file. By the end of the
 function we should have:
 
     * A one line description of the problem
-    * A more verbose explanation of the issue and how it affets operations
+    * A more verbose explanation of the issue and how it affects operations
     * A name to follow up with additional questions / closeout
     * The commands entered by the operator
     * The current CONDA environment
@@ -63,12 +63,13 @@ def get_current_environment():
 
     The environment name is gathered by first checking environment variable
     ``$CONDA_ENVNAME`` that is set by the hutch-python startup scripts. If for
-    whatever reason that is not available we check $CONDA_DEFAULT_ENV which is
-    set by Conda itself. The reason this is not relied on primarily is it has a
-    strange name and is entirely undocumented but seems to work effectively.
+    whatever reason that is not available we check ``$CONDA_DEFAULT_ENV`` which
+    is set by Conda itself. The reason this is not relied on primarily is it
+    has a strange name and is entirely undocumented but seems to work
+    effectively.
 
-    In addition the hutch-python startup script sets the PYTHONPATH to pick up
-    packages in "development" mode. The list of package names installed this
+    In addition the hutch-python startup script sets the ``PYTHONPATH`` to pick
+    up packages in "development" mode. The list of package names installed this
     way is found to help inform how the current Python environment differs from
     the enforced CONDA environment
 
@@ -168,7 +169,7 @@ def report_bug(title=None, description=None, author=None,
 
     Parameters
     ----------
-    title :str, optional
+    title : str, optional
         One sentence description of the issue
 
     description : str, optional
