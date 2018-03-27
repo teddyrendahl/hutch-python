@@ -34,12 +34,8 @@ posthumously report issues without running the actual function again.
 
 Issue Lifecyle
 ^^^^^^^^^^^^^^
-We can not expect that every operator on the beamline has a valid Github
-account. To get around this, when you call `report_bug` we dump a JSON
-description of the issue into a standard NFS directory. Then by a regular CRON
-job we will post this issue to https://github.com/pcdshub/Bug-Reports. This
-leads to a slight delay but also allows to have issues posted by persons
-without valid GitHub accounts. Once issues are received on GitHub the
-appropriate action will be made by the PCDS staff. This may mean a deeper look
-at the linked log files and/or creating a distilled issue or action item in a
-different repository. 
+After reporting the issue on the command line, an issue will be created at
+https://github.com/pcdshub/Bug-Reports. This will alert those subscribed to
+this repository via email about the current issue and appropriate action will
+be made by the PCDS staff. This may mean a deeper look at the linked log files
+and/or creating a distilled issue or action item in a different repository. 
