@@ -92,6 +92,8 @@ def get_last_n_commands(n):
     with warnings.catch_warnings():
         warnings.simplefilter('ignore', UserWarning)
         ha = HistoryAccessor()
+    # Parse the last n commands of the IPython history, joining printed
+    # messages
     return '\n'.join([cmd[2] for cmd in ha.get_tail(n, include_latest=True)])
 
 
@@ -295,7 +297,7 @@ class BugMagics(Magics):
     @line_magic
     def report_bug(self, line):
         """Creates a bug_report while running the given line"""
-        # Enter both the DEBUG context and store the output of our command
+        # Store the output of our command
         with capture_output() as shell_output:
             self.shell.run_cell(line)
         # Show the capture output to the user
