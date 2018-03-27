@@ -201,11 +201,7 @@ def report_bug(title=None, description=None, author=None,
     # Gather environment information
     conda_env, dev_pkgs = get_current_environment()
     # Gather logfiles
-    try:
-        logfiles = get_session_logfiles()
-    except RuntimeError:
-        logger.warning("No debug RotatingFileHandler configured for session")
-        logfiles = list()
+    logfiles = get_session_logfiles()
     # Save the report to JSON
     return save_report({'title': title, 'author': author, 'commands': commands,
                         'description': description, 'env': conda_env,
