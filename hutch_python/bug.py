@@ -114,7 +114,8 @@ def get_text_from_editor():
         f.write(message + '\n\n')
         f.flush()
         # Open the editor and allow the user to type
-        subprocess.call(['vim', f.name])
+        editor = os.environ.get('EDITOR', 'vim')
+        subprocess.call([editor, f.name])
         # Read and clean the file
         f.seek(0)
         text = ''.join([line.lstrip() for line in f.readlines()
