@@ -288,7 +288,7 @@ def post_to_github(path, user, pw=None, delete=True):
     if not pw:
         pw = getpass.getpass()
     # Our url to create issues via POST
-    url = 'https://api.github.com/repos/teddyrendahl/Bug-Reports/issues'
+    url = 'https://api.github.com/repos/pcdshub/Bug-Reports/issues'
     # Create the body of the template
     env = Environment(loader=PackageLoader('hutch_python'),
                       trim_blocks=True, lstrip_blocks=True)
