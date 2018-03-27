@@ -21,7 +21,6 @@ from jinja2 import Environment, PackageLoader
 from .log_setup import get_session_logfiles
 from .constants import BUG_REPORT_PATH
 
-
 logger = logging.getLogger(__name__)
 
 
