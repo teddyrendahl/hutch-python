@@ -185,7 +185,8 @@ def report_bug(title=None, description=None, author=None,
     # If the user somehow has no IPython history this is raised. A very rare
     # occurence except for in Continuous Integration tests
     except OSError:
-        logger.exception
+        logger.exception('Unable to retrieve commmands from the '
+                         'IPython session')
         commands = ''
     # Get a more specific description
     description = description or get_text_from_editor()
