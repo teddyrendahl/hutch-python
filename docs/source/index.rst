@@ -40,6 +40,7 @@
    :caption: Internal API Reference
    :hidden:
 
+   bug
    cache
    cli
    ipython_log
