@@ -1,13 +1,13 @@
 import os
 import logging
+import pathlib
 import tempfile
-
 import simplejson
 from requests import Response
 
 import hutch_python.bug
-from hutch_python.bug import post_to_github, report_bug
-
+from hutch_python.bug import (get_current_environment, post_to_github,
+                              report_bug)
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +27,23 @@ class FakeSession:
         r = Response()
         r.status_code = 201
         return r
+
+
+def test_get_current_environment():
+    logger.debug('test_get_current_environment')
+    # Development packages
+    fk_pkgs = ['one', 'two', 'three']
+    os.environ['CONDA_ENVNAME'] = 'test-environment'
+    with tempfile.TemporaryDirectory() as tmp:
+        logger.debug('Creating temp directory {}', tmp)
+        # Set a PythonPath
+        os.environ['PYTHONPATH'] = tmp
+        # Create fake packages
+        for pkg in fk_pkgs:
+            pathlib.Path(os.path.join(tmp, pkg)).touch()
+        env, pkgs = get_current_environment()
+        assert all([pkg in pkgs for pkg in fk_pkgs])
+        assert env == 'test-environment'
 
 
 def test_bug_report(monkeypatch):
