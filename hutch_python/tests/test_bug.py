@@ -7,7 +7,7 @@ from requests import Response
 
 import hutch_python.bug
 from hutch_python.bug import (get_current_environment, post_to_github,
-                              report_bug)
+                              report_bug, get_text_from_editor)
 
 logger = logging.getLogger(__name__)
 
@@ -77,3 +77,16 @@ def test_post_to_github(monkeypatch):
         post_to_github(tmp.name, 'user', pw='pw')
         fname = tmp.name
     assert not os.path.exists(fname)
+
+
+def test_get_text_from_editor(monkeypatch):
+    logger.debug("test_get_text_from_editor")
+
+    # Mock write function
+    def write_text(info):
+        open(info[1], 'w+').write(info[0])
+
+    # Patch in our fake write_text
+    monkeypatch.setattr(hutch_python.bug.subprocess, 'call', write_text)
+    os.environ['EDITOR'] = 'vim'
+    assert get_text_from_editor() == 'vim'
