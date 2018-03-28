@@ -66,6 +66,7 @@ def get_current_environment():
             dev_pkgs = os.listdir(dev)
         except FileNotFoundError:
             logger.debug("No dev folder found")
+            dev_pkgs = list()
     else:
         dev_pkgs = list()
     return env, dev_pkgs
