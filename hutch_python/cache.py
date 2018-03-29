@@ -67,6 +67,9 @@ class LoadCache:
                     + body.format(datetime.datetime.now()))
             for name, obj in self.objs.__dict__.items():
                 text += '{:<20} {}\n'.format(name, obj.__class__)
+            if not db_path.exists():
+                db_path.touch()
+                db_path.chmod(0o666)
             with db_path.open('w') as f:
                 f.write(text)
 
