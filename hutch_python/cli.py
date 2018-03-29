@@ -16,6 +16,7 @@ from pcdsdaq.sim import set_sim_mode as set_daq_sim
 from .constants import DIR_MODULE
 from .ipython_log import init_ipython_logger
 from .load_conf import load
+from .bug import BugMagics
 from .log_setup import (setup_logging, set_console_level, debug_mode,
                         debug_context, debug_wrapper)
 
@@ -115,6 +116,9 @@ def hutch_ipython_embed(stack_offset=0):
     init_ipython_logger(shell)
     shell.enable_matplotlib()
     plt.ion()
+    # Add our Bug Reporting Magic
+    logger.debug('Registering bug_report magics')
+    shell.register_magics(BugMagics)
     shell(stack_depth=stack_depth)
 
 

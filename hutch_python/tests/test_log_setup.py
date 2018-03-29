@@ -4,9 +4,10 @@ from pathlib import Path
 
 import pytest
 
-from hutch_python.log_setup import (setup_logging,
+from hutch_python.log_setup import (setup_logging, get_session_logfiles,
                                     get_console_handler, set_console_level,
-                                    debug_mode, debug_context, debug_wrapper)
+                                    debug_mode, debug_context, debug_wrapper,
+                                    get_debug_handler)
 
 from conftest import restore_logging
 
@@ -36,6 +37,19 @@ def test_console_handler(log_queue):
         setup_queue_console()
         handler = get_console_handler()
         assert isinstance(handler, QueueHandler)
+
+
+def test_get_session_logfiles():
+    logger.debug('test_get_session_logfiles')
+    with restore_logging():
+        # Create a parent log file
+        setup_logging(dir_logs=Path(__file__).parent / 'logs')
+        debug_handler = get_debug_handler()
+        debug_handler.doRollover()
+        debug_handler.doRollover()
+        assert len(get_session_logfiles()) == 3
+        assert all([log.startswith(debug_handler.baseFilename)
+                    for log in get_session_logfiles()])
 
 
 def setup_queue_console():

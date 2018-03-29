@@ -28,6 +28,9 @@ requirements:
     - lightpath >=0.3.0
     - cookiecutter >=1.6.0
     - matplotlib
+    - simplejson
+    - requests
+    - jinja2
 
 test:
   imports:
