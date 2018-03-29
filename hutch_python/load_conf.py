@@ -252,11 +252,22 @@ def load_conf(conf, hutch_dir=None):
 
     # Install Presets
     if hutch_dir is not None:
-        if proposal is None:
-            setup_preset_paths(beamline=hutch_dir / 'presets')
-        else:
-            setup_preset_paths(beamline=hutch_dir / 'presets',
-                               experiment=hutch_dir / 'presets' / proposal)
+        with safe_load('position presets'):
+            presets_dir = Path(hutch_dir) / 'presets'
+            beamline_presets = presets_dir / 'beamline'
+            preset_paths = [presets_dir, beamline_presets]
+            if proposal is not None:
+                experiment_presets = presets_dir / proposal
+                preset_paths.append(experiment_presets)
+            for path in preset_paths:
+                if not path.exists():
+                    path.mkdir()
+                    path.chmod(0o777)
+            if proposal is None:
+                setup_preset_paths(beamline=beamline_presets)
+            else:
+                setup_preset_paths(beamline=beamline_presets,
+                                   experiment=experiment_presets)
 
     # Write db.txt info file to the user's module
     try:
