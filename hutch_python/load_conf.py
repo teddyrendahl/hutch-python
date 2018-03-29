@@ -9,6 +9,7 @@ from pathlib import Path
 from bluesky import RunEngine
 from bluesky.callbacks.best_effort import BestEffortCallback
 from bluesky.utils import install_kicker
+from pcdsdevices.mv_interface import setup_preset_paths
 
 from . import plan_defaults
 from .cache import LoadCache
@@ -97,8 +98,9 @@ def load_conf(conf, hutch_dir=None):
         ``Path`` object that points to the hutch's launch directory. This is
         the directory that includes the ``experiments`` directory and a
         hutchname directory e.g. ``mfx``
-        If this is missing, we'll be unable to write the ``db.txt`` file or do
-        relative filepath database selection for ``happi``.
+        If this is missing, we'll be unable to write the ``db.txt`` file,
+        do relative filepath database selection for ``happi``,
+        or estable a preset positions directory.
 
     Returns
     ------
@@ -247,6 +249,14 @@ def load_conf(conf, hutch_dir=None):
                     cache(**{name: space})
 
         default_class_namespace(object, 'all_objects', cache)
+
+    # Install Presets
+    if hutch_dir is not None:
+        if proposal is None:
+            setup_preset_paths(beamline=hutch_dir / 'presets')
+        else:
+            setup_preset_paths(beamline=hutch_dir / 'presets',
+                               experiment=hutch_dir / 'presets' / proposal)
 
     # Write db.txt info file to the user's module
     try:
