@@ -100,7 +100,7 @@ def load_conf(conf, hutch_dir=None):
         hutchname directory e.g. ``mfx``
         If this is missing, we'll be unable to write the ``db.txt`` file,
         do relative filepath database selection for ``happi``,
-        or estable a preset positions directory.
+        or establish a preset positions directory.
 
     Returns
     ------
