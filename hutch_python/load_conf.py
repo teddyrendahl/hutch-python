@@ -257,7 +257,7 @@ def load_conf(conf, hutch_dir=None):
             beamline_presets = presets_dir / 'beamline'
             preset_paths = [presets_dir, beamline_presets]
             if proposal is not None:
-                experiment_presets = presets_dir / proposal
+                experiment_presets = presets_dir / (proposal + str(run))
                 preset_paths.append(experiment_presets)
             for path in preset_paths:
                 if not path.exists():
