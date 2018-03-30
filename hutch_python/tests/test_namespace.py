@@ -1,6 +1,9 @@
 import logging
 from types import SimpleNamespace
 
+from ophyd.device import Device, Component
+from ophyd.signal import Signal
+
 from hutch_python.namespace import class_namespace, metadata_namespace
 
 
@@ -20,6 +23,22 @@ def test_class_namespace():
     assert str_space.three == '3'
     assert func_space.four(1) == 4
     assert len(err_space) == 0
+
+
+class NormalDevice(Device):
+    apples = Component(Device)
+    oranges = Component(Signal)
+
+
+def test_class_namespace_subdevices():
+    logger.debug('test_class_namespace_subdevices')
+    scope = SimpleNamespace(tree=NormalDevice(name='tree'))
+    device_space = class_namespace(Device, scope)
+    assert isinstance(device_space.tree_apples, Device)
+    assert isinstance(device_space.tree, NormalDevice)
+    assert not hasattr(device_space, 'apples')
+    assert not hasattr(device_space, 'oranges')
+    assert not hasattr(device_space, 'tree_oranges')
 
 
 def test_metadata_namespace():
