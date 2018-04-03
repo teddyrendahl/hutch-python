@@ -208,14 +208,14 @@ def report_bug(title=None, description=None, author=None,
 
 def post_to_github(report, user=None, pw=None):
     """
-    Load a saved report and post an issue to GitHub
+    Post an issue report to GitHub
 
     Authentication can be done in three different ways depending on preference.
     First, the call can be made with the username and password specified. If
-    this is not done we first look for a configuration file `web.cfg` that has
+    this is not done we first look for a configuration file web.cfg that has
     a section labeled GitHub which looks like:
 
-    .. code::
+    .. code:: ini
 
         [GITHUB]
         user=username
