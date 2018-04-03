@@ -93,6 +93,9 @@ cfg = """\
 [DEFAULT]
 user=user
 pw=pw
+[GITHUB]
+user=github_user
+pw=github_pw
 """
 
 
