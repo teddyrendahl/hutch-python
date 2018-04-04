@@ -27,7 +27,7 @@ def get_qs_objs(proposal, run):
     configuration file is the standard ``.ini`` structure and should define the
     username and password like:
 
-    .. code::
+    .. code:: ini
 
         [DEFAULT]
         user = MY_USERNAME

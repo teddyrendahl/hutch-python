@@ -3,13 +3,13 @@ This module is used to both gather and report information for the purpose of
 identifying bugs
 """
 import os
-import uuid
 import getpass
 import logging
 import textwrap
 import tempfile
 import warnings
 import subprocess
+from configparser import ConfigParser, NoOptionError, NoSectionError
 
 import requests
 import simplejson
@@ -19,7 +19,6 @@ from IPython.utils.io import capture_output
 from jinja2 import Environment, PackageLoader
 
 from .log_setup import get_session_logfiles
-from .constants import BUG_REPORT_PATH
 
 logger = logging.getLogger(__name__)
 
@@ -124,8 +123,7 @@ def get_text_from_editor():
 
 
 def report_bug(title=None, description=None, author=None,
-               prior_commands=None,
-               captured_output=None):
+               prior_commands=None, captured_output=None, **kwargs):
     """
     Report a bug from the IPython session
 
@@ -163,10 +161,8 @@ def report_bug(title=None, description=None, author=None,
     captured_output : str, optional
         Captured output from the command
 
-    Returns
-    -------
-    path : str
-        A path to the created JSON file
+    kwargs:
+        Pass authentication information to :func:`.post_to_github`
     """
     logger.debug("Reporting a bug from the IPython terminal ...")
     if not title:
@@ -203,64 +199,77 @@ def report_bug(title=None, description=None, author=None,
     # Gather logfiles
     logfiles = get_session_logfiles()
     # Save the report to JSON
-    return save_report({'title': title, 'author': author, 'commands': commands,
-                        'description': description, 'env': conda_env,
-                        'logfiles': logfiles, 'output': captured_output,
-                        'dev_pkgs': dev_pkgs})
+    return post_to_github({'title': title, 'author': author,
+                           'commands': commands, 'description': description,
+                           'env': conda_env, 'logfiles': logfiles,
+                           'output': captured_output, 'dev_pkgs': dev_pkgs},
+                          **kwargs)
 
 
-def save_report(report):
+def post_to_github(report, user=None, pw=None):
     """
-    Ship the report to the bug report directory
+    Post an issue report to GitHub
+
+    Authentication can be done in three different ways depending on preference.
+    First, the call can be made with the username and password specified. If
+    this is not done we first look for a configuration file web.cfg that has
+    a section labeled GitHub which looks like:
+
+    .. code:: ini
+
+        [GITHUB]
+        user=username
+        pw=password
+
+    If this is not availble the username and password will be requested via the
+    command line.
 
     Parameters
     ----------
-    report : dict
-        A dictionary with the keys:
+    report: dict
+        A report dictionary with keys:
 
             * title
-            * description
             * author
             * commands
+            * description
             * env
             * logfiles
             * output
             * dev_pkgs
 
-    Returns
-    -------
-    path : str
-        A path to the created JSON file
-    """
-    path = os.path.join(BUG_REPORT_PATH, '{}.json'.format(str(uuid.uuid4())))
-    logger.info("Saving JSON representation of bug report %s", path)
-    simplejson.dump(report, open(path, 'w+'))
-    return path
-
-
-def post_to_github(path, user, pw=None, delete=True):
-    """
-    Load a saved report and post an issue to GitHub
-
-    Parameters
-    ----------
-    path: str
-        Path to issue JSON file
-
-    user: str
-        Username of GitHub profile
+    user: str, optional
+        Username of GitHub profile.
 
     pw : str, optional
         Password for GitHub profile. This will be queried for if not provided
         in the function call.
-
-    delete : bool, optional
-        Delete the JSON file after the GitHub issue has been created
-        succesfully
     """
-    report = simplejson.load(open(path, 'r'))
+    # Determine authentication method. No username or password search for
+    # configuration file with GITHUB section
+    if not user and not pw:
+        # Find configuration file
+        cfg = ConfigParser()
+        cfgs = cfg.read(['web.cfg', '.web.cfg',
+                         os.path.expanduser('~/.web.cfg'),
+                         'qs.cfg', '.qs.cfg',
+                         os.path.expanduser('~/.qs.cfg')])
+        if cfgs:
+            try:
+                user = cfg.get('GITHUB', 'user')
+                pw = cfg.get('GITHUB', 'pw')
+            except (NoOptionError, NoSectionError) as exc:
+                logger.debug('No GITHUB section in configuration file '
+                             'with user and pw entries')
+        # No valid configurations
+        else:
+            logger.debug('No "web.cfg" file found')
+    # Manually ask if we didn't get the username or password already
+    if not user:
+        user = input('Github Username: ')
     if not pw:
-        pw = getpass.getpass()
+        pw = getpass.getpass('Password for GitHub Account %s: '
+                             ''.format(user))
     # Our url to create issues via POST
     url = 'https://api.github.com/repos/pcdshub/Bug-Reports/issues'
     # Create the body of the template
@@ -280,8 +289,6 @@ def post_to_github(path, user, pw=None, delete=True):
     r = session.post(url, simplejson.dumps(issue))
     if r.status_code == 201:
         logger.info("Succesfully created GitHub issue")
-        if delete:
-            os.remove(path)
     else:
         logger.exception("Could not create GitHub issue. HTTP Status Code: %s",
                          r.status_code)
