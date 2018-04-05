@@ -264,10 +264,10 @@ def load_conf(conf, hutch_dir=None):
                     path.mkdir()
                     path.chmod(0o777)
             if proposal is None:
-                setup_preset_paths(beamline=beamline_presets)
+                setup_preset_paths(hutch=beamline_presets)
             else:
-                setup_preset_paths(beamline=beamline_presets,
-                                   experiment=experiment_presets)
+                setup_preset_paths(hutch=beamline_presets,
+                                   exp=experiment_presets)
 
     # Write db.txt info file to the user's module
     try:
