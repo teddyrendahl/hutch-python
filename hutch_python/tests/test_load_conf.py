@@ -3,6 +3,8 @@ import os.path
 from socket import gethostname
 from types import SimpleNamespace
 
+from pcdsdaq.sim import set_sim_mode
+
 import hutch_python.qs_load
 from hutch_python.load_conf import load, load_conf
 
@@ -13,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 def test_file_load():
     logger.debug('test_file_load')
+    set_sim_mode(True)
     objs = load(os.path.join(os.path.dirname(__file__), 'conf.yaml'))
     should_have = ('x', 'unique_device', 'calc_thing', 'daq', 'tst_beampath')
     err = '{} was overriden by a namespace'
@@ -35,6 +38,7 @@ def test_conf_empty():
 
 def test_conf_platform():
     logger.debug('test_conf_platform')
+    set_sim_mode(True)
     # No platform
     objs = load_conf({})
     assert objs['daq']._plat == 0
