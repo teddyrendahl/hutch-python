@@ -5,6 +5,7 @@ The file's specification can be found on the `yaml_files` page.
 import logging
 import yaml
 from pathlib import Path
+from socket import gethostname
 
 from bluesky import RunEngine
 from bluesky.callbacks.best_effort import BestEffortCallback
@@ -69,7 +70,9 @@ def load_conf(conf, hutch_dir=None):
       not provided, or the hutch name e.g. ``mfx.db``.
     - Create a ``RunEngine``, ``RE``
     - Import ``plan_defaults`` and include as ``p``, ``plans``
-    - Use ``hutch`` key to create a ``daq`` object with ``RE`` registered
+    - Create a ``daq`` object with ``RE`` registered, using ``daq_platform``
+      to define the ``platform`` argument if provided. The default value if
+      ``daq_platform`` was not defined is 0.
     - Use ``db`` key to load devices from the ``happi`` beamline database
       and create a ``hutch_beampath`` object from ``lightpath``
     - Use ``load`` key to bring up the user's ``beamline`` modules
@@ -161,6 +164,21 @@ def load_conf(conf, hutch_dir=None):
                          'load objects from questionnaire or experiment '
                          'file.'))
 
+    try:
+        platform_info = conf['daq_platform']
+        hostname = gethostname()
+        try:
+            daq_platform = platform_info[hostname]
+            logger.info('Selected %s daq platform: %s',
+                        hostname, daq_platform)
+        except KeyError:
+            daq_platform = platform_info['default']
+            logger.info('Selected default %s daq platform: %s',
+                        hutch, daq_platform)
+    except KeyError:
+        daq_platform = 0
+        logger.info('Selected default hutch-python daq platform: 0')
+
     # Display the banner
     if hutch is None:
         hutch_banner()
@@ -186,10 +204,9 @@ def load_conf(conf, hutch_dir=None):
     cache(p=plan_defaults)
 
     # Daq
-    if hutch is not None:
-        with safe_load('daq'):
-            daq_objs = get_daq_objs(hutch, RE)
-            cache(**daq_objs)
+    with safe_load('daq'):
+        daq_objs = get_daq_objs(daq_platform, RE)
+        cache(**daq_objs)
 
     # Happi db and Lightpath
     if db is not None:
