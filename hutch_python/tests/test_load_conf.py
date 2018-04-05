@@ -1,5 +1,6 @@
 import logging
 import os.path
+from socket import gethostname
 from types import SimpleNamespace
 
 import hutch_python.qs_load
@@ -30,6 +31,24 @@ def test_conf_empty():
     logger.debug('test_conf_empty')
     objs = load_conf({})
     assert len(objs) > 1
+
+
+def test_conf_platform():
+    logger.debug('test_conf_platform')
+    # No platform
+    objs = load_conf({})
+    assert objs['daq']._platform == 0
+    # Define default platform
+    objs = load_conf({'daq_platform': {'default': 1}})
+    assert objs['daq']._platform == 1
+    # Define host platform
+    hostname = gethostname()
+    objs = load_conf({'daq_platform': {hostname: 2}})
+    assert objs['daq']._platform == 2
+    # Define both
+    objs = load_conf({'daq_platform': {'default': 3,
+                                       hostname: 4}})
+    assert objs['daq']._platform == 4
 
 
 def test_skip_failures():
