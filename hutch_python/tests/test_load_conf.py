@@ -37,18 +37,18 @@ def test_conf_platform():
     logger.debug('test_conf_platform')
     # No platform
     objs = load_conf({})
-    assert objs['daq']._platform == 0
+    assert objs['daq']._plat == 0
     # Define default platform
     objs = load_conf({'daq_platform': {'default': 1}})
-    assert objs['daq']._platform == 1
+    assert objs['daq']._plat == 1
     # Define host platform
     hostname = gethostname()
     objs = load_conf({'daq_platform': {hostname: 2}})
-    assert objs['daq']._platform == 2
+    assert objs['daq']._plat == 2
     # Define both
     objs = load_conf({'daq_platform': {'default': 3,
                                        hostname: 4}})
-    assert objs['daq']._platform == 4
+    assert objs['daq']._plat == 4
 
 
 def test_skip_failures():
