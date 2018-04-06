@@ -21,7 +21,7 @@ def get_qs_objs(proposal, run):
     There are two possible methods of authentication to the
     ``QuestionnaireClient``, ``Kerberos`` and ``WS-Auth``. The first is simpler
     but is not possible for all users, we therefore search for a configuration
-    file named ``qs.cfg``, either hidden in the current directory or the users
+    file named ``web.cfg``, either hidden in the current directory or the users
     home directory. This should contain the username and password needed to
     authenticate into the ``QuestionnaireClient``. The format of this
     configuration file is the standard ``.ini`` structure and should define the
@@ -55,7 +55,9 @@ def get_qs_objs(proposal, run):
         # launch the client via Kerberos
         cfg = ConfigParser()
         cfgs = cfg.read(['qs.cfg', '.qs.cfg',
-                         os.path.expanduser('~/.qs.cfg')])
+                         os.path.expanduser('~/.qs.cfg'),
+                         'web.cfg', '.web.cfg',
+                         os.path.expanduser('~/.web.cfg')])
         # Ws-auth
         if cfgs:
             user = cfg.get('DEFAULT', 'user', fallback=None)

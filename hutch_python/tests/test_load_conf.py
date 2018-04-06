@@ -4,6 +4,7 @@ from socket import gethostname
 from types import SimpleNamespace
 
 from pcdsdaq.sim import set_sim_mode
+from pcdsdevices.mv_interface import Presets
 
 import hutch_python.qs_load
 from hutch_python.load_conf import load, load_conf
@@ -22,6 +23,7 @@ def test_file_load():
     for elem in should_have:
         assert not isinstance(objs[elem], SimpleNamespace), err.format(elem)
     assert 'tst' in objs
+    assert len(Presets._paths) == 2
 
 
 def test_no_file():
