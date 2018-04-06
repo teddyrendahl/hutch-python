@@ -112,3 +112,6 @@ conda-bld-tst
 
 # generated file
 hutch_python/tests/tst/db.txt
+
+# pytest
+.pytest_cache

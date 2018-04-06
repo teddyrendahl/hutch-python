@@ -4,6 +4,8 @@ This module provides utilities for grouping objects into namespaces.
 from inspect import isfunction
 import logging
 
+from ophyd import Device
+
 from .utils import (IterableNamespace, find_class, strip_prefix,
                     extract_objs)
 
@@ -22,6 +24,10 @@ def class_namespace(cls, scope=None):
         Every object attached to the given modules will be considered for the
         `class_namespace`. If ``scope`` is omitted, we'll check all objects
         loaded by ``hutch-python`` and everything in the caller's global frame.
+        If anything is an instance of ``ophyd.Device``, we'll also include the
+        object's components as part of the scope, using the ``name`` attribute
+        to identify them rather than the attribute name on the device. This
+        will continue recursively.
 
     Returns
     -------
@@ -40,6 +46,23 @@ def class_namespace(cls, scope=None):
                 logger.error(err.format(cls))
                 logger.debug(exc, exc_info=True)
                 return class_space
+
+    cache = set()
+
+    # Helper function to recursively add subdevices to the scope
+    def accumulate(obj, scope_objs, cache):
+        if obj not in cache:
+            cache.add(obj)
+            for comp_name in getattr(obj, 'component_names', []):
+                sub_obj = getattr(obj, comp_name)
+                accumulate(sub_obj, scope_objs, cache)
+            # Don't accidentally override
+            if obj.name not in scope_objs:
+                scope_objs[obj.name] = obj
+
+    for name, obj in scope_objs.copy().items():
+        if isinstance(obj, Device):
+            accumulate(obj, scope_objs, cache)
 
     for name, obj in scope_objs.items():
         include = False
