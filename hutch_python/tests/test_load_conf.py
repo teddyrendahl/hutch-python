@@ -1,7 +1,9 @@
 import logging
 import os.path
+from socket import gethostname
 from types import SimpleNamespace
 
+from pcdsdaq.sim import set_sim_mode
 from pcdsdevices.mv_interface import Presets
 
 import hutch_python.qs_load
@@ -14,6 +16,7 @@ logger = logging.getLogger(__name__)
 
 def test_file_load():
     logger.debug('test_file_load')
+    set_sim_mode(True)
     objs = load(os.path.join(os.path.dirname(__file__), 'conf.yaml'))
     should_have = ('x', 'unique_device', 'calc_thing', 'daq', 'tst_beampath')
     err = '{} was overriden by a namespace'
@@ -33,6 +36,25 @@ def test_conf_empty():
     logger.debug('test_conf_empty')
     objs = load_conf({})
     assert len(objs) > 1
+
+
+def test_conf_platform():
+    logger.debug('test_conf_platform')
+    set_sim_mode(True)
+    # No platform
+    objs = load_conf({})
+    assert objs['daq']._plat == 0
+    # Define default platform
+    objs = load_conf({'daq_platform': {'default': 1}})
+    assert objs['daq']._plat == 1
+    # Define host platform
+    hostname = gethostname()
+    objs = load_conf({'daq_platform': {hostname: 2}})
+    assert objs['daq']._plat == 2
+    # Define both
+    objs = load_conf({'daq_platform': {'default': 3,
+                                       hostname: 4}})
+    assert objs['daq']._plat == 4
 
 
 def test_skip_failures():
