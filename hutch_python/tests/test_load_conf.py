@@ -2,6 +2,8 @@ import logging
 import os.path
 from types import SimpleNamespace
 
+from pcdsdevices.mv_interface import Presets
+
 import hutch_python.qs_load
 from hutch_python.load_conf import load, load_conf
 
@@ -18,6 +20,7 @@ def test_file_load():
     for elem in should_have:
         assert not isinstance(objs[elem], SimpleNamespace), err.format(elem)
     assert 'tst' in objs
+    assert len(Presets._paths) == 2
 
 
 def test_no_file():
