@@ -128,6 +128,13 @@ def load_conf(conf, hutch_dir=None):
     except KeyError:
         hutch = None
         logger.info('Missing hutch from conf. Will skip DAQ.')
+
+    # Display the banner
+    if hutch is None:
+        hutch_banner()
+    else:
+        hutch_banner(hutch)
+
     try:
         db = conf['db']
         if isinstance(db, str):
@@ -180,12 +187,6 @@ def load_conf(conf, hutch_dir=None):
     except KeyError:
         daq_platform = 0
         logger.info('Selected default hutch-python daq platform: 0')
-
-    # Display the banner
-    if hutch is None:
-        hutch_banner()
-    else:
-        hutch_banner(hutch)
 
     # Make cache namespace
     cache = LoadCache((hutch or 'hutch') + '.db', hutch_dir=hutch_dir)
