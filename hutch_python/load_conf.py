@@ -174,12 +174,16 @@ def load_conf(conf, hutch_dir=None):
                          'file.'))
 
     try:
+        # This is an internal variable here for note-keeping. The ELog uses
+        # this to determine if we are in the secondary or primary DAQ mode
+        default_platform = True
         platform_info = conf['daq_platform']
         hostname = gethostname()
         try:
             daq_platform = platform_info[hostname]
             logger.info('Selected %s daq platform: %s',
                         hostname, daq_platform)
+            default_platform = False
         except KeyError:
             daq_platform = platform_info['default']
             logger.info('Selected default %s daq platform: %s',
