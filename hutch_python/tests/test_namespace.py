@@ -25,18 +25,25 @@ def test_class_namespace():
     assert len(err_space) == 0
 
 
+class Layer(Device):
+    potato = Component(Device)
+
+
 class NormalDevice(Device):
     apples = Component(Device)
     bananas = Component(Device, lazy=True)
     oranges = Component(Signal)
+    veggies = Component(Layer)
 
 
 def test_class_namespace_subdevices():
     logger.debug('test_class_namespace_subdevices')
     scope = SimpleNamespace(tree=NormalDevice(name='tree'))
     device_space = class_namespace(Device, scope)
-    assert isinstance(device_space.tree_apples, Device)
     assert isinstance(device_space.tree, NormalDevice)
+    assert isinstance(device_space.tree_apples, Device)
+    assert isinstance(device_space.tree_veggies, Layer)
+    assert isinstance(device_space.tree_veggies_potato, Device)
     assert not hasattr(device_space, 'apples')
     assert not hasattr(device_space, 'bananas')
     assert not hasattr(device_space, 'tree_bananas')
