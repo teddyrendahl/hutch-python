@@ -27,7 +27,7 @@ def class_namespace(cls, scope=None):
         If anything is an instance of ``ophyd.Device``, we'll also include the
         object's components as part of the scope, using the ``name`` attribute
         to identify them rather than the attribute name on the device. This
-        will continue recursively, skipping lazy components.
+        will continue recursively, skipping lazy and dynamic components.
 
     Returns
     -------
@@ -52,13 +52,13 @@ def class_namespace(cls, scope=None):
     # subdevices of the correct type
     cache = {}
 
-    def inspect_device_cls(device_cls, desired_cls, cache, attr_path=None):
+    def inspect_device_cls(device_cls, desired_cls, cache):
         """
         Recursive helper function.
 
         Gets a list of components of device_class that match desired_cls,
-        skipping lazy components. Uses cache to speed up and attr_path for
-        recursive calls.
+        skipping lazy components. Uses cache to improve speed for hutch-python
+        environments with large numbers of objects with the same class.
         """
         try:
             return cache[device_cls]
@@ -68,18 +68,19 @@ def class_namespace(cls, scope=None):
                 logger.debug('Checking subdevices for class %s', device_cls)
                 for cpt_name in device_cls.component_names:
                     cpt = getattr(device_cls, cpt_name)
-                    if not cpt.lazy:
-                        if attr_path is None:
-                            sub_attr_path = [cpt_name]
-                        else:
-                            sub_attr_path = attr_path + [cpt_name]
+                    if hasattr(cpt, 'cls') and not cpt.lazy:
                         if issubclass(cpt.cls, desired_cls):
-                            attrs.append(sub_attr_path)
+                            attrs.append([cpt_name])
                         subattrs = inspect_device_cls(cpt.cls, desired_cls,
-                                                      cache, sub_attr_path)
-                        attrs.extend(subattrs)
-                logger.debug('Class %s has matching subdevices %s',
-                             device_cls, attrs)
+                                                      cache)
+                        expand_subattrs = [[cpt_name] + a for a in subattrs]
+                        attrs.extend(expand_subattrs)
+                if attrs:
+                    logger.debug('Class %s has matching subdevices %s',
+                                 device_cls, attrs)
+                else:
+                    logger.debug('Class %s has no matching subdevices',
+                                 device_cls)
             cache[device_cls] = attrs
             return attrs
 
