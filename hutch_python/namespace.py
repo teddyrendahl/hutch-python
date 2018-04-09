@@ -27,7 +27,7 @@ def class_namespace(cls, scope=None):
         If anything is an instance of ``ophyd.Device``, we'll also include the
         object's components as part of the scope, using the ``name`` attribute
         to identify them rather than the attribute name on the device. This
-        will continue recursively.
+        will continue recursively, skipping lazy components.
 
     Returns
     -------
@@ -37,6 +37,7 @@ def class_namespace(cls, scope=None):
     class_space = IterableNamespace()
     scope_objs = extract_objs(scope=scope, stack_offset=1)
 
+    # Resolve str arguments for cls
     if isinstance(cls, str):
         if cls != 'function':
             try:
@@ -47,68 +48,64 @@ def class_namespace(cls, scope=None):
                 logger.debug(exc, exc_info=True)
                 return class_space
 
-    # Mapping from Device class to subdevices of the correct type
+    # Mapping from Device class to list of lists of attrs that lead us to
+    # subdevices of the correct type
     cache = {}
 
-    def isinstance_ext(obj, desired_cls):
+    def inspect_device_cls(device_cls, desired_cls, cache, attr_path=None):
         """
-        isinstance extended for functions because Python is dumb
+        Recursive helper function.
+
+        Gets a list of components of device_class that match desired_cls,
+        skipping lazy components. Uses cache to speed up and attr_path for
+        recursive calls.
         """
+        try:
+            return cache[device_cls]
+        except KeyError:
+            attrs = []
+            if issubclass(device_cls, Device):
+                logger.debug('Checking subdevices for class %s', device_cls)
+                for cpt_name in device_cls.component_names:
+                    cpt = getattr(device_cls, cpt_name)
+                    if not cpt.lazy:
+                        if attr_path is None:
+                            sub_attr_path = [cpt_name]
+                        else:
+                            sub_attr_path = attr_path + [cpt_name]
+                        if issubclass(cpt.cls, desired_cls):
+                            attrs.append(sub_attr_path)
+                        subattrs = inspect_device_cls(cpt.cls, desired_cls,
+                                                      cache, sub_attr_path)
+                        attrs.extend(subattrs)
+                logger.debug('Class %s has matching subdevices %s',
+                             device_cls, attrs)
+            cache[device_cls] = attrs
+            return attrs
+
+    for name, obj in scope_objs.items():
+        # Determine whether or not to include this object
         include = False
         if cls == 'function':
             if isfunction(obj):
                 include = True
         elif isinstance(obj, cls):
             include = True
-        return include
 
-    def inspect_device_cls(device_cls, desired_cls, attr_path=None):
-        """
-        Get a list of components of device_class that match desired_cls,
-        skipping lazy components.
-        """
-        attrs = []
-        if issubclass(device_cls, Device):
-            logger.debug('Checking subdevices for class %s', device_cls)
-            for cpt_name in device_cls.component_names:
-                cpt = getattr(device_cls, cpt_name)
-                if not cpt.lazy:
-                    if attr_path is None:
-                        sub_attr_path = [cpt_name]
-                    else:
-                        sub_attr_path = attr_path + [cpt_name]
-                    if issubclass(cpt.cls, desired_cls):
-                        attrs.append(sub_attr_path)
-                    subattrs = inspect_device_cls(cpt.cls, desired_cls,
-                                                  sub_attr_path)
-                    attrs.extend(subattrs)
-            logger.debug('Class %s has matching subdevices %s',
-                         device_cls, attrs)
-        return attrs
+        if include:
+            logger.debug('Adding %s to %s namespace', name, cls)
+            setattr(class_space, name, obj)
 
-    def add_to_space(obj, obj_name, desired_cls, cache, namespace):
-        """
-        Helper function to add one object to the namespace, and possibly
-        subdevices, or not.
-        """
-        if isinstance_ext(obj, desired_cls):
-            logger.debug('Adding %s to %s namespace', obj_name, desired_cls)
-            setattr(namespace, obj_name, obj)
+        # Determine whether or not to include any subdevices
         if isinstance(obj, Device):
-            obj_cls = obj.__class__
-            if obj_cls not in cache:
-                cache[obj_cls] = inspect_device_cls(obj_cls, desired_cls)
-            subdevice_attrs = cache[obj_cls]
+            subdevice_attrs = inspect_device_cls(obj.__class__, cls, cache)
             for attrs in subdevice_attrs:
                 device = obj
                 for attr in attrs:
                     device = getattr(device, attr)
                 logger.debug('Adding %s to %s namespace',
-                             device.name, desired_cls)
-                setattr(namespace, device.name, device)
-
-    for name, obj in scope_objs.items():
-        add_to_space(obj, name, cls, cache, class_space)
+                             device.name, cls)
+                setattr(class_space, device.name, device)
 
     return class_space
 
