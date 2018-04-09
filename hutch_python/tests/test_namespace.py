@@ -27,6 +27,7 @@ def test_class_namespace():
 
 class NormalDevice(Device):
     apples = Component(Device)
+    bananas = Component(Device, lazy=True)
     oranges = Component(Signal)
 
 
@@ -37,6 +38,8 @@ def test_class_namespace_subdevices():
     assert isinstance(device_space.tree_apples, Device)
     assert isinstance(device_space.tree, NormalDevice)
     assert not hasattr(device_space, 'apples')
+    assert not hasattr(device_space, 'bananas')
+    assert not hasattr(device_space, 'tree_bananas')
     assert not hasattr(device_space, 'oranges')
     assert not hasattr(device_space, 'tree_oranges')
 
