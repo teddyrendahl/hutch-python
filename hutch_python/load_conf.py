@@ -228,12 +228,12 @@ def load_conf(conf, hutch_dir=None):
     with safe_load('elog'):
         # Use the fact if we we used the default_platform or not to decide
         # whether we are in a specialty station or not
-        if not default_platform:
-            logger.info("Configuring ELog to post to secondary experiment")
-            kwargs = {'station': '1'}
-        else:
+        if default_platform:
             logger.debug("Using primary experiment ELog")
             kwargs = dict()
+        else:
+            logger.info("Configuring ELog to post to secondary experiment")
+            kwargs = {'station': '1'}
         cache(**{'elog': HutchELog.from_conf(hutch.upper(), **kwargs)})
 
     # Load user files
