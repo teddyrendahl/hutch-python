@@ -10,8 +10,8 @@ from socket import gethostname
 from bluesky import RunEngine
 from bluesky.callbacks.best_effort import BestEffortCallback
 from bluesky.utils import install_kicker
-from pcdsdevices.mv_interface import setup_preset_paths
 from elog import HutchELog
+from pcdsdevices.mv_interface import setup_preset_paths
 
 from . import plan_defaults
 from .cache import LoadCache
