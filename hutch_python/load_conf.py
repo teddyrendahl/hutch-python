@@ -234,7 +234,7 @@ def load_conf(conf, hutch_dir=None):
         else:
             logger.info("Configuring ELog to post to secondary experiment")
             kwargs = {'station': '1'}
-        cache(**{'elog': HutchELog.from_conf(hutch.upper(), **kwargs)})
+        cache(elog=HutchELog.from_conf(hutch.upper(), **kwargs))
 
     # Load user files
     if load is not None:
