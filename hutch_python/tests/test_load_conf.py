@@ -9,7 +9,7 @@ from pcdsdevices.mv_interface import Presets
 import hutch_python.qs_load
 from hutch_python.load_conf import load, load_conf
 
-from .conftest import QSBackend
+from .conftest import QSBackend, ELog
 
 logger = logging.getLogger(__name__)
 
@@ -55,6 +55,26 @@ def test_conf_platform():
     objs = load_conf({'daq_platform': {'default': 3,
                                        hostname: 4}})
     assert objs['daq']._plat == 4
+
+
+def test_elog(monkeypatch, temporary_config):
+    monkeypatch.setattr(hutch_python.load_conf, 'HutchELog', ELog)
+    # No platform
+    objs = load_conf({'hutch': 'TST'})
+    assert objs['elog'].station is None
+    # Check authentication worked correctly
+    assert objs['elog'].user == 'user'
+    assert objs['elog'].pw == 'pw'
+    # Define default platform
+    objs = load_conf({'daq_platform': {'default': 1},
+                      'hutch': 'TST'})
+    assert objs['elog'].station is None
+    # Define host platform
+    hostname = gethostname()
+    objs = load_conf({'daq_platform': {'default': 3,
+                                       hostname: 4},
+                      'hutch': 'TST'})
+    assert objs['elog'].station == '1'
 
 
 def test_skip_failures():

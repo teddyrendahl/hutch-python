@@ -8,6 +8,7 @@ from logging.handlers import QueueHandler
 from queue import Queue
 
 import pytest
+from elog import HutchELog
 
 import hutch_python.utils
 
@@ -116,3 +117,12 @@ def fake_curexp_script():
     hutch_python.utils.CUR_EXP_SCRIPT = 'echo {}lr1215'
     yield
     hutch_python.utils.CUR_EXP_SCRIPT = old_script
+
+
+class ELog(HutchELog):
+    """Pseudo ELog"""
+    def __init__(self, instrument, station=None, user=None, pw=None):
+        self.instrument = instrument
+        self.station = station
+        self.user = user
+        self.pw = pw

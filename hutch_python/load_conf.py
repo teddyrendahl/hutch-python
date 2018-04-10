@@ -10,6 +10,7 @@ from socket import gethostname
 from bluesky import RunEngine
 from bluesky.callbacks.best_effort import BestEffortCallback
 from bluesky.utils import install_kicker
+from elog import HutchELog
 from pcdsdevices.mv_interface import setup_preset_paths
 
 from . import plan_defaults
@@ -174,12 +175,16 @@ def load_conf(conf, hutch_dir=None):
                          'file.'))
 
     try:
+        # This is an internal variable here for note-keeping. The ELog uses
+        # this to determine if we are in the secondary or primary DAQ mode
+        default_platform = True
         platform_info = conf['daq_platform']
         hostname = gethostname()
         try:
             daq_platform = platform_info[hostname]
             logger.info('Selected %s daq platform: %s',
                         hostname, daq_platform)
+            default_platform = False
         except KeyError:
             daq_platform = platform_info['default']
             logger.info('Selected default %s daq platform: %s',
@@ -218,6 +223,18 @@ def load_conf(conf, hutch_dir=None):
             cache(**happi_objs)
             bp = get_lightpath(db, hutch)
             cache(**{"{}_beampath".format(hutch.lower()): bp})
+
+    # Elog
+    with safe_load('elog'):
+        # Use the fact if we we used the default_platform or not to decide
+        # whether we are in a specialty station or not
+        if default_platform:
+            logger.debug("Using primary experiment ELog")
+            kwargs = dict()
+        else:
+            logger.info("Configuring ELog to post to secondary experiment")
+            kwargs = {'station': '1'}
+        cache(elog=HutchELog.from_conf(hutch.upper(), **kwargs))
 
     # Load user files
     if load is not None:
