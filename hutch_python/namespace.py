@@ -27,7 +27,7 @@ def class_namespace(cls, scope=None):
         If anything is an instance of ``ophyd.Device``, we'll also include the
         object's components as part of the scope, using the ``name`` attribute
         to identify them rather than the attribute name on the device. This
-        will continue recursively.
+        will continue recursively, skipping lazy and dynamic components.
 
     Returns
     -------
@@ -37,6 +37,7 @@ def class_namespace(cls, scope=None):
     class_space = IterableNamespace()
     scope_objs = extract_objs(scope=scope, stack_offset=1)
 
+    # Resolve str arguments for cls
     if isinstance(cls, str):
         if cls != 'function':
             try:
@@ -47,33 +48,65 @@ def class_namespace(cls, scope=None):
                 logger.debug(exc, exc_info=True)
                 return class_space
 
-    cache = set()
+    # Mapping from Device class to list of lists of attrs that lead us to
+    # subdevices of the correct type
+    cache = {}
 
-    # Helper function to recursively add subdevices to the scope
-    def accumulate(obj, scope_objs, cache):
-        if obj not in cache:
-            cache.add(obj)
-            for comp_name in getattr(obj, 'component_names', []):
-                sub_obj = getattr(obj, comp_name)
-                accumulate(sub_obj, scope_objs, cache)
-            # Don't accidentally override
-            if obj.name not in scope_objs:
-                scope_objs[obj.name] = obj
+    def inspect_device_cls(device_cls, desired_cls, cache):
+        """
+        Recursive helper function.
 
-    for name, obj in scope_objs.copy().items():
-        if isinstance(obj, Device):
-            accumulate(obj, scope_objs, cache)
+        Gets a list of components of device_class that match desired_cls,
+        skipping lazy components. Uses cache to improve speed for hutch-python
+        environments with large numbers of objects with the same class.
+        """
+        try:
+            return cache[device_cls]
+        except KeyError:
+            attrs = []
+            if issubclass(device_cls, Device):
+                logger.debug('Checking subdevices for class %s', device_cls)
+                for cpt_name in device_cls.component_names:
+                    cpt = getattr(device_cls, cpt_name)
+                    if hasattr(cpt, 'cls') and not cpt.lazy:
+                        if issubclass(cpt.cls, desired_cls):
+                            attrs.append([cpt_name])
+                        subattrs = inspect_device_cls(cpt.cls, desired_cls,
+                                                      cache)
+                        expand_subattrs = [[cpt_name] + a for a in subattrs]
+                        attrs.extend(expand_subattrs)
+                if attrs:
+                    logger.debug('Class %s has matching subdevices %s',
+                                 device_cls, attrs)
+                else:
+                    logger.debug('Class %s has no matching subdevices',
+                                 device_cls)
+            cache[device_cls] = attrs
+            return attrs
 
     for name, obj in scope_objs.items():
+        # Determine whether or not to include this object
         include = False
         if cls == 'function':
             if isfunction(obj):
                 include = True
         elif isinstance(obj, cls):
             include = True
+
         if include:
+            logger.debug('Adding %s to %s namespace', name, cls)
             setattr(class_space, name, obj)
-            logger.debug('Include %s in cls=%s namespace', name, cls)
+
+        # Determine whether or not to include any subdevices
+        if isinstance(obj, Device):
+            subdevice_attrs = inspect_device_cls(obj.__class__, cls, cache)
+            for attrs in subdevice_attrs:
+                device = obj
+                for attr in attrs:
+                    device = getattr(device, attr)
+                logger.debug('Adding %s to %s namespace',
+                             device.name, cls)
+                setattr(class_space, device.name, device)
 
     return class_space
 

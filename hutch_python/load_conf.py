@@ -4,6 +4,7 @@ The file's specification can be found on the `yaml_files` page.
 """
 import logging
 import yaml
+from copy import copy
 from pathlib import Path
 from socket import gethostname
 
@@ -283,7 +284,8 @@ def load_conf(conf, hutch_dir=None):
                 if count_ns_leaves(space) > 1:
                     cache(**{name: space})
 
-        default_class_namespace(object, 'all_objects', cache)
+        all_objs = copy(cache.objs)
+        cache(a=all_objs, all_objects=all_objs)
 
     # Install Presets
     if hutch_dir is not None:
