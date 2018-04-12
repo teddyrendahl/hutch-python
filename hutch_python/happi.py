@@ -2,6 +2,7 @@ import logging
 
 import happi
 import lightpath
+from lightpath.config import beamlines
 from happi.loader import load_devices
 
 logger = logging.getLogger(__name__)
@@ -30,13 +31,30 @@ def get_happi_objs(db, hutch):
     """
     # Load the happi Client
     client = happi.Client(path=db)
-    # Assume we want hutch devices that are active
-    reqs = dict(beamline=hutch.upper(), active=True)
-    containers = client.search(**reqs)
-    if not containers:
-        logger.warning("No devices found in database for %s",
+    containers = list()
+    # Find upstream devices based on lightpath configuration
+    beamline_conf = beamlines.get(hutch.upper())
+    # Something strange is happening if there are no upstream devices
+    if not beamline_conf:
+        logger.warning("Unable to find lightpath for %s",
                        hutch.upper())
-        return dict()
+        beamline_conf = {}
+    # Add the complete hutch beamline
+    beamline_conf[hutch.upper()] = {}
+    # Base beamline
+    for beamline, conf in beamline_conf.items():
+        # Assume we want hutch devices that are active and in the bounds
+        # determined by the beamline configuration
+        reqs = dict(beamline=beamline, active=True,
+                    start=conf.get('start', 0),
+                    end=conf.get('end', None))
+        blc = client.search(**reqs)
+        # Add the beamline containers to the complete list
+        if blc:
+            containers.extend(blc)
+        else:
+            logger.warning("No devices found in database for %s",
+                           beamline.upper())
     # Instantiate the devices needed
     dev_namespace = load_devices(*containers, pprint=False)
     return dev_namespace.__dict__
