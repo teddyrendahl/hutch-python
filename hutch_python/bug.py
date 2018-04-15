@@ -206,7 +206,7 @@ def report_bug(title=None, description=None, author=None,
                           **kwargs)
 
 
-def post_to_github(report, user=None, pw=None):
+def post_to_github(report, user=None, pw=None, proxies=None):
     """
     Post an issue report to GitHub
 
@@ -245,6 +245,7 @@ def post_to_github(report, user=None, pw=None):
         Password for GitHub profile. This will be queried for if not provided
         in the function call.
     """
+    proxies = proxies or dict()
     # Determine authentication method. No username or password search for
     # configuration file with GITHUB section
     if not user and not pw:
@@ -280,6 +281,7 @@ def post_to_github(report, user=None, pw=None):
     # Requests session
     session = requests.Session()
     session.auth = (user, pw)
+    session.proxies.update(proxies)
     issue = {'title': report['title'],
              'body': body,
              'assignee': None,
