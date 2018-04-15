@@ -256,12 +256,21 @@ def post_to_github(report, user=None, pw=None, proxies=None):
                          'qs.cfg', '.qs.cfg',
                          os.path.expanduser('~/.qs.cfg')])
         if cfgs:
+            # Grab login information
             try:
                 user = cfg.get('GITHUB', 'user')
                 pw = cfg.get('GITHUB', 'pw')
             except (NoOptionError, NoSectionError) as exc:
                 logger.debug('No GITHUB section in configuration file '
                              'with user and pw entries')
+            # Grab proxy information if we will be using web.cfg
+            if (user or pw) and not proxies:
+                try:
+                    proxy_name = cfg.get('GITHUB', 'proxy')
+                    logger.debug("Using proxy host %s", proxy_name)
+                    proxies = {'https': proxy_name}
+                except NoOptionError:
+                    logger.debug("No proxy information found")
         # No valid configurations
         else:
             logger.debug('No "web.cfg" file found')
