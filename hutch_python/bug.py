@@ -284,7 +284,7 @@ def post_to_github(report, user=None, pw=None, proxies=None):
     if not user:
         user = input('Github Username: ')
     if not pw:
-        pw = getpass.getpass('Password for GitHub Account %s: '
+        pw = getpass.getpass('Password for GitHub Account {}: '
                              ''.format(user))
     # Our url to create issues via POST
     url = 'https://api.github.com/repos/pcdshub/Bug-Reports/issues'
