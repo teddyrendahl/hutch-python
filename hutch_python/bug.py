@@ -220,9 +220,12 @@ def post_to_github(report, user=None, pw=None, proxies=None):
         [GITHUB]
         user=username
         pw=password
+        proxy=http://proxyhost:port
 
-    If this is not availble the username and password will be requested via the
-    command line.
+    If this is not available the username and password will be requested via
+    the command line. The proxy specification allows posts from hosts without
+    direct connection to the internet. Please consult PCDS for information
+    about available hosts and ports.
 
     Parameters
     ----------
@@ -244,6 +247,9 @@ def post_to_github(report, user=None, pw=None, proxies=None):
     pw : str, optional
         Password for GitHub profile. This will be queried for if not provided
         in the function call.
+
+    proxies : dict, optional
+        Mapping of protocol to hostname and port.
     """
     proxies = proxies or dict()
     # Determine authentication method. No username or password search for
