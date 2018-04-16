@@ -206,7 +206,7 @@ def report_bug(title=None, description=None, author=None,
                           **kwargs)
 
 
-def post_to_github(report, user=None, pw=None):
+def post_to_github(report, user=None, pw=None, proxies=None):
     """
     Post an issue report to GitHub
 
@@ -220,9 +220,12 @@ def post_to_github(report, user=None, pw=None):
         [GITHUB]
         user=username
         pw=password
+        proxy=http://proxyhost:port
 
-    If this is not availble the username and password will be requested via the
-    command line.
+    If this is not available the username and password will be requested via
+    the command line. The proxy specification allows posts from hosts without
+    direct connection to the internet. Please consult PCDS for information
+    about available hosts and ports.
 
     Parameters
     ----------
@@ -244,7 +247,11 @@ def post_to_github(report, user=None, pw=None):
     pw : str, optional
         Password for GitHub profile. This will be queried for if not provided
         in the function call.
+
+    proxies : dict, optional
+        Mapping of protocol to hostname and port.
     """
+    proxies = proxies or dict()
     # Determine authentication method. No username or password search for
     # configuration file with GITHUB section
     if not user and not pw:
@@ -255,12 +262,21 @@ def post_to_github(report, user=None, pw=None):
                          'qs.cfg', '.qs.cfg',
                          os.path.expanduser('~/.qs.cfg')])
         if cfgs:
+            # Grab login information
             try:
                 user = cfg.get('GITHUB', 'user')
                 pw = cfg.get('GITHUB', 'pw')
             except (NoOptionError, NoSectionError) as exc:
                 logger.debug('No GITHUB section in configuration file '
                              'with user and pw entries')
+            # Grab proxy information if we will be using web.cfg
+            if (user or pw) and not proxies:
+                try:
+                    proxy_name = cfg.get('GITHUB', 'proxy')
+                    logger.debug("Using proxy host %s", proxy_name)
+                    proxies = {'https': proxy_name}
+                except NoOptionError:
+                    logger.debug("No proxy information found")
         # No valid configurations
         else:
             logger.debug('No "web.cfg" file found')
@@ -268,7 +284,7 @@ def post_to_github(report, user=None, pw=None):
     if not user:
         user = input('Github Username: ')
     if not pw:
-        pw = getpass.getpass('Password for GitHub Account %s: '
+        pw = getpass.getpass('Password for GitHub Account {}: '
                              ''.format(user))
     # Our url to create issues via POST
     url = 'https://api.github.com/repos/pcdshub/Bug-Reports/issues'
@@ -280,6 +296,7 @@ def post_to_github(report, user=None, pw=None):
     # Requests session
     session = requests.Session()
     session.auth = (user, pw)
+    session.proxies.update(proxies)
     issue = {'title': report['title'],
              'body': body,
              'assignee': None,

@@ -21,6 +21,7 @@ def user_input(prompt):
 class FakeSession:
     handle = None
     past_auth = dict()
+    proxies = dict()
 
     def __init__(self):
         pass
@@ -78,6 +79,8 @@ def test_bug_report(monkeypatch, temporary_config):
     bug = simplejson.load(open(tmp.name, 'r'))
     # Check GitHub authentication
     assert FakeSession.past_auth == {'github_user': 'github_pw'}
+    # Test proxy host information
+    assert FakeSession.proxies == {'https': 'http://proxyhost:11111'}
     # See that we catch the fake environment
     assert bug['title'].startswith('Please')
 
