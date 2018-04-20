@@ -14,7 +14,7 @@ HUTCH_COLORS = dict(
     xpp='38;5;40',
     xcs='38;5;93',
     mfx='38;5;202',
-    cxi='38;5;96',
+    cxi='38;5;196',
     mec='38;5;214')
 
 INPUT_LEVEL = 5
