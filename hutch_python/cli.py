@@ -60,6 +60,17 @@ def setup_cli_env():
     # Make sure the hutch's directory is in the path
     sys.path.insert(0, os.getcwd())
 
+    # Set up logging first
+    if args.cfg is None:
+        log_dir = None
+    else:
+        log_dir = os.path.join(os.path.dirname(args.cfg), 'logs')
+    setup_logging(dir_logs=log_dir)
+
+    # Debug mode next
+    if args.debug:
+        debug_mode(True)
+
     # Options that mean skipping the python environment
     if args.create:
         hutch = args.create
@@ -72,22 +83,11 @@ def setup_cli_env():
             # Fallback: pick current env
             base = str(Path(os.environ['CONDA_EXE']).parent.parent)
             env = os.environ['CONDA_DEFAULT_ENV']
-        logger.info('Creating hutch-python dir for hutch %s using %s %s',
-                    hutch, base, env)
+        logger.info(('Creating hutch-python dir for hutch %s using'
+                     ' base=%s env=%s'), hutch, base, env)
         cookiecutter(str(DIR_MODULE / 'cookiecutter'), no_input=True,
                      extra_context=dict(base=base, env=env, hutch=hutch))
         return {}
-
-    # Set up logging first
-    if args.cfg is None:
-        log_dir = None
-    else:
-        log_dir = os.path.join(os.path.dirname(args.cfg), 'logs')
-    setup_logging(dir_logs=log_dir)
-
-    # Debug mode next
-    if args.debug:
-        debug_mode(True)
 
     # Now other flags
     if args.sim:
