@@ -25,6 +25,8 @@ This module requires Python 3.6+ and the following utilities:
   for using the daq in scans
 - `pcdsdevices <https://github.com/pcdshub/pcdsdevices>`_
   for our Device abstraction layers
+- `elog <https://github.com/pcdshub/elog>`_
+  for posting to the LCLS experiment elogs
 - `happi <https://github.com/pcdshub/happi>`_
   to enable device loading from a happi database
 - `psdm_qs_cli <https://github.com/slaclab/psdm_qs_cli>`_
