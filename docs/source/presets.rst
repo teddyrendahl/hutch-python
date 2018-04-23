@@ -22,15 +22,22 @@ Move to a preset, and check that we got there:
 .. ipython::
    :verbatim:
 
+   # Check where we are
    In [1]: reflaser.wm()
    Out[1]: 10.0
-   In [2]: reflaser.wm_tt()
-   Out[2]: 32.1
-   In [3]: reflaser.mv_tt(wait=True)
-   In [4]: reflaser.wm()
-   Out[4]: 42.1
-   In [5]: reflaser.wm_tt()
-   Out[5]: 0.0
+
+   In [1]: reflaser.wm_tt()
+   Out[1]: 32.1
+
+   # Do the move and wait
+   In [1]: reflaser.mv_tt(wait=True)
+
+   # Check where we ended up
+   In [1]: reflaser.wm()
+   Out[1]: 42.1
+
+   In [1]: reflaser.wm_tt()
+   Out[1]: 0.0
 
 Two ways to revise a position:
 
