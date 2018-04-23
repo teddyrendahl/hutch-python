@@ -2,8 +2,8 @@
 Presets
 =======
 ``hutch-python`` provides a position presets system through the
-``pcdsdevices`` module.
-See the `presets documentation <https://pcdshub.github.io/pcdsdevices>`_
+``pcdsdevices`` module. See the
+`presets documentation <https://pcdshub.github.io/pcdsdevices/presets.html>`_
 for a full description. On this page we will go through examples
 and show where the presets are stored.
 
