@@ -22,15 +22,15 @@ Move to a preset, and check that we got there:
 .. ipython::
    :verbatim:
 
-   In  [1]: reflaser.wm()
-   Out [1]: 10.0
-   In  [2]: reflaser.wm_tt()
-   Out [2]: 32.1
-   In  [3]: reflaser.mv_tt(wait=True)
-   In  [4]: reflaser.wm()
-   Out [4]: 42.1
-   In  [5]: reflaser.wm_tt()
-   Out [5]: 0.0
+   In [1]: reflaser.wm()
+   Out[1]: 10.0
+   In [2]: reflaser.wm_tt()
+   Out[2]: 32.1
+   In [3]: reflaser.mv_tt(wait=True)
+   In [4]: reflaser.wm()
+   Out[4]: 42.1
+   In [5]: reflaser.wm_tt()
+   Out[5]: 0.0
 
 Two ways to revise a position:
 
@@ -58,18 +58,18 @@ Check all of the active presets:
 .. ipython::
    :verbatim:
 
-   In  [1]: reflaser.presets.positions
-   Out [1]: namespace(refl=20.0, tt=40.0)
+   In [1]: reflaser.presets.positions
+   Out[1]: namespace(refl=20.0, tt=40.0)
 
 Check the history of a single preset:
 
 .. ipython::
    :verbatim:
 
-   In  [1]: reflaser.presets.tt.history
-   Out [1]: {'23 Apr 2018 10:37:49': '   42.1000 Add timetool in pos',
-             '23 Apr 2018 10:38:00': '   41.2000 Fix timetool pos',
-             '23 Apr 2018 10:39:00': '   40.0000 Fix it again'}
+   In [1]: reflaser.presets.tt.history
+   Out[1]: {'23 Apr 2018 10:37:49': '   42.1000 Add timetool in pos',
+            '23 Apr 2018 10:38:00': '   41.2000 Fix timetool pos',
+            '23 Apr 2018 10:39:00': '   40.0000 Fix it again'}
 
 
 Preset Files
