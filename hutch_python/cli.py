@@ -3,20 +3,21 @@ This module defines the command-line interface arguments for the
 ``hutch-python`` script. It also provides utilities that are only used at
 startup.
 """
-import os
-import sys
+from pathlib import Path
 import argparse
 import logging
 import matplotlib.pyplot as plt
+import os
+import sys
 
 from IPython.terminal.embed import InteractiveShellEmbed
 from cookiecutter.main import cookiecutter
 from pcdsdaq.sim import set_sim_mode as set_daq_sim
 
-from .constants import DIR_MODULE
+from .bug import BugMagics
+from .constants import CONDA_BASE, DIR_MODULE
 from .ipython_log import init_ipython_logger
 from .load_conf import load
-from .bug import BugMagics
 from .log_setup import (setup_logging, set_console_level, debug_mode,
                         debug_context, debug_wrapper)
 
@@ -59,12 +60,6 @@ def setup_cli_env():
     # Make sure the hutch's directory is in the path
     sys.path.insert(0, os.getcwd())
 
-    # Options that mean skipping the python environment
-    if args.create:
-        cookiecutter(str(DIR_MODULE / 'cookiecutter'), no_input=True,
-                     extra_context=dict(hutch=args.create))
-        return {}
-
     # Set up logging first
     if args.cfg is None:
         log_dir = None
@@ -75,6 +70,25 @@ def setup_cli_env():
     # Debug mode next
     if args.debug:
         debug_mode(True)
+
+    # Options that mean skipping the python environment
+    if args.create:
+        hutch = args.create
+        envs_dir = CONDA_BASE / 'envs'
+        if envs_dir.exists():
+            # Pick most recent pcds release in our common env
+            base = str(CONDA_BASE)
+            path_obj = sorted(envs_dir.glob('pcds-*'))[-1]
+            env = path_obj.name
+        else:
+            # Fallback: pick current env
+            base = str(Path(os.environ['CONDA_EXE']).parent.parent)
+            env = os.environ['CONDA_DEFAULT_ENV']
+        logger.info(('Creating hutch-python dir for hutch %s using'
+                     ' base=%s env=%s'), hutch, base, env)
+        cookiecutter(str(DIR_MODULE / 'cookiecutter'), no_input=True,
+                     extra_context=dict(base=base, env=env, hutch=hutch))
+        return {}
 
     # Now other flags
     if args.sim:

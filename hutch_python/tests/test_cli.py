@@ -8,6 +8,7 @@ import pytest
 from hutch_python.cli import (setup_cli_env, hutch_ipython_embed, run_script,
                               start_user)
 from hutch_python.load_conf import load
+import hutch_python.cli
 
 from conftest import cli_args, restore_logging
 
@@ -49,9 +50,7 @@ def test_sim_arg():
             setup_cli_env()
 
 
-def test_create_arg():
-    logger.debug('test_create_arg')
-
+def create_arg_test(env=None):
     hutch = 'temp_create'
     test_dir = CFG_PATH.parent.parent.parent / hutch
     if test_dir.exists():
@@ -63,8 +62,33 @@ def test_create_arg():
 
     assert test_dir.exists()
 
+    # Make sure conf.yml is valid
     load(str(test_dir / 'conf.yml'))
+
+    # Make sure we picked the correct env
+    if env is not None:
+        with (test_dir / 'temp_createversion').open() as f:
+            lines = f.readlines()
+        has_env = False
+        for line in lines:
+            if 'CONDA_ENVNAME' in line:
+                has_env = True
+                assert env == line.split("'")[-2]
+                break
+        assert has_env
+
     shutil.rmtree(test_dir)
+
+
+def test_create_arg_dev():
+    logger.debug('test_create_arg_dev')
+    create_arg_test()
+
+
+def test_create_arg_prod(monkeypatch):
+    logger.debug('test_create_arg_prod')
+    monkeypatch.setattr(hutch_python.cli, 'CONDA_BASE', CFG_PATH.parent)
+    create_arg_test('pcds-2.0.0')
 
 
 def test_hutch_ipython_embed():
