@@ -78,7 +78,8 @@ def setup_cli_env():
         if envs_dir.exists():
             # Pick most recent pcds release in our common env
             base = str(CONDA_BASE)
-            env = sorted(envs_dir.glob('pcds-*'))[-1]
+            path_obj = sorted(envs_dir.glob('pcds-*'))[-1]
+            env = path_obj.name
         else:
             # Fallback: pick current env
             base = str(Path(os.environ['CONDA_EXE']).parent.parent)
