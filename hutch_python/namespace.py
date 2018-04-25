@@ -111,59 +111,43 @@ def class_namespace(cls, scope=None):
     return class_space
 
 
-def metadata_namespace(md, scope=None):
+def tree_namespace(scope=None):
     """
-    Create a ``namespace`` that accumulates objects and creates a tree based on
-    their metadata.
+    Create a ``namespace`` that accumulates objects and creates a tree.
+
+    This tree is a nested set of `IterableNamespace` objects based on the
+    object names as defined in scope. We will split on underscores and use the
+    splits to create the tree.
 
     Parameters
     ----------
-    md: ``list`` of ``str``
-        Each of the metadata categories to group objects by, in order from the
-        root of the tree to the leaves.
-
     scope: ``module``, ``namespace``, or ``list`` of these
         Every object attached to the given modules will be considered for the
-        `metadata_namespace`. If ``scope`` is omitted, we'll check all objects
+        `tree_namespace`. If ``scope`` is omitted, we'll check all objects
         loaded by ``hutch-python`` and everything in the caller's global frame.
 
     Returns
     -------
     namespace: `IterableNamespace`
     """
-    logger.debug('Create metadata_namespace md=%s, scope=%s', md, scope)
-    metadata_space = IterableNamespace()
+    logger.debug('Create tree_namespace scope=%s', scope)
+    tree_space = IterableNamespace()
     scope_objs = extract_objs(scope=scope, stack_offset=1)
 
     for name, obj in scope_objs.items():
-        # Collect obj metadata
-        if hasattr(obj, 'md'):
-            raw_keys = [getattr(obj.md, filt, None) for filt in md]
-        # Fallback: use_the_name
-        else:
-            if '_' not in name:
-                continue
-            name_keys = name.split('_')
-            raw_keys = name_keys[:len(md)]
-        # Abandon if no matches
-        if raw_keys[0] is None:
-            continue
-        # Force lowercase
-        keys = []
-        for key in raw_keys:
-            if isinstance(key, str):
-                keys.append(key.lower())
-            else:
-                keys.append(key)
-        # Add key to existing namespace branch, create new if needed
-        logger.debug('Add %s to metadata namespace', name)
-        upper_space = metadata_space
-        for key in keys:
-            if key is None:
-                break
-            name = strip_prefix(name, key)
-            if not hasattr(upper_space, key):
-                setattr(upper_space, key, IterableNamespace())
-            upper_space = getattr(upper_space, key)
-        setattr(upper_space, name, obj)
-    return metadata_space
+        logger.debug('Add %s to tree namespace', name)
+        upper_space = tree_space
+        keys = name.split('_')[:-1]
+
+        if keys:
+            # Add key to existing namespace branch, create new if needed
+            for key in keys:
+                name = strip_prefix(name, key)
+                # Force lowercase
+                key = key.lower()
+                if not hasattr(upper_space, key):
+                    setattr(upper_space, key, IterableNamespace())
+                upper_space = getattr(upper_space, key)
+            setattr(upper_space, name, obj)
+    logger.debug('Created tree namespace %s', tree_space)
+    return tree_space
