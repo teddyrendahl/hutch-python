@@ -39,8 +39,14 @@ class LoadCache:
         self.objs = IterableNamespace(**objs)
         self.hutch_dir = hutch_dir
         self.module = module
-        sys.modules[module] = self.objs
-        sys.modules['hutch_python.db'] = self.objs
+        self.spoof_module(module)
+        self.spoof_module('hutch_python.db')
+
+    def spoof_module(self, module_name):
+        """
+        Create a fake module that is actually self.objs
+        """
+        sys.modules[module_name] = self.objs
 
     def __call__(self, **objs):
         """
