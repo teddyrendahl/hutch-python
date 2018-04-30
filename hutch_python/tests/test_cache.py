@@ -19,3 +19,12 @@ def test_load_cache_integration():
     assert cache.objs.nums.obj1 == 1
     assert cache.objs.nums.obj2 == 2
     assert cache.objs.nums.obj3 == 3
+
+
+def test_load_cache_importable():
+    logger.debug('test_load_cache_importable')
+    cache = LoadCache('fake2.db')
+    cache(one=1)
+
+    import hutch_python.db
+    assert hutch_python.db.one == 1
