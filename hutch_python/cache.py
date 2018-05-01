@@ -3,6 +3,7 @@ This module is responsible for accumulating all loaded objects and making sure
 they are available in the ``xxx.db`` virtual module. It is used extensively in
 `load_conf.load_conf`.
 """
+from importlib import import_module
 from pathlib import Path
 import datetime
 import sys
@@ -46,6 +47,17 @@ class LoadCache:
         """
         Create a fake module that is actually self.objs
         """
+        # Check for real module that it needs to be slipped into
+        module_parts = module_name.split('.')
+        parent = '.'.join(module_parts[:-1])
+        if parent:
+            try:
+                parent_module = import_module(parent)
+                setattr(parent_module, module_parts[-1], self.objs)
+            except ImportError:
+                pass
+
+        # Place it here so it looks like we've already imported it
         sys.modules[module_name] = self.objs
 
     def __call__(self, **objs):
