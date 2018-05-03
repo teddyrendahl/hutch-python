@@ -59,7 +59,7 @@ class LoadCache:
                 setattr(parent_module, module_parts[-1], self.objs)
             except ImportError:
                 logger.debug('Skip patching parent module %s, does not import',
-                             parent_module, exc_info=True)
+                             parent, exc_info=True)
 
         # Place it here so it looks like we've already imported it
         sys.modules[module_name] = self.objs
