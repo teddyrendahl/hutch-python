@@ -6,9 +6,12 @@ they are available in the ``xxx.db`` virtual module. It is used extensively in
 from importlib import import_module
 from pathlib import Path
 import datetime
+import logging
 import sys
 
 from .utils import IterableNamespace
+
+logger = logging.getLogger(__name__)
 
 
 class LoadCache:
@@ -55,7 +58,8 @@ class LoadCache:
                 parent_module = import_module(parent)
                 setattr(parent_module, module_parts[-1], self.objs)
             except ImportError:
-                pass
+                logger.debug('Skip patching parent module %s, does not import',
+                             parent_module, exc_info=True)
 
         # Place it here so it looks like we've already imported it
         sys.modules[module_name] = self.objs
