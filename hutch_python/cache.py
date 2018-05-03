@@ -3,11 +3,15 @@ This module is responsible for accumulating all loaded objects and making sure
 they are available in the ``xxx.db`` virtual module. It is used extensively in
 `load_conf.load_conf`.
 """
+from importlib import import_module
 from pathlib import Path
 import datetime
+import logging
 import sys
 
 from .utils import IterableNamespace
+
+logger = logging.getLogger(__name__)
 
 
 class LoadCache:
@@ -39,8 +43,26 @@ class LoadCache:
         self.objs = IterableNamespace(**objs)
         self.hutch_dir = hutch_dir
         self.module = module
-        sys.modules[module] = self.objs
-        sys.modules['hutch_python.db'] = self.objs
+        self.spoof_module(module)
+        self.spoof_module('hutch_python.db')
+
+    def spoof_module(self, module_name):
+        """
+        Create a fake module that is actually self.objs
+        """
+        # Check for real module that it needs to be slipped into
+        module_parts = module_name.split('.')
+        parent = '.'.join(module_parts[:-1])
+        if parent:
+            try:
+                parent_module = import_module(parent)
+                setattr(parent_module, module_parts[-1], self.objs)
+            except ImportError:
+                logger.debug('Skip patching parent module %s, does not import',
+                             parent, exc_info=True)
+
+        # Place it here so it looks like we've already imported it
+        sys.modules[module_name] = self.objs
 
     def __call__(self, **objs):
         """
