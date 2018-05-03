@@ -133,6 +133,8 @@ def hutch_ipython_embed(stack_offset=0):
     # Add our Bug Reporting Magic
     logger.debug('Registering bug_report magics')
     shell.register_magics(BugMagics)
+    # Disable jedi completion, it's buggy
+    shell.Completer.use_jedi = False
     shell(stack_depth=stack_depth)
 
 
