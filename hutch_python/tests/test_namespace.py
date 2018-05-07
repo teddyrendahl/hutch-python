@@ -4,7 +4,7 @@ from types import SimpleNamespace
 from ophyd.device import Device, Component
 from ophyd.signal import Signal
 
-from hutch_python.namespace import class_namespace, metadata_namespace
+from hutch_python.namespace import class_namespace, tree_namespace
 
 
 logger = logging.getLogger(__name__)
@@ -51,46 +51,16 @@ def test_class_namespace_subdevices():
     assert not hasattr(device_space, 'tree_oranges')
 
 
-def test_metadata_namespace():
+def test_tree_namespace():
     logger.debug('test_metadata_namespace')
-    obj1 = SimpleNamespace()
-    obj2 = SimpleNamespace()
-    obj3 = SimpleNamespace()
-    obj4 = SimpleNamespace()
-    obj5 = SimpleNamespace()
-    obj6 = SimpleNamespace()
-    obj1.md = SimpleNamespace(beamline='MFX', stand='DIA')
-    obj2.md = SimpleNamespace(beamline='MFX', stand='DIA')
-    obj3.md = SimpleNamespace(beamline='MFX', stand='DG2')
-    obj4.md = SimpleNamespace(beamline='MFX')
-    obj5.md = SimpleNamespace(beamline='XPP', stand='SB2')
-    obj6.md = SimpleNamespace(beamline='MFX', stand='DIA')
-    scope = SimpleNamespace(mfx_dia_obj1=obj1, mfx_dia_obj2=obj2,
-                            mfx_dg2_obj3=obj3, mfx_obj4=obj4,
-                            xpp_sb2_obj5=obj5, hello=obj6)
-    md = ['beamline', 'stand']
-    namespaces = metadata_namespace(md, scope=scope)
+    scope = SimpleNamespace(mfx_dia_obj1=1, mfx_dia_obj2=2,
+                            mfx_dg2_obj3=3, mfx_obj4=4,
+                            xpp_sb2_obj5=5)
+    namespaces = tree_namespace(scope=scope)
     mfx = namespaces.mfx
     xpp = namespaces.xpp
-    assert mfx.dia.obj1 == obj1
-    assert mfx.dia.obj2 == obj2
-    assert mfx.dg2.obj3 == obj3
-    assert mfx.obj4 == obj4
-    assert xpp.sb2.obj5 == obj5
-    assert mfx.dia.hello == obj6
-
-
-def test_metadata_namespace_fallback():
-    logger.debug('test_metadata_namespace_fallback')
-    # objects without md, so use name
-    obj1 = SimpleNamespace()
-    obj2 = SimpleNamespace()
-    obj3 = SimpleNamespace()
-    scope = SimpleNamespace(mfx_dia_obj1=obj1, mfx_dia_obj2=obj2,
-                            mfx_dg2_obj3=obj3)
-    md = ['beamline', 'stand']
-    namespaces = metadata_namespace(md, scope=scope)
-    mfx = namespaces.mfx
-    assert mfx.dia.obj1 == obj1
-    assert mfx.dia.obj2 == obj2
-    assert mfx.dg2.obj3 == obj3
+    assert mfx.dia.obj1 == 1
+    assert mfx.dia.obj2 == 2
+    assert mfx.dg2.obj3 == 3
+    assert mfx.obj4 == 4
+    assert xpp.sb2.obj5 == 5
