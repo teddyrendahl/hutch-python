@@ -32,11 +32,13 @@ def get_exp_objs(proposal, run):
     logger.debug('get_exp_objs(%s, %s)', proposal, run)
     expname = proposal.lower() + str(run)
     module_name = 'experiments.' + expname
-    try:
-        module = import_module(module_name)
-    except ImportError:
-        logger.info('Skip missing experiment file %s.py', expname)
-        return SimpleNamespace()
     with safe_load(expname):
-        return module.User()
+        try:
+            module = import_module(module_name)
+            return module.User()
+        except ImportError as exc:
+            if module_name in exc.msg:
+                logger.info('Skip missing experiment file %s.py', expname)
+            else:
+                raise
     return SimpleNamespace()
