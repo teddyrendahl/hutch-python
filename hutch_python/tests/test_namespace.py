@@ -64,3 +64,10 @@ def test_tree_namespace():
     assert mfx.dg2.obj3 == 3
     assert mfx.obj4 == 4
     assert xpp.sb2.obj5 == 5
+
+def test_conflicting_name():
+    logger.debug('test_conflicting_name')
+    # This should be ok, but make sure the warning is covered
+    scope = SimpleNamespace(hutch_stand=SimpleNamespace(dev=1),
+                            hutch_stand_dev=2)
+    tree_namespace(scope=scope)
